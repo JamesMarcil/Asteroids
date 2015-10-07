@@ -1,5 +1,4 @@
 #pragma once
-#pragma comment(lib, "dxguid.lib")
 
 #include <d3d11.h>
 #include <d3dcompiler.h>
