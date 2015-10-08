@@ -1,5 +1,5 @@
 #include "Camera.h"
-#include <Windows.h>
+#include "InputManager.h"
 
 using namespace DirectX;
 
@@ -60,23 +60,37 @@ void Camera::Update(float dt)
     // Current speed
 	float speed = dt * 3;
 
+    InputManager* pManager = InputManager::instance();
+
     // Speed up when shift is pressed
-	if (GetAsyncKeyState(VK_SHIFT)) { speed *= 5; }
+    if( pManager->IsKeyDown( VK_SHIFT ) ){ speed += 5; }
 
     // Movement
-	if (GetAsyncKeyState('W') & 0x8000) { MoveRelative(0, 0, speed); }
-	if (GetAsyncKeyState('S') & 0x8000) { MoveRelative(0, 0, -speed); }
-	if (GetAsyncKeyState('A') & 0x8000) { MoveRelative(-speed, 0, 0); }
-	if (GetAsyncKeyState('D') & 0x8000) { MoveRelative(speed, 0, 0); }
-	if (GetAsyncKeyState('X') & 0x8000) { MoveAbsolute(0, -speed, 0); }
-	if (GetAsyncKeyState(' ') & 0x8000) { MoveAbsolute(0, speed, 0); }
+    if( pManager->IsKeyDown( 'W' ) ){ MoveRelative( 0, 0, speed ); }
+    if( pManager->IsKeyDown( 'S' ) ){ MoveRelative( 0, 0, -speed ); }
+    if( pManager->IsKeyDown( 'A' ) ){ MoveRelative( -speed, 0, 0 ); }
+    if( pManager->IsKeyDown( 'D' ) ){ MoveRelative( speed, 0, 0 ); }
+    if( pManager->IsKeyDown( 'X' ) ){ MoveAbsolute( 0, -speed, 0 ); }
+    if( pManager->IsKeyDown( ' ' ) ){ MoveAbsolute( 0, speed, 0 ); }
+
+    // Handle rotation
+	if ( pManager->IsMouseDown( MouseButton::LMB ) )
+	{
+        POINT   prevMousePos = pManager->GetPreviousMousePos(),
+                currMousePos = pManager->GetCurrentMousePos();
+
+		float xDiff = min( 5.0f, ( currMousePos.x - prevMousePos.x ) * 5.0f * dt );
+		float yDiff = min( 5.0f, ( currMousePos.y - prevMousePos.y ) * 5.0f * dt );
+
+		Rotate( yDiff, xDiff );
+	}
 
     // Check for reset
-    if (GetAsyncKeyState('R') & 0x8000)
+    if ( pManager->IsKeyDown( 'R' ) )
     {
         position = startPosition;
-        xRotation = 0;
-        xRotation = 0;
+        xRotation = 0.0f;
+        xRotation = 0.0f;
         XMStoreFloat4(&rotation, XMQuaternionIdentity());
     }
 

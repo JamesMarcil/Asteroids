@@ -12,6 +12,7 @@
 #include "DirectXGameCore.h"
 #include <WindowsX.h>
 #include <sstream>
+#include "InputManager.h"
 
 #pragma region Global Window Callback
 
@@ -345,6 +346,7 @@ int DirectXGameCore::Run()
 
 			// Standard game loop type stuff
 			CalculateFrameStats();
+			InputManager::instance()->Update( deltaTime );
 			UpdateScene(deltaTime, totalTime);
 			DrawScene(deltaTime, totalTime);			
 		}
@@ -555,7 +557,7 @@ LRESULT DirectXGameCore::ProcessMessage(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 	case WM_LBUTTONDOWN:
 	case WM_MBUTTONDOWN:
 	case WM_RBUTTONDOWN:
-		OnMouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        InputManager::instance()->ReceiveMouseDown( hwnd, wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 		return 0;
 
 	// Messages that correspond to mouse button being released while the cursor
@@ -563,13 +565,13 @@ LRESULT DirectXGameCore::ProcessMessage(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 	case WM_LBUTTONUP:
 	case WM_MBUTTONUP:
 	case WM_RBUTTONUP:
-		OnMouseUp(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        InputManager::instance()->ReceiveMouseUp( hwnd, wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 		return 0;
 
 	// Message that occurs while the mouse moves over the window or while
 	// we're currently capturing it
 	case WM_MOUSEMOVE:
-		OnMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        InputManager::instance()->ReceiveMouseMove( hwnd, wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 		return 0;
 	}
 

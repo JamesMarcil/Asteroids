@@ -36,12 +36,6 @@ public:
 	virtual void DrawScene(float deltaTime, float totalTime)   = 0;
 	virtual LRESULT ProcessMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	// Convenience methods for handling mouse input, since we
-	// can easily grab that information from OS-level messages
-	virtual void OnMouseDown(WPARAM btnState, int x, int y){ }
-	virtual void OnMouseUp(WPARAM btnState, int x, int y)  { }
-	virtual void OnMouseMove(WPARAM btnState, int x, int y){ }
-
 protected:
 	// Handles window and Direct3D initialization
 	bool InitMainWindow();

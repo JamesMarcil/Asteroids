@@ -24,6 +24,7 @@
 #include "MyDemoGame.h"
 #include "Vertex.h"
 #include "WICTextureLoader.h"
+#include "InputManager.h"
 
 // For the DirectX Math library
 using namespace DirectX;
@@ -232,18 +233,21 @@ void MyDemoGame::OnResize()
 void MyDemoGame::UpdateScene(float deltaTime, float totalTime)
 {
 	// Quit if the escape key is pressed
-	if (GetAsyncKeyState(VK_ESCAPE))
+	InputManager* pManager = InputManager::instance();
+	if ( pManager->IsKeyDown( VK_ESCAPE ) )
+    {
 		Quit();
+    }
 
-    
-    //entities[currentEntity]->SetPosition(sin(totalTime) * 2, 0, 0);
-    //entities[currentEntity]->SetRotation(0, totalTime, 0);
+    // Update the GameEntity position
     entities[currentEntity]->UpdateWorldMatrix();
 
     // Check for entity swap
-    bool currentSpacebar = (GetAsyncKeyState(VK_TAB) & 0x8000) != 0;
-    if (currentSpacebar && !prevSpaceBar)
+    bool currentSpacebar = pManager->IsKeyDown( VK_TAB );
+	if ( currentSpacebar && !prevSpaceBar )
+	{
         currentEntity = (currentEntity + 1) % entities.size();
+	}
     prevSpaceBar = currentSpacebar;
 
 	// Update the camera
@@ -314,62 +318,5 @@ void MyDemoGame::DrawScene(float deltaTime, float totalTime)
 	//  - Do this exactly ONCE PER FRAME
 	//  - Always at the very end of the frame
 	HR(swapChain->Present(0, 0));
-}
-
-#pragma endregion
-
-#pragma region Mouse Input
-
-// --------------------------------------------------------
-// Helper method for mouse clicking.  We get this information
-// from the OS-level messages anyway, so these helpers have
-// been created to provide basic mouse input if you want it.
-//
-// Feel free to add code to this method
-// --------------------------------------------------------
-void MyDemoGame::OnMouseDown(WPARAM btnState, int x, int y)
-{
-	// Save the previous mouse position, so we have it for the future
-	prevMousePos.x = x;
-	prevMousePos.y = y;
-
-	// Caputure the mouse so we keep getting mouse move
-	// events even if the mouse leaves the window.  we'll be
-	// releasing the capture once a mouse button is released
-	SetCapture(hMainWnd);
-}
-
-// --------------------------------------------------------
-// Helper method for mouse release
-//
-// Feel free to add code to this method
-// --------------------------------------------------------
-void MyDemoGame::OnMouseUp(WPARAM btnState, int x, int y)
-{
-	// We don't care about the tracking the cursor outside
-	// the window anymore (we're not dragging if the mouse is up)
-	ReleaseCapture();
-}
-
-// --------------------------------------------------------
-// Helper method for mouse movement.  We only get this message
-// if the mouse is currently over the window, or if we're 
-// currently capturing the mouse.
-//
-// Feel free to add code to this method
-// --------------------------------------------------------
-void MyDemoGame::OnMouseMove(WPARAM btnState, int x, int y)
-{
-	// Calc differences
-	if (btnState & 0x0001)
-	{
-		float xDiff = (x - prevMousePos.x) * 0.005f;
-		float yDiff = (y - prevMousePos.y) * 0.005f;
-		camera->Rotate(yDiff, xDiff);
-	}
-
-	// Save the previous mouse position, so we have it for the future
-	prevMousePos.x = x;
-	prevMousePos.y = y;
 }
 #pragma endregion

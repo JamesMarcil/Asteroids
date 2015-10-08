@@ -32,11 +32,6 @@ public:
 	void UpdateScene(float deltaTime, float totalTime);
 	void DrawScene(float deltaTime, float totalTime);
 
-	// For handing mouse input
-	void OnMouseDown(WPARAM btnState, int x, int y);
-	void OnMouseUp(WPARAM btnState, int x, int y);
-	void OnMouseMove(WPARAM btnState, int x, int y);
-
 private:
     // Input and mesh swapping
     bool prevSpaceBar;
@@ -66,8 +61,4 @@ private:
 
 	// Basic debug camera
 	Camera* camera;
-
-	// Keeps track of the old mouse position.  Useful for 
-	// determining how far the mouse moved in a single frame.
-	POINT prevMousePos;
 };

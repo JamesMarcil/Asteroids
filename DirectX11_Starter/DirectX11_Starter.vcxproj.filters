@@ -116,6 +116,9 @@
     <ClInclude Include="DXMacros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Keycodes.h">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\PixelShader.hlsl">

@@ -92,6 +92,7 @@
     <ClInclude Include="DXMacros.h" />
     <ClInclude Include="GameEntity.h" />
     <ClInclude Include="InputManager.h" />
+    <ClInclude Include="Keycodes.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MyDemoGame.h" />
