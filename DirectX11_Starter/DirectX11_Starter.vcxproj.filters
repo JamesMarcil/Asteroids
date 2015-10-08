@@ -113,6 +113,9 @@
     <ClInclude Include="Transform.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
+    <ClInclude Include="DXMacros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\PixelShader.hlsl">

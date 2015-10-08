@@ -89,6 +89,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraManager.h" />
+    <ClInclude Include="DXMacros.h" />
     <ClInclude Include="GameEntity.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="Material.h" />
