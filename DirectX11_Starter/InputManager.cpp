@@ -20,7 +20,7 @@ void InputManager::Update( float deltaTime )
     GetKeyboardState( keys );
 
     // Update state of KeyInfo vector
-    for( SHORT i = 0; i < 0xFF; ++i )
+    for( SHORT i = 0; i <= 0xFF; ++i )
     {
         KeyInfo& info = m_keys[ i ];
 
