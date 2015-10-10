@@ -27,9 +27,9 @@ private:
 
     // Deleted to prevent copying/moving
 	InputManager(const InputManager& rhs) = delete;
-	InputManager(const InputManager&& rhs) = delete;
+	InputManager(InputManager&& rhs) = delete;
 	InputManager& operator=(const InputManager& rhs) = delete;
-	InputManager&& operator=(const InputManager&& rhs) = delete;
+	InputManager& operator=(InputManager&& rhs) = delete;
 
 public:
     /*
