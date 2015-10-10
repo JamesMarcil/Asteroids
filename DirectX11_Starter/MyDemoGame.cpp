@@ -201,8 +201,8 @@ void MyDemoGame::LoadShaders()
 void MyDemoGame::CreateMatrices()
 {
 	// Set up the camera
-	camera = new Camera(0, 0, -5);
-	camera->UpdateProjectionMatrix(aspectRatio);
+	camera = new DebugCamera(0, 0, -5);
+	camera->SetAspectRatio(aspectRatio);
 }
 
 #pragma endregion
@@ -218,9 +218,9 @@ void MyDemoGame::OnResize()
 	// Handle base-level DX resize stuff
 	DirectXGameCore::OnResize();
 
-	if (camera != 0)
+	if(camera != nullptr)
 	{
-		camera->UpdateProjectionMatrix(aspectRatio);
+		camera->SetAspectRatio(aspectRatio);
 	}
 }
 #pragma endregion
@@ -272,10 +272,6 @@ void MyDemoGame::DrawScene(float deltaTime, float totalTime)
 		1.0f,
 		0);
 
-
-	
-
-    
     GameEntity* ge = entities[currentEntity];
     ID3D11Buffer* vb = ge->GetMesh()->GetVertexBuffer();
     ID3D11Buffer* ib = ge->GetMesh()->GetIndexBuffer();
@@ -287,8 +283,8 @@ void MyDemoGame::DrawScene(float deltaTime, float totalTime)
     deviceContext->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
 
     vertexShader->SetMatrix4x4("world", *ge->GetWorldMatrix());
-    vertexShader->SetMatrix4x4("view", camera->GetView());
-    vertexShader->SetMatrix4x4("projection", camera->GetProjection());
+    vertexShader->SetMatrix4x4("view", camera->GetViewMatrix());
+    vertexShader->SetMatrix4x4("projection", camera->GetProjectionMatrix());
 
     // Pass in some light data to the pixel shader
     pixelShader->SetFloat3("DirLightDirection", XMFLOAT3(1, 1, 1));
@@ -312,7 +308,6 @@ void MyDemoGame::DrawScene(float deltaTime, float totalTime)
     // Finally do the actual drawingw
     deviceContext->DrawIndexed(ge->GetMesh()->GetIndexCount(), 0, 0);
    
-
 	// Present the buffer
 	//  - Puts the image we're drawing into the window so the user can see it
 	//  - Do this exactly ONCE PER FRAME

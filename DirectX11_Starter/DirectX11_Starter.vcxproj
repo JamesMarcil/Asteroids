@@ -75,6 +75,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CameraManager.cpp" />
+    <ClCompile Include="DebugCamera.cpp" />
     <ClCompile Include="GameEntity.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Material.cpp" />
@@ -89,6 +90,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraManager.h" />
+    <ClInclude Include="DebugCamera.h" />
     <ClInclude Include="DXMacros.h" />
     <ClInclude Include="GameEntity.h" />
     <ClInclude Include="InputManager.h" />

@@ -5,7 +5,7 @@
 #include "SimpleShader.h"
 
 #include "Mesh.h"
-#include "Camera.h"
+#include "DebugCamera.h"
 #include "GameEntity.h"
 
 #include <vector>

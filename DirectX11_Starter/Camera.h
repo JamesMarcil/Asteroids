@@ -1,38 +1,109 @@
-#pragma once
-#include <DirectXMath.h>
+#ifndef CAMERA_H
+#define CAMERA_H
 
+// DirectX
+#include <DirectXMath.h>
 
 class Camera
 {
-public:
-	Camera(float x, float y, float z);
-	~Camera();
+private:
+	DirectX::XMFLOAT3 m_position;							// The current position
+	DirectX::XMFLOAT4 m_rotation;							// The rotation quaternion
+	float m_xRotation, m_yRotation;							// x and y rotation components
 
-    // Transformations
+	DirectX::XMFLOAT4X4 m_viewMatrix, m_projectionMatrix;	// The View and Projection matrices
+
+	float m_fov, m_aspectRatio, m_nearPlane, m_farPlane;	// Projection matrix values
+
+	/*
+	 *	Recalculate the View matrix based on the current position and rotation.
+	 */
+	void RecalculateViewMatrix();
+
+protected:
+	float m_moveSpeed, m_rotationSpeed;						// Camera's movement and rotation speeds				
+
+public:
+	// Public Constants
+	const static float DEFAULT_FOV;
+	const static float DEFAULT_ASPECT_RATIO;
+	const static float DEFAULT_NEAR_PLANE;
+	const static float DEFAULT_FAR_PLANE;
+	const static float DEFAULT_MOVE_SPEED;
+	const static float DEFAULT_ROTATION_SPEED;
+
+	/*
+	 *	Construct an instance of the Camera at the origin.
+	 */
+	Camera();
+
+	/*
+	 *	Construct an instance of the Camera at the provided (x,y,z) position.
+	 */
+	Camera(float x, float y, float z);
+
+	/*
+	 * Default Destructor
+	 */
+	virtual ~Camera();
+
+    /*
+	 *	Move the Camera relative to its forward direction.
+	 *	@param	x		Distance in the x-coordinate.
+	 *	@param	y		Distance in the y-coordinate.
+	 *	@param	z		Distance in the z-coordinate.
+	 */
 	void MoveRelative(float x, float y, float z);
+
+	/*
+	 *	Move the Camera in world coordinates.
+	 *	@param	x		Distance in the x-coordinate.
+	 *	@param	y		Distance in the y-coordinate.
+	 *	@param	z		Distance in the z-coordinate.
+	 */
     void MoveAbsolute(float x, float y, float z);
+
+	/*
+	 *	Rotate the Camera along the x and y coordinate axes.
+	 *	@param	x		Amount to rotate around the x-axis (in radians).
+	 *	@param	y		Amount to rotate around the y-axis (in radains).
+	 */
 	void Rotate(float x, float y);
 
-    // Updating
-	void Update(float dt);
-	void UpdateViewMatrix();
-	void UpdateProjectionMatrix(float aspectRatio);
+    /*
+	 *	Update function to be provided by the child class.
+	 *	@param	dt		The delta time value this frame.
+	 */
+	virtual void Update(float dt) = 0;
 
-    // Getters
-	DirectX::XMFLOAT3 GetPosition() { return position; }
-	DirectX::XMFLOAT4X4 GetView() { return viewMatrix; }
-	DirectX::XMFLOAT4X4 GetProjection() { return projMatrix; }
+	/*
+	 *	Recalculate the Perspective projection based on the provided FOV, aspect ratio, near plane, and far plane.
+	 *	@param	fov			The field-of-view angle (in radians).
+	 *	@param	aspectRatio	The aspect ratio.
+	 *  @param	nearPlane	The distance to the near plane.
+	 *	@param	farPlane	The distance to the far plane.
+	 */
+	void UpdateProjectionMatrix(float fov, float aspectRatio, float nearPlane, float farPlane);
 
-private:
-    // Camera matrices
-	DirectX::XMFLOAT4X4 viewMatrix;
-	DirectX::XMFLOAT4X4 projMatrix;
+	// Getters
+	const	DirectX::XMFLOAT3&		GetPosition()			const { return m_position; }
+	const	DirectX::XMFLOAT4&		GetRotation()			const { return m_rotation; }
+	const	DirectX::XMFLOAT4X4&	GetViewMatrix()			const { return m_viewMatrix; }
+	const	DirectX::XMFLOAT4X4&	GetProjectionMatrix()	const { return m_projectionMatrix; }
+			float					GetFOV()				const { return m_fov; }
+			float					GetAspectRatio()		const { return m_aspectRatio; }
+			float					GetNearPlane()			const { return m_nearPlane; }
+			float					GetFarPlane()			const { return m_farPlane; }
+			float					GetMovementSpeed()		const { return m_moveSpeed; }
+			float					GetRotationSpeed()		const { return m_rotationSpeed; }
 
-    // Transformations
-    DirectX::XMFLOAT3 startPosition;
-	DirectX::XMFLOAT3 position;
-	DirectX::XMFLOAT4 rotation;
-	float xRotation;
-	float yRotation;
+	// Setters
+	void SetFOV(float fov);
+	void SetAspectRatio(float aspectRatio);
+	void SetNearPlane(float nearPlane);
+	void SetFarPlane(float farPlane);
+	void SetMovementSpeed(float movementSpeed);
+	void SetRotationSpeed(float rotationSpeed);
 };
 
+#endif

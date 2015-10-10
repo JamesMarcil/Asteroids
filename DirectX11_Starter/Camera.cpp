@@ -1,125 +1,171 @@
 #include "Camera.h"
-#include "InputManager.h"
 
 using namespace DirectX;
 
-// Creates a camera at the specified position
-Camera::Camera(float x, float y, float z)
-{
-	position = XMFLOAT3(x, y, z);
-    startPosition = XMFLOAT3(x, y, z);
-	XMStoreFloat4(&rotation, XMQuaternionIdentity());
-	xRotation = 0;
-	yRotation = 0;
+const float Camera::DEFAULT_FOV = 0.25f * XM_PI;
+const float Camera::DEFAULT_ASPECT_RATIO = 4.0f / 3.0f;
+const float Camera::DEFAULT_NEAR_PLANE = 0.1f;
+const float Camera::DEFAULT_FAR_PLANE = 100.0f;
+const float Camera::DEFAULT_MOVE_SPEED = 5.0f;
+const float Camera::DEFAULT_ROTATION_SPEED = 5.0f;
 
-	XMStoreFloat4x4(&viewMatrix, XMMatrixIdentity());
-	XMStoreFloat4x4(&projMatrix, XMMatrixIdentity());
+/*
+ *	Construct an instance of the Camera at the provided (x,y,z) position.
+ */
+Camera::Camera(float x, float y, float z)
+	: m_xRotation(0.0f), m_yRotation(0.0f), m_moveSpeed(Camera::DEFAULT_MOVE_SPEED), m_rotationSpeed(Camera::DEFAULT_ROTATION_SPEED)
+{
+	m_position = XMFLOAT3( x, y, z );
+	m_rotation = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+
+	RecalculateViewMatrix();
+	UpdateProjectionMatrix(Camera::DEFAULT_FOV, Camera::DEFAULT_ASPECT_RATIO, Camera::DEFAULT_NEAR_PLANE, Camera::DEFAULT_FAR_PLANE);
 }
 
-// Nothing to really do
-Camera::~Camera()
-{ }
+/*
+ *	Construct an instance of the Camera at the origin.
+ */
+Camera::Camera() : Camera(0.0f, 0.0f, 0.0f) {}
 
+/*
+ * Default Destructor
+ */
+Camera::~Camera() { /* Nothing to do. */ }
 
-// Moves the camera relative to its orientation
+#pragma region Movement functions
+
+/*
+ *	Move the Camera relative to its forward direction.
+ *	@param	x		Distance in the x-coordinate.
+ *	@param	y		Distance in the y-coordinate.
+ *	@param	z		Distance in the z-coordinate.
+ */
 void Camera::MoveRelative(float x, float y, float z)
 {
-	// Rotate the desired movement vector
-	XMVECTOR dir = XMVector3Rotate(XMVectorSet(x, y, z, 0), XMLoadFloat4(&rotation));
-	
-	// Move in that direction
-	XMStoreFloat3(&position, XMLoadFloat3(&position) + dir);
+	// Rotate the desired movement vector and move in that direction
+	XMVECTOR dir = XMVector3Rotate(XMVectorSet(x, y, z, 0), XMLoadFloat4(&m_rotation));
+	XMStoreFloat3(&m_position, XMLoadFloat3(&m_position) + dir);
+
+	// Update the View matrix
+	RecalculateViewMatrix();
 }
 
-// Moves the camera in world space (not local space)
+/*
+ *	Move the Camera in world coordinates.
+ *	@param	x		Distance in the x-coordinate.
+ *	@param	y		Distance in the y-coordinate.
+ *	@param	z		Distance in the z-coordinate.
+ */
 void Camera::MoveAbsolute(float x, float y, float z)
 {
-    // Simple add, no need to load/store
-    position.x += x;
-    position.y += y;
-    position.z += z;
+    m_position.x += x;
+    m_position.y += y;
+    m_position.z += z;
+
+	// Update the View matrix
+	RecalculateViewMatrix();
 }
 
-// Rotate on the X and/or Y axis
+/*
+ *	Rotate the Camera along the x and y coordinate axes.
+ *	@param	x		Amount to rotate around the x-axis (in radians).
+ *	@param	y		Amount to rotate around the y-axis (in radains).
+ */
 void Camera::Rotate(float x, float y)
 {
     // Adjust the current rotation
-	xRotation += x;
-	yRotation += y;
+	m_xRotation += x;
+	m_yRotation += y;
 
-    // Clamp the x between PI/2 and -PI/2
-    xRotation = max(min(xRotation, XM_PIDIV2), -XM_PIDIV2);
-
-    // Recreate the quaternion
-	XMStoreFloat4(&rotation, XMQuaternionRotationRollPitchYaw(xRotation, yRotation, 0));
-}
-
-// Camera's update, which looks for key presses
-void Camera::Update(float dt)
-{
-    // Current speed
-	float speed = dt * 3;
-
-    InputManager* pManager = InputManager::instance();
-
-    // Speed up when shift is pressed
-    if( pManager->IsKeyDown( VK_SHIFT ) ){ speed += 5; }
-
-    // Movement
-    if( pManager->IsKeyDown( 'W' ) ){ MoveRelative( 0, 0, speed ); }
-    if( pManager->IsKeyDown( 'S' ) ){ MoveRelative( 0, 0, -speed ); }
-    if( pManager->IsKeyDown( 'A' ) ){ MoveRelative( -speed, 0, 0 ); }
-    if( pManager->IsKeyDown( 'D' ) ){ MoveRelative( speed, 0, 0 ); }
-    if( pManager->IsKeyDown( 'X' ) ){ MoveAbsolute( 0, -speed, 0 ); }
-    if( pManager->IsKeyDown( ' ' ) ){ MoveAbsolute( 0, speed, 0 ); }
-
-    // Handle rotation
-	if ( pManager->IsMouseDown( MouseButton::LMB ) )
+	// Clamp the x-component between PI/2 and -PI/2
+	if ( m_xRotation >= XM_PIDIV2 )
 	{
-        POINT   prevMousePos = pManager->GetPreviousMousePos(),
-                currMousePos = pManager->GetCurrentMousePos();
-
-		float xDiff = min( 5.0f, ( currMousePos.x - prevMousePos.x ) * 5.0f * dt );
-		float yDiff = min( 5.0f, ( currMousePos.y - prevMousePos.y ) * 5.0f * dt );
-
-		Rotate( yDiff, xDiff );
+		m_xRotation = XM_PIDIV2;
+	}
+	else if ( m_xRotation <= -XM_PIDIV2 )
+	{
+		m_xRotation = -XM_PIDIV2;
 	}
 
-    // Check for reset
-    if ( pManager->IsKeyDown( 'R' ) )
-    {
-        position = startPosition;
-        xRotation = 0.0f;
-        xRotation = 0.0f;
-        XMStoreFloat4(&rotation, XMQuaternionIdentity());
-    }
+	// Wrap the y-component at 2 * PI and -2 * PI
+	if ( m_yRotation > XM_2PI )
+	{
+		m_yRotation = -XM_2PI;
+	}
+	else if ( m_yRotation < -XM_2PI )
+	{
+		m_yRotation = XM_2PI;
+	}
 
-    // Update the view every frame - could be optimized
-	UpdateViewMatrix();
+    // Recreate the quaternion
+	XMStoreFloat4(&m_rotation, XMQuaternionRotationRollPitchYaw(m_xRotation, m_yRotation, 0.0f));
+
+	// Update the View matrix
+	RecalculateViewMatrix();
+}
+#pragma endregion
+
+#pragma region Setters
+void Camera::SetFOV(float fov)
+{
+	UpdateProjectionMatrix(fov, m_aspectRatio, m_nearPlane, m_farPlane);
 }
 
-// Creates a new view matrix based on current position and orientation
-void Camera::UpdateViewMatrix()
+void Camera::SetAspectRatio(float aspectRatio)
 {
-    // Rotate the standard "forward" matrix by our rotation
-    // This gives us our "look direction"
-	XMVECTOR dir = XMVector3Rotate(XMVectorSet(0, 0, 1, 0), XMLoadFloat4(&rotation));
-
-	XMMATRIX view = XMMatrixLookToLH(
-		XMLoadFloat3(&position),
-		dir,
-		XMVectorSet(0, 1, 0, 0));
-
-	XMStoreFloat4x4(&viewMatrix, XMMatrixTranspose(view));
+	UpdateProjectionMatrix(m_fov, aspectRatio, m_nearPlane, m_farPlane);
 }
 
-// Updates the projection matrix
-void Camera::UpdateProjectionMatrix(float aspectRatio)
+void Camera::SetNearPlane(float nearPlane)
 {
-	XMMATRIX P = XMMatrixPerspectiveFovLH(
-		0.25f * 3.1415926535f,		// Field of View Angle
-		aspectRatio,				// Aspect ratio
-		0.1f,						// Near clip plane distance
-		100.0f);					// Far clip plane distance
-	XMStoreFloat4x4(&projMatrix, XMMatrixTranspose(P)); // Transpose for HLSL!
+	UpdateProjectionMatrix(m_fov, m_aspectRatio, nearPlane, m_farPlane);
+}
+
+void Camera::SetFarPlane(float farPlane)
+{
+	UpdateProjectionMatrix(m_fov, m_aspectRatio, m_nearPlane, farPlane);
+}
+
+void Camera::SetMovementSpeed(float movementSpeed)
+{
+	m_moveSpeed = movementSpeed;
+}
+
+void Camera::SetRotationSpeed(float rotationSpeed)
+{
+	m_rotationSpeed = rotationSpeed;
+}
+#pragma endregion
+
+/*
+ *	Recalculate the View matrix based on the current position and rotation.
+ */
+void Camera::RecalculateViewMatrix()
+{
+	XMVECTOR	position = XMLoadFloat3(&m_position),
+		rotation = XMLoadFloat4(&m_rotation),
+		forward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f),
+		up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f),
+		dir = XMVector3Rotate(forward, rotation);
+
+	XMMATRIX view = XMMatrixLookToLH(position, dir, up);
+	XMStoreFloat4x4(&m_viewMatrix, XMMatrixTranspose(view));
+}
+
+/*
+ *	Recalculate the Perspective projection based on the provided FOV, aspect ratio, near plane, and far plane.
+ *	@param	fov			The field-of-view angle (in radians).
+ *	@param	aspectRatio	The aspect ratio.
+ *  @param	nearPlane	The distance to the near plane.
+ *	@param	farPlane	The distance to the far plane.
+ */
+void Camera::UpdateProjectionMatrix( float fov, float aspectRatio, float nearPlane, float farPlane )
+{
+	XMMATRIX P = XMMatrixPerspectiveFovLH(fov, aspectRatio, nearPlane, farPlane);
+	XMStoreFloat4x4(&m_projectionMatrix, XMMatrixTranspose(P));
+
+	m_fov = fov;
+	m_aspectRatio = aspectRatio;
+	m_nearPlane = nearPlane;
+	m_farPlane = farPlane;
 }
