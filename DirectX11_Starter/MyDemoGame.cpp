@@ -25,6 +25,7 @@
 #include "Vertex.h"
 #include "WICTextureLoader.h"
 #include "InputManager.h"
+#include "CameraManager.h"
 
 // For the DirectX Math library
 using namespace DirectX;
@@ -74,8 +75,6 @@ MyDemoGame::MyDemoGame(HINSTANCE hInstance)
 	// Custom window size - will be created by Init() later
 	windowWidth = 800;
 	windowHeight = 600;
-
-	camera = 0;
 }
 
 // --------------------------------------------------------
@@ -95,8 +94,6 @@ MyDemoGame::~MyDemoGame()
 
     for (unsigned int i = 0; i < meshes.size(); i++)
         delete meshes[i];
-
-    delete camera;
 
     ReleaseMacro(diffuseTexture);
     ReleaseMacro(rustTexture);
@@ -124,7 +121,6 @@ bool MyDemoGame::Init()
 	//  - For your own projects, feel free to expand/replace these.
 	CreateGeometry();
 	LoadShaders();
-	CreateMatrices();
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives we'll be using and how to interpret them
@@ -194,35 +190,6 @@ void MyDemoGame::LoadShaders()
 
 }
 
-// --------------------------------------------------------
-// Initializes the matrices necessary to represent our geometry's 
-// transformations and our 3D camera
-// --------------------------------------------------------
-void MyDemoGame::CreateMatrices()
-{
-	// Set up the camera
-	camera = new DebugCamera(0, 0, -5);
-	camera->SetAspectRatio(aspectRatio);
-}
-
-#pragma endregion
-
-#pragma region Window Resizing
-
-// --------------------------------------------------------
-// Handles resizing DirectX "stuff" to match the (usually) new
-// window size and updating our projection matrix to match
-// --------------------------------------------------------
-void MyDemoGame::OnResize()
-{
-	// Handle base-level DX resize stuff
-	DirectXGameCore::OnResize();
-
-	if(camera != nullptr)
-	{
-		camera->SetAspectRatio(aspectRatio);
-	}
-}
 #pragma endregion
 
 #pragma region Game Loop
@@ -249,9 +216,6 @@ void MyDemoGame::UpdateScene(float deltaTime, float totalTime)
         currentEntity = (currentEntity + 1) % entities.size();
 	}
     prevSpaceBar = currentSpacebar;
-
-	// Update the camera
-	camera->Update(deltaTime);
 }
 
 // --------------------------------------------------------
@@ -259,6 +223,9 @@ void MyDemoGame::UpdateScene(float deltaTime, float totalTime)
 // --------------------------------------------------------
 void MyDemoGame::DrawScene(float deltaTime, float totalTime)
 {
+    // Retrieve the active Camera
+    Camera* camera = CameraManager::instance()->GetActiveCamera();
+
 	// Background color (Cornflower Blue in this case) for clearing
 	const float color[4] = {0.4f, 0.6f, 0.75f, 0.0f};
 

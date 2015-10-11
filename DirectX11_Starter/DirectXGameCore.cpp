@@ -13,6 +13,7 @@
 #include <WindowsX.h>
 #include <sstream>
 #include "InputManager.h"
+#include "CameraManager.h"
 
 #pragma region Global Window Callback
 
@@ -308,6 +309,10 @@ void DirectXGameCore::OnResize()
 
 	// Recalculate the aspect ratio, since it probably changed
 	aspectRatio = (float)windowWidth / windowHeight;
+
+    // Update the active Camera
+    Camera* active = CameraManager::instance()->GetActiveCamera();
+    active->SetAspectRatio( aspectRatio );
 }
 #pragma endregion
 
@@ -347,6 +352,7 @@ int DirectXGameCore::Run()
 			// Standard game loop type stuff
 			CalculateFrameStats();
 			InputManager::instance()->Update( deltaTime );
+            CameraManager::instance()->Update( deltaTime );
 			UpdateScene(deltaTime, totalTime);
 			DrawScene(deltaTime, totalTime);			
 		}

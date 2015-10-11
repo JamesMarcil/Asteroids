@@ -5,7 +5,6 @@
 #include "SimpleShader.h"
 
 #include "Mesh.h"
-#include "DebugCamera.h"
 #include "GameEntity.h"
 
 #include <vector>
@@ -27,10 +26,9 @@ public:
 	~MyDemoGame();
 
 	// Overrides for base level methods
-	bool Init();
-	void OnResize();
-	void UpdateScene(float deltaTime, float totalTime);
-	void DrawScene(float deltaTime, float totalTime);
+	bool Init() override;
+	void UpdateScene(float deltaTime, float totalTime) override;
+	void DrawScene(float deltaTime, float totalTime) override;
 
 private:
     // Input and mesh swapping
@@ -46,7 +44,6 @@ private:
 	// start doing something more advanced!
 	void CreateGeometry();
 	void LoadShaders();
-	void CreateMatrices();
 
 	// Wrappers for DirectX shaders to provide simplified functionality
 	SimpleVertexShader* vertexShader;
@@ -58,7 +55,4 @@ private:
     ID3D11ShaderResourceView* specMapTexture;
 
     ID3D11SamplerState* samplerState;
-
-	// Basic debug camera
-	Camera* camera;
 };

@@ -7,6 +7,8 @@
 class Camera
 {
 private:
+    friend class CameraManager;
+
 	DirectX::XMFLOAT3 m_position;							// The current position
 	DirectX::XMFLOAT4 m_rotation;							// The rotation quaternion
 	float m_xRotation, m_yRotation;							// x and y rotation components
@@ -19,6 +21,12 @@ private:
 	 *	Recalculate the View matrix based on the current position and rotation.
 	 */
 	void RecalculateViewMatrix();
+
+    /*
+	 *	Update function to be provided by the child class.
+	 *	@param	dt		The delta time value this frame.
+	 */
+	virtual void Update(float dt) = 0;
 
 protected:
 	float m_moveSpeed, m_rotationSpeed;						// Camera's movement and rotation speeds				
@@ -69,12 +77,6 @@ public:
 	 *	@param	y		Amount to rotate around the y-axis (in radains).
 	 */
 	void Rotate(float x, float y);
-
-    /*
-	 *	Update function to be provided by the child class.
-	 *	@param	dt		The delta time value this frame.
-	 */
-	virtual void Update(float dt) = 0;
 
 	/*
 	 *	Recalculate the Perspective projection based on the provided FOV, aspect ratio, near plane, and far plane.
