@@ -3,14 +3,13 @@
 
 // DirectX
 #include <DirectXMath.h>
+#include "Transform.h"
 
 class Camera
 {
 private:
     friend class CameraManager;
 
-	DirectX::XMFLOAT3 m_position;							// The current position
-	DirectX::XMFLOAT4 m_rotation;							// The rotation quaternion
 	float m_xRotation, m_yRotation;							// x and y rotation components
 
 	DirectX::XMFLOAT4X4 m_viewMatrix, m_projectionMatrix;	// The View and Projection matrices
@@ -32,6 +31,8 @@ protected:
 	float m_moveSpeed, m_rotationSpeed;						// Camera's movement and rotation speeds				
 
 public:
+	Transform transform;
+
 	// Public Constants
 	const static float DEFAULT_FOV;
 	const static float DEFAULT_ASPECT_RATIO;
@@ -88,8 +89,6 @@ public:
 	void UpdateProjectionMatrix(float fov, float aspectRatio, float nearPlane, float farPlane);
 
 	// Getters
-	const	DirectX::XMFLOAT3&		GetPosition()			const { return m_position; }
-	const	DirectX::XMFLOAT4&		GetRotation()			const { return m_rotation; }
 	const	DirectX::XMFLOAT4X4&	GetViewMatrix()			const { return m_viewMatrix; }
 	const	DirectX::XMFLOAT4X4&	GetProjectionMatrix()	const { return m_projectionMatrix; }
 			float					GetFOV()				const { return m_fov; }

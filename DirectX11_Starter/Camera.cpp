@@ -15,8 +15,8 @@ const float Camera::DEFAULT_ROTATION_SPEED = 5.0f;
 Camera::Camera(float x, float y, float z)
 	: m_xRotation(0.0f), m_yRotation(0.0f), m_moveSpeed(Camera::DEFAULT_MOVE_SPEED), m_rotationSpeed(Camera::DEFAULT_ROTATION_SPEED)
 {
-	m_position = XMFLOAT3( x, y, z );
-	m_rotation = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+
+	transform = Transform(XMFLOAT4(x, y, z, 1));
 
 	RecalculateViewMatrix();
 	UpdateProjectionMatrix(Camera::DEFAULT_FOV, Camera::DEFAULT_ASPECT_RATIO, Camera::DEFAULT_NEAR_PLANE, Camera::DEFAULT_FAR_PLANE);
@@ -43,8 +43,10 @@ Camera::~Camera() { /* Nothing to do. */ }
 void Camera::MoveRelative(float x, float y, float z)
 {
 	// Rotate the desired movement vector and move in that direction
-	XMVECTOR dir = XMVector3Rotate(XMVectorSet(x, y, z, 0), XMLoadFloat4(&m_rotation));
-	XMStoreFloat3(&m_position, XMLoadFloat3(&m_position) + dir);
+	XMVECTOR dir = XMVector3Rotate(XMVectorSet(x, y, z, 0), XMLoadFloat4(&transform.GetRotation()));
+	XMFLOAT3 translation;
+	XMStoreFloat3(&translation, dir);
+	transform.Translate(translation);
 
 	// Update the View matrix
 	RecalculateViewMatrix();
@@ -58,9 +60,7 @@ void Camera::MoveRelative(float x, float y, float z)
  */
 void Camera::MoveAbsolute(float x, float y, float z)
 {
-    m_position.x += x;
-    m_position.y += y;
-    m_position.z += z;
+	transform.Translate(x, y, z);
 
 	// Update the View matrix
 	RecalculateViewMatrix();
@@ -78,27 +78,28 @@ void Camera::Rotate(float x, float y)
 	m_yRotation += y;
 
 	// Clamp the x-component between PI/2 and -PI/2
-	if ( m_xRotation >= XM_PIDIV2 )
+	if (m_xRotation >= XM_PIDIV2 )
 	{
 		m_xRotation = XM_PIDIV2;
 	}
-	else if ( m_xRotation <= -XM_PIDIV2 )
+	else if (m_xRotation <= -XM_PIDIV2 )
 	{
 		m_xRotation = -XM_PIDIV2;
 	}
 
 	// Wrap the y-component at 2 * PI and -2 * PI
-	if ( m_yRotation > XM_2PI )
+	if (m_yRotation > XM_2PI )
 	{
 		m_yRotation = -XM_2PI;
 	}
-	else if ( m_yRotation < -XM_2PI )
+	else if (m_yRotation < -XM_2PI )
 	{
 		m_yRotation = XM_2PI;
 	}
 
-    // Recreate the quaternion
-	XMStoreFloat4(&m_rotation, XMQuaternionRotationRollPitchYaw(m_xRotation, m_yRotation, 0.0f));
+	XMVECTOR rot = XMQuaternionRotationRollPitchYaw(m_xRotation, m_yRotation, 0.0f);
+
+	transform.SetRotation(rot, 1.0f);
 
 	// Update the View matrix
 	RecalculateViewMatrix();
@@ -142,8 +143,8 @@ void Camera::SetRotationSpeed(float rotationSpeed)
  */
 void Camera::RecalculateViewMatrix()
 {
-	XMVECTOR	position = XMLoadFloat3(&m_position),
-		rotation = XMLoadFloat4(&m_rotation),
+	XMVECTOR	position = XMLoadFloat4(&transform.GetTranslation()),
+		rotation = XMLoadFloat4(&transform.GetRotation()),
 		forward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f),
 		up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f),
 		dir = XMVector3Rotate(forward, rotation);

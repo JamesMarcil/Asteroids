@@ -206,9 +206,6 @@ void MyDemoGame::UpdateScene(float deltaTime, float totalTime)
 		Quit();
     }
 
-    // Update the GameEntity position
-    entities[currentEntity]->UpdateWorldMatrix();
-
     // Check for entity swap
     bool currentSpacebar = pManager->IsKeyDown( VK_TAB );
 	if ( currentSpacebar && !prevSpaceBar )
@@ -249,7 +246,7 @@ void MyDemoGame::DrawScene(float deltaTime, float totalTime)
     deviceContext->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
     deviceContext->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
 
-    vertexShader->SetMatrix4x4("world", *ge->GetWorldMatrix());
+    vertexShader->SetMatrix4x4("world", ge->transform.GetTransform());
     vertexShader->SetMatrix4x4("view", camera->GetViewMatrix());
     vertexShader->SetMatrix4x4("projection", camera->GetProjectionMatrix());
 
@@ -260,7 +257,8 @@ void MyDemoGame::DrawScene(float deltaTime, float totalTime)
     pixelShader->SetFloat3("PointLightPosition", XMFLOAT3(3, 3, -3));
     pixelShader->SetFloat4("PointLightColor", XMFLOAT4(1, 1, 1, 1));
 
-    pixelShader->SetFloat3("CameraPosition", camera->GetPosition());
+	XMFLOAT4 camPos = camera->transform.GetTranslation();
+    pixelShader->SetFloat3("CameraPosition", XMFLOAT3(camPos.x, camPos.y, camPos.z));
 
     pixelShader->SetFloat("time", totalTime);
 
