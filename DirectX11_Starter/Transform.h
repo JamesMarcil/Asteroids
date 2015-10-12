@@ -1,6 +1,7 @@
 #pragma once
 
 #include <DirectXMath.h>
+#include <vector>
 
 using namespace DirectX;
 
@@ -10,6 +11,7 @@ private:
 	XMFLOAT4 translation;
 	XMFLOAT4 rotation;
 	XMFLOAT4 scale;
+	std::vector<Transform*> children;
 
 public:
 	Transform();
@@ -21,6 +23,7 @@ public:
 	XMFLOAT4 GetTranslation();
 	XMFLOAT4 GetRotation();
 	XMFLOAT4 GetScale();
+	std::vector<Transform*> GetChildren();
 
 	/* Setters */
 	void SetTranslation(XMVECTOR vec);
