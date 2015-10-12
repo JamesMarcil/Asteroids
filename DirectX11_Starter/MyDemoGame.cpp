@@ -23,7 +23,6 @@
 
 #include "MyDemoGame.h"
 #include "Vertex.h"
-#include "WICTextureLoader.h"
 #include "InputManager.h"
 #include "CameraManager.h"
 
@@ -65,11 +64,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 MyDemoGame::MyDemoGame(HINSTANCE hInstance) 
 	: DirectXGameCore(hInstance)
 {
-	// Set up a custom caption for the game window.
-	// - The "L" before the string signifies a "wide character" string
-	// - "Wide" characters take up more space in memory (hence the name)
-	// - This allows for an extended character set (more fancy letters/symbols)
-	// - Lots of Windows functions want "wide characters", so we use the "L"
 	windowCaption = L"Galactic Bulge presents: Asteroids";
 
 	// Custom window size - will be created by Init() later
@@ -84,20 +78,10 @@ MyDemoGame::MyDemoGame(HINSTANCE hInstance)
 // --------------------------------------------------------
 MyDemoGame::~MyDemoGame()
 {
-	// Delete our simple shaders
-	delete vertexShader;
-	delete pixelShader;
-
     // Loop and remove Game Entities
     for (unsigned int i = 0; i < entities.size(); i++)
         delete entities[i];
 
-    for (unsigned int i = 0; i < meshes.size(); i++)
-        delete meshes[i];
-
-    ReleaseMacro(diffuseTexture);
-    ReleaseMacro(rustTexture);
-    ReleaseMacro(specMapTexture);
     ReleaseMacro(samplerState);
 }
 
@@ -111,16 +95,30 @@ MyDemoGame::~MyDemoGame()
 // --------------------------------------------------------
 bool MyDemoGame::Init()
 {
-	// Call the base class's Init() method to create the window,
-	// initialize DirectX, etc.
 	if( !DirectXGameCore::Init() )
 		return false;
 
-	// Helper methods to create something to draw, load shaders to draw it 
-	// with and set up matrices so we can see how to pass data to the GPU.
-	//  - For your own projects, feel free to expand/replace these.
-	CreateGeometry();
-	LoadShaders();
+	resourceManager = ResourceManager::GetInstance();
+	resourceManager->LoadResources(device, deviceContext);
+
+	// Fill out a description and then create the sampler state
+	D3D11_SAMPLER_DESC samplerDesc;
+	ZeroMemory(&samplerDesc, sizeof(samplerDesc));
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	device->CreateSamplerState(&samplerDesc, &samplerState);
+
+	GameEntity* sphere = new GameEntity(resourceManager->GetMesh("Sphere"));
+	GameEntity* helix = new GameEntity(resourceManager->GetMesh("Helix"));
+	GameEntity* cube = new GameEntity(resourceManager->GetMesh("Cube"));
+	entities.push_back(sphere);
+	entities.push_back(helix);
+	entities.push_back(cube);
+
+	currentEntity = 1;
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives we'll be using and how to interpret them
@@ -128,66 +126,6 @@ bool MyDemoGame::Init()
 
 	// Successfully initialized
 	return true;
-}
-
-// --------------------------------------------------------
-// Creates the geometry we're going to draw - a single triangle for now
-// --------------------------------------------------------
-void MyDemoGame::CreateGeometry()
-{
-    XMFLOAT4 red = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-    XMFLOAT4 green = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-    XMFLOAT4 blue = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
-    XMFLOAT4 yellow = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
-
-    
-    Mesh* sphereMesh = new Mesh("models/sphere.obj", device);
-    Mesh* helixMesh = new Mesh("models/helix.obj", device);
-    Mesh* cubeMesh = new Mesh("models/cube.obj", device);
-
-    meshes.push_back(sphereMesh);
-    meshes.push_back(helixMesh);
-    meshes.push_back(cubeMesh);
-
-    // Make some entities
-    GameEntity* sphere = new GameEntity(sphereMesh);
-    GameEntity* helix = new GameEntity(helixMesh);
-    GameEntity* cube = new GameEntity(cubeMesh);
-    entities.push_back(sphere);
-    entities.push_back(helix);
-    entities.push_back(cube);
-
-    currentEntity = 0;
-}
-
-// --------------------------------------------------------
-// Loads shaders from compiled shader object (.cso) files
-// - These simple shaders provide helpful methods for sending
-//   data to individual variables on the GPU
-// --------------------------------------------------------
-void MyDemoGame::LoadShaders()
-{
-	vertexShader = new SimpleVertexShader(device, deviceContext);
-	vertexShader->LoadShaderFile(L"VertexShader.cso");
-
-	pixelShader = new SimplePixelShader(device, deviceContext);
-	pixelShader->LoadShaderFile(L"PixelShader.cso");
-
-    // Load textures
-    DirectX::CreateWICTextureFromFile(device, deviceContext, L"textures/crate.png", 0, &diffuseTexture);
-    DirectX::CreateWICTextureFromFile(device, deviceContext, L"textures/rusty.jpg", 0, &rustTexture);
-    DirectX::CreateWICTextureFromFile(device, deviceContext, L"textures/rustySpec.png", 0, &specMapTexture);
-
-    // Fill out a description and then create the sampler state
-    D3D11_SAMPLER_DESC samplerDesc;
-    ZeroMemory(&samplerDesc, sizeof(samplerDesc));
-    samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-    samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-    samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-    samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-    samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-    device->CreateSamplerState(&samplerDesc, &samplerState);
-
 }
 
 #pragma endregion
@@ -246,29 +184,27 @@ void MyDemoGame::DrawScene(float deltaTime, float totalTime)
     deviceContext->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
     deviceContext->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
 
-    vertexShader->SetMatrix4x4("world", ge->transform.GetTransform());
-    vertexShader->SetMatrix4x4("view", camera->GetViewMatrix());
-    vertexShader->SetMatrix4x4("projection", camera->GetProjectionMatrix());
+    resourceManager->GetShader("StandardVertex")->SetMatrix4x4("world", ge->transform.GetTransform());
+    resourceManager->GetShader("StandardVertex")->SetMatrix4x4("view", camera->GetViewMatrix());
+    resourceManager->GetShader("StandardVertex")->SetMatrix4x4("projection", camera->GetProjectionMatrix());
 
     // Pass in some light data to the pixel shader
-    pixelShader->SetFloat3("DirLightDirection", XMFLOAT3(1, 1, 1));
-    pixelShader->SetFloat4("DirLightColor", XMFLOAT4(0.3f, 0.3f, 0.3f, 1));
-
-    pixelShader->SetFloat3("PointLightPosition", XMFLOAT3(3, 3, -3));
-    pixelShader->SetFloat4("PointLightColor", XMFLOAT4(1, 1, 1, 1));
+	resourceManager->GetShader("StandardPixel")->SetFloat3("DirLightDirection", XMFLOAT3(1, 1, 1));
+	resourceManager->GetShader("StandardPixel")->SetFloat4("DirLightColor", XMFLOAT4(0.3f, 0.3f, 0.3f, 1));
+    resourceManager->GetShader("StandardPixel")->SetFloat3("PointLightPosition", XMFLOAT3(3, 3, -3));
+    resourceManager->GetShader("StandardPixel")->SetFloat4("PointLightColor", XMFLOAT4(1, 1, 1, 1));
 
 	XMFLOAT4 camPos = camera->transform.GetTranslation();
-    pixelShader->SetFloat3("CameraPosition", XMFLOAT3(camPos.x, camPos.y, camPos.z));
+    resourceManager->GetShader("StandardPixel")->SetFloat3("CameraPosition", XMFLOAT3(camPos.x, camPos.y, camPos.z));
+    resourceManager->GetShader("StandardPixel")->SetFloat("time", totalTime);
 
-    pixelShader->SetFloat("time", totalTime);
+    resourceManager->GetShader("StandardPixel")->SetShaderResourceView("diffuseTexture", resourceManager->GetTexture("Diffuse"));
+    resourceManager->GetShader("StandardPixel")->SetShaderResourceView("rustTexture", resourceManager->GetTexture("Rust"));
+    resourceManager->GetShader("StandardPixel")->SetShaderResourceView("specMapTexture", resourceManager->GetTexture("Rust_Spec"));
+    resourceManager->GetShader("StandardPixel")->SetSamplerState("trilinear", samplerState);
 
-    pixelShader->SetShaderResourceView("diffuseTexture", diffuseTexture);
-    pixelShader->SetShaderResourceView("rustTexture", rustTexture);
-    pixelShader->SetShaderResourceView("specMapTexture", specMapTexture);
-    pixelShader->SetSamplerState("trilinear", samplerState);
-
-    vertexShader->SetShader(true);
-    pixelShader->SetShader(true);
+	resourceManager->GetShader("StandardVertex")->SetShader(true);
+	resourceManager->GetShader("StandardPixel")->SetShader(true);
 
     // Finally do the actual drawingw
     deviceContext->DrawIndexed(ge->GetMesh()->GetIndexCount(), 0, 0);
