@@ -1,27 +1,23 @@
-#pragma once
+#ifndef MY_DEMO_GAME_H
+#define MY_DEMO_GAME_H
 
-#include <DirectXMath.h>
+// DirectX
 #include "DirectXGameCore.h"
-#include "SimpleShader.h"
 
-#include "Mesh.h"
+// Game
 #include "GameEntity.h"
-#include "ResourceManager.h"
 
+// STD
 #include <vector>
 
-// Include run-time memory checking in debug builds, so 
-// we can be notified of memory leaks
-#if defined(DEBUG) || defined(_DEBUG)
-#define _CRTDBG_MAP_ALLOC
-#include <crtdbg.h>
-#endif
-
-// --------------------------------------------------------
-// Game class which extends the base DirectXGameCore class
-// --------------------------------------------------------
 class MyDemoGame : public DirectXGameCore
 {
+private:
+    bool	 prevSpaceBar;
+    unsigned currentEntity;
+
+	std::vector<GameEntity> entities;
+
 public:
 	MyDemoGame(HINSTANCE hInstance);
 	~MyDemoGame();
@@ -29,12 +25,6 @@ public:
 	bool Init() override;
 	void UpdateScene(float deltaTime, float totalTime) override;
 	void DrawScene(float deltaTime, float totalTime) override;
-
-private:
-    bool	 prevSpaceBar;
-    unsigned currentEntity;
-
-	ResourceManager*		 resourceManager;
-    ID3D11SamplerState*		 samplerState;
-	std::vector<GameEntity*> entities;
 };
+
+#endif

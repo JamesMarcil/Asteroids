@@ -10,7 +10,7 @@ Mesh::Mesh(Vertex* vertArray, int numVerts, unsigned int* indexArray, int numInd
 	CreateBuffers(vertArray, numVerts, indexArray, numIndices, device);
 }
 
-Mesh::Mesh(char* objFile, ID3D11Device* device)
+Mesh::Mesh( const std::string& filename, ID3D11Device* device)
 {
 	// String to hold a single line
 	char chars[512];
@@ -28,7 +28,7 @@ Mesh::Mesh(char* objFile, ID3D11Device* device)
 	int numTriangles = 0;
 
 	// File input
-	std::ifstream obj(objFile);
+	std::ifstream obj(filename);
 
 	// Scan the file for info
 	if( obj.is_open() )

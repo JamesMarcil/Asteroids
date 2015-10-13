@@ -4,91 +4,156 @@
 #include "WICTextureLoader.h"
 #include "DXMacros.h"
 
-// STD
-#include <utility>
-
 ResourceManager::ResourceManager() {}
 
 ResourceManager::~ResourceManager()
 {
-    // Delete Meshes
-	for ( auto& pair : meshes) {
-        delete pair.second;
-	}
+    // Meshes are stack-allocated and automatically cleaned up.
 
-    // Delete Shaders
-	for ( auto& pair : shaders) {
-		delete pair.second;
-	}
+    // Cleanup Shaders
+    for( auto& pair : shaders )
+    {
+        delete pair.second;
+    }
 
     // Release Textures
-	for ( auto& pair : textures) {
+	for ( auto& pair : textures) 
+    {
         ReleaseMacro( pair.second );
 	}
+
+    // Release SamplerStates
+    for( auto& pair : samplers )
+    {
+        ReleaseMacro( pair.second );
+    }
 }
 
-void ResourceManager::LoadResources(ID3D11Device* device, ID3D11DeviceContext* deviceContext) 
+/*
+ * Register an ID3D11Device and ID3D11DeviceContext with the ResourceManager.
+ * @param   device              The ID3D11Device to register.
+ * @param   deviceContext       The ID3D11DeviceContext to register.
+ */
+void ResourceManager::RegisterDeviceAndContext( ID3D11Device* const device, ID3D11DeviceContext* const deviceContext )
 {
-	/* Mesh Creation */
-	Mesh* sphereMesh = new Mesh("models/sphere.obj", device);
-	Mesh* helixMesh = new Mesh("models/helix.obj", device);
-	Mesh* cubeMesh = new Mesh("models/cube.obj", device);
-	AddMesh("Sphere", sphereMesh);
-	AddMesh("Helix", helixMesh);
-	AddMesh("Cube", cubeMesh);
-
-	/* Shader Creation */
-	SimpleVertexShader* vertexShader = new SimpleVertexShader(device, deviceContext);
-	vertexShader->LoadShaderFile(L"VertexShader.cso");
-	SimplePixelShader* pixelShader = new SimplePixelShader(device, deviceContext);
-	pixelShader->LoadShaderFile(L"PixelShader.cso");
-	AddShader("StandardVertex", vertexShader);
-	AddShader("StandardPixel", pixelShader);
-
-	/* Texture Creation */
-	ID3D11ShaderResourceView* diffuseTexture;
-	ID3D11ShaderResourceView* rustTexture;
-	ID3D11ShaderResourceView* rustSpecTexture;
-	DirectX::CreateWICTextureFromFile(device, deviceContext, L"textures/crate.png", 0, &diffuseTexture);
-	DirectX::CreateWICTextureFromFile(device, deviceContext, L"textures/rusty.jpg", 0, &rustTexture);
-	DirectX::CreateWICTextureFromFile(device, deviceContext, L"textures/rustySpec.png", 0, &rustSpecTexture);
-	AddTexture("Diffuse", diffuseTexture);
-	AddTexture("Rust", rustTexture);
-	AddTexture("Rust_Spec", rustSpecTexture);
+    this->device = device;
+    this->deviceContext = deviceContext;
 }
 
+/*
+ * Access the ResourceManager Singleton
+ */
 ResourceManager* ResourceManager::instance() 
 {
     static ResourceManager manager;
     return &manager;
 }
 
+#pragma region Getters 
+
 Mesh* ResourceManager::GetMesh( const std::string& id ) 
 {
-	return meshes[id];
+    auto& iter = meshes.find( id );
+    if( iter == meshes.cend() )
+    {
+        return nullptr;
+    }
+
+    return &iter->second;
 }
 
 ISimpleShader* ResourceManager::GetShader( const std::string& id ) 
 {
-	return shaders[id];
+    auto& iter = shaders.find( id );
+    if( iter == shaders.cend() )
+    {
+        return nullptr;
+    }
+
+    return iter->second;
 }
 
 ID3D11ShaderResourceView* ResourceManager::GetTexture( const std::string& id ) 
 {
-	return textures[id];
+    auto& iter = textures.find( id );
+    if( iter == textures.cend() )
+    {
+        return nullptr;
+    }
+
+    return iter->second;
 }
 
-void ResourceManager::AddMesh(std::string&& id, Mesh* toAdd) 
+ID3D11SamplerState* ResourceManager::GetSamplerState( const std::string& id )
 {
-    meshes.emplace( std::forward<std::string>( id ), toAdd );
+    auto& iter = samplers.find( id );
+    if( iter == samplers.cend() )
+    {
+        return nullptr;
+    }
+
+    return iter->second;
 }
 
-void ResourceManager::AddShader(std::string&& id, ISimpleShader* toAdd) 
+#pragma endregion
+
+/*
+ * Register an ID3D11ShaderResourceView* with the ResourceManager.
+ * @param       id          The id to store the ID3D11ShaderResourceView* at.
+ * @param       filename    The filename of the texture.
+ * @return  A bool indicating if the operation was successful.
+ */
+bool ResourceManager::RegisterTexture( std::string&& id, LPCWSTR filename )
 {
-    shaders.emplace( std::forward<std::string>( id ), toAdd );
+    // Bail if there is not a registered ID3D11Device or ID3D11DeviceContext
+    if( !device || !deviceContext )
+    {
+        return false;
+    }
+
+    // Bail if there is already an ID3D11ShaderResourceView* stored at that id
+    if( textures.find( id ) != textures.cend() )
+    {
+        return false;
+    }
+
+    // Create the ID3D11ShaderResourceView*
+    {
+        ID3D11ShaderResourceView* pTexture;
+        DirectX::CreateWICTextureFromFile(device, deviceContext, filename, 0, &pTexture);
+        textures.emplace( std::forward<std::string>( id ), pTexture );
+    }
+
+    return true;
 }
 
-void ResourceManager::AddTexture(std::string&& id, ID3D11ShaderResourceView* toAdd) 
+
+/*
+ * Register an ID3D11SamplerState* with the ResourceManager.
+ * @param       id          The id to store the ID3D11SamplerState* at.
+ * @param       filename    The description used to create the ID3D11SamplerState.
+ * @return  A bool indicating if the operation was successful.
+ */
+bool ResourceManager::RegisterSamplerState( std::string&& id, D3D11_SAMPLER_DESC pSamplerDesc )
 {
-    textures.emplace( std::forward<std::string>( id ), toAdd );
+    // Bail if there is not a registered ID3D11Device or ID3D11DeviceContext
+    if( !device || !deviceContext )
+    {
+        return false;
+    }
+
+    // Bail if there is already an ID3D11SamplerState* stored at that id
+    if( samplers.find( id ) != samplers.cend() )
+    {
+        return false;
+    }
+
+    // Create the ID3D11SamplerState*
+    {
+        ID3D11SamplerState* pSamplerState;
+        device->CreateSamplerState( &pSamplerDesc, &pSamplerState );
+        samplers.emplace( std::forward<std::string>( id ), pSamplerState );
+    }
+
+    return true;
 }

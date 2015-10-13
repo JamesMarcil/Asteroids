@@ -1,36 +1,27 @@
-// ----------------------------------------------------------------------------
-//  A few notes on project settings
-//
-//  - The project is set to use the UNICODE character set
-//    - This was changed in Project Properties > Config Properties > General > Character Set
-//    - This basically adds a "#define UNICODE" to the project
-//
-//  - The include directories were automagically correct, since the DirectX 
-//    headers and libs are part of the windows SDK
-//    - For instance, $(WindowsSDK_IncludePath) is set as a project include 
-//      path by default.  That's where the DirectX headers are located.
-//
-//  - Two libraries had to be manually added to the Linker Input Dependencies
-//    - d3d11.lib
-//    - d3dcompiler.lib
-//    - This was changed in Project Properties > Config Properties > Linker > Input > Additional Dependencies
-//
-//  - The Working Directory was changed to match the actual .exe's 
-//    output directory, since we need to load the compiled shader files at run time
-//    - This was changed in Project Properties > Config Properties > Debugging > Working Directory
-//
-// ----------------------------------------------------------------------------
-
 #include "MyDemoGame.h"
-#include "Vertex.h"
+
+// Managers
 #include "InputManager.h"
 #include "CameraManager.h"
+#include "ResourceManager.h"
+
+// DirectX
+#include <DirectXMath.h>
+#include "Vertex.h"
+#include "SimpleShader.h"
 
 // For the DirectX Math library
 using namespace DirectX;
 
-
 #pragma region Win32 Entry Point (WinMain)
+
+// Include run-time memory checking in debug builds, so 
+// we can be notified of memory leaks
+#if defined(DEBUG) || defined(_DEBUG)
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+#endif
+
 // --------------------------------------------------------
 // Win32 Entry Point - Where your program starts
 // --------------------------------------------------------
@@ -71,19 +62,7 @@ MyDemoGame::MyDemoGame(HINSTANCE hInstance)
 	windowHeight = 600;
 }
 
-// --------------------------------------------------------
-// Cleans up our DirectX stuff and any objects we need to delete
-// - When you make new DX resources, you need to release them here
-// - If you don't, you get a lot of scary looking messages in Visual Studio
-// --------------------------------------------------------
-MyDemoGame::~MyDemoGame()
-{
-    // Loop and remove Game Entities
-    for (unsigned int i = 0; i < entities.size(); i++)
-        delete entities[i];
-
-    ReleaseMacro(samplerState);
-}
+MyDemoGame::~MyDemoGame() {}
 
 #pragma endregion
 
@@ -98,31 +77,41 @@ bool MyDemoGame::Init()
 	if( !DirectXGameCore::Init() )
 		return false;
 
-	resourceManager = ResourceManager::instance();
-	resourceManager->LoadResources(device, deviceContext);
+    {
+        ResourceManager* pManager = ResourceManager::instance();
+        pManager->RegisterDeviceAndContext( device, deviceContext );
 
-	// Fill out a description and then create the sampler state
-	D3D11_SAMPLER_DESC samplerDesc;
-	ZeroMemory(&samplerDesc, sizeof(samplerDesc));
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-	device->CreateSamplerState(&samplerDesc, &samplerState);
+        /* Mesh Creation */
+        pManager->RegisterMesh( "Sphere", "models/sphere.obj" );
+        pManager->RegisterMesh( "Helix", "models/helix.obj" );
+        pManager->RegisterMesh( "Cube", "models/cube.obj" );
 
-	GameEntity* sphere = new GameEntity(resourceManager->GetMesh("Sphere"));
-	GameEntity* helix = new GameEntity(resourceManager->GetMesh("Helix"));
-	GameEntity* cube = new GameEntity(resourceManager->GetMesh("Cube"));
-	entities.push_back(sphere);
-	entities.push_back(helix);
-	entities.push_back(cube);
+        /* Shader Creation */
+        pManager->RegisterShader<SimpleVertexShader>( "StandardVertex", L"VertexShader.cso" );
+        pManager->RegisterShader<SimplePixelShader>( "StandardPixel", L"PixelShader.cso" );
+
+        /* Texture Creation */
+        pManager->RegisterTexture("Diffuse", L"textures/crate.png" );
+        pManager->RegisterTexture("Rust", L"textures/rusty.jpg" );
+        pManager->RegisterTexture("Rust_Spec", L"textures/rustySpec.png" );
+
+        /* Sampler Creation */
+        D3D11_SAMPLER_DESC samplerDesc;
+        ZeroMemory(&samplerDesc, sizeof(samplerDesc));
+        samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+        samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+        samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+        samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+        samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+        pManager->RegisterSamplerState( "trilinear", samplerDesc );
+
+        /* GameEntity Creation */
+        entities.emplace_back( pManager->GetMesh("Sphere") );
+        entities.emplace_back( pManager->GetMesh("Helix") );
+        entities.emplace_back( pManager->GetMesh( "Cube" ) );
+    }
 
 	currentEntity = 1;
-
-	// Tell the input assembler stage of the pipeline what kind of
-	// geometric primitives we'll be using and how to interpret them
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Successfully initialized
 	return true;
@@ -158,61 +147,59 @@ void MyDemoGame::UpdateScene(float deltaTime, float totalTime)
 // --------------------------------------------------------
 void MyDemoGame::DrawScene(float deltaTime, float totalTime)
 {
-    // Retrieve the active Camera
-    Camera* camera = CameraManager::instance()->GetActiveCamera();
-
 	// Background color (Cornflower Blue in this case) for clearing
 	const float color[4] = {0.4f, 0.6f, 0.75f, 0.0f};
 
 	// Clear the render target and depth buffer (erases what's on the screen)
-	//  - Do this ONCE PER FRAME
-	//  - At the beginning of DrawScene (before drawing *anything*)
-	deviceContext->ClearRenderTargetView(renderTargetView, color);
-	deviceContext->ClearDepthStencilView(
-		depthStencilView, 
-		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
-		1.0f,
-		0);
+	deviceContext->ClearRenderTargetView( renderTargetView, color );
+	deviceContext->ClearDepthStencilView( depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
 
-    GameEntity* ge = entities[currentEntity];
-    ID3D11Buffer* vb = ge->GetMesh()->GetVertexBuffer();
-    ID3D11Buffer* ib = ge->GetMesh()->GetIndexBuffer();
-
-    // Set buffers in the input assembler
+    GameEntity* ge = &entities[currentEntity];
+    Mesh* mesh = ge->GetMesh();
+    ID3D11Buffer* vb = mesh->GetVertexBuffer();
+    ID3D11Buffer* ib = mesh->GetIndexBuffer();
     UINT stride = sizeof(Vertex);
     UINT offset = 0;
+
+    // Update the Shaders
+    {
+        ResourceManager* pManager = ResourceManager::instance();
+        ISimpleShader   *pVertexShader = pManager->GetShader( "StandardVertex" ),
+                        *pPixelShader = pManager->GetShader( "StandardPixel" );
+        Camera* pCamera = CameraManager::instance()->GetActiveCamera();
+        XMFLOAT4 camPos = pCamera->transform.GetTranslation();
+
+        // Update the Vertex Shader
+        pVertexShader->SetMatrix4x4("world", ge->transform.GetTransform());
+        pVertexShader->SetMatrix4x4("view", pCamera->GetViewMatrix());
+        pVertexShader->SetMatrix4x4("projection", pCamera->GetProjectionMatrix());
+        pVertexShader->SetShader(true);
+
+        // Update the Pixel Shader
+        pPixelShader->SetFloat3("DirLightDirection", XMFLOAT3(1, 1, 1));
+        pPixelShader->SetFloat4("DirLightColor", XMFLOAT4(0.3f, 0.3f, 0.3f, 1));
+        pPixelShader->SetFloat3("PointLightPosition", XMFLOAT3(3, 3, -3));
+        pPixelShader->SetFloat4("PointLightColor", XMFLOAT4(1, 1, 1, 1));
+        pPixelShader->SetFloat3("CameraPosition", XMFLOAT3(camPos.x, camPos.y, camPos.z));
+        pPixelShader->SetFloat("time", totalTime);
+        pPixelShader->SetShaderResourceView("diffuseTexture", pManager->GetTexture("Diffuse"));
+        pPixelShader->SetShaderResourceView("rustTexture", pManager->GetTexture("Rust"));
+        pPixelShader->SetShaderResourceView("specMapTexture", pManager->GetTexture("Rust_Spec"));
+        pPixelShader->SetSamplerState("trilinear", pManager->GetSamplerState( "trilinear" ) );
+        pPixelShader->SetShader(true);
+    }
+
+    // Set the Vertex and Index buffers
     deviceContext->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
     deviceContext->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
 
-    resourceManager->GetShader("StandardVertex")->SetMatrix4x4("world", ge->transform.GetTransform());
-    resourceManager->GetShader("StandardVertex")->SetMatrix4x4("view", camera->GetViewMatrix());
-    resourceManager->GetShader("StandardVertex")->SetMatrix4x4("projection", camera->GetProjectionMatrix());
+    // We are drawing triangles
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    // Pass in some light data to the pixel shader
-	resourceManager->GetShader("StandardPixel")->SetFloat3("DirLightDirection", XMFLOAT3(1, 1, 1));
-	resourceManager->GetShader("StandardPixel")->SetFloat4("DirLightColor", XMFLOAT4(0.3f, 0.3f, 0.3f, 1));
-    resourceManager->GetShader("StandardPixel")->SetFloat3("PointLightPosition", XMFLOAT3(3, 3, -3));
-    resourceManager->GetShader("StandardPixel")->SetFloat4("PointLightColor", XMFLOAT4(1, 1, 1, 1));
-
-	XMFLOAT4 camPos = camera->transform.GetTranslation();
-    resourceManager->GetShader("StandardPixel")->SetFloat3("CameraPosition", XMFLOAT3(camPos.x, camPos.y, camPos.z));
-    resourceManager->GetShader("StandardPixel")->SetFloat("time", totalTime);
-
-    resourceManager->GetShader("StandardPixel")->SetShaderResourceView("diffuseTexture", resourceManager->GetTexture("Diffuse"));
-    resourceManager->GetShader("StandardPixel")->SetShaderResourceView("rustTexture", resourceManager->GetTexture("Rust"));
-    resourceManager->GetShader("StandardPixel")->SetShaderResourceView("specMapTexture", resourceManager->GetTexture("Rust_Spec"));
-    resourceManager->GetShader("StandardPixel")->SetSamplerState("trilinear", samplerState);
-
-	resourceManager->GetShader("StandardVertex")->SetShader(true);
-	resourceManager->GetShader("StandardPixel")->SetShader(true);
-
-    // Finally do the actual drawingw
-    deviceContext->DrawIndexed(ge->GetMesh()->GetIndexCount(), 0, 0);
+    // Draw the GameEntity
+    deviceContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
    
 	// Present the buffer
-	//  - Puts the image we're drawing into the window so the user can see it
-	//  - Do this exactly ONCE PER FRAME
-	//  - Always at the very end of the frame
 	HR(swapChain->Present(0, 0));
 }
 #pragma endregion

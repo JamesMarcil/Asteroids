@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <d3d11.h>
 
 #include "Vertex.h"
@@ -15,7 +17,7 @@ class Mesh
 {
 public:
 	Mesh(Vertex* vertArray, int numVerts, unsigned int* indexArray, int numIndices, ID3D11Device* device);
-	Mesh(char* objFile, ID3D11Device* device);
+	Mesh( const std::string& filename, ID3D11Device* device);
 	~Mesh(void);
 
 	ID3D11Buffer* GetVertexBuffer() { return vb; }
