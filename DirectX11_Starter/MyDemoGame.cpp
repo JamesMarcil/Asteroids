@@ -98,7 +98,7 @@ bool MyDemoGame::Init()
 	if( !DirectXGameCore::Init() )
 		return false;
 
-	resourceManager = ResourceManager::GetInstance();
+	resourceManager = ResourceManager::instance();
 	resourceManager->LoadResources(device, deviceContext);
 
 	// Fill out a description and then create the sampler state

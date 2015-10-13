@@ -1,32 +1,34 @@
 #include "ResourceManager.h"
+
+// DirectX
 #include "WICTextureLoader.h"
-#include <iterator>
+#include "DXMacros.h"
 
-ResourceManager* ResourceManager::singleton = nullptr;
+// STD
+#include <utility>
 
-ResourceManager::ResourceManager() {
-	meshes   = std::map<char*, Mesh*>();
-	shaders	 = std::map<char*, ISimpleShader*>();
-	textures = std::map<char*, ID3D11ShaderResourceView*>();
+ResourceManager::ResourceManager() {}
+
+ResourceManager::~ResourceManager()
+{
+    // Delete Meshes
+	for ( auto& pair : meshes) {
+        delete pair.second;
+	}
+
+    // Delete Shaders
+	for ( auto& pair : shaders) {
+		delete pair.second;
+	}
+
+    // Release Textures
+	for ( auto& pair : textures) {
+        ReleaseMacro( pair.second );
+	}
 }
 
-ResourceManager::~ResourceManager(){
-	for (std::pair<char*, Mesh*> m : meshes) {
-		m.second->~Mesh();
-		m.second = 0;
-	}
-
-	for (std::pair<char*, ISimpleShader*> s : shaders) {
-		delete s.second;
-	}
-
-	for (std::pair<char*, ID3D11ShaderResourceView*> t : textures) {
-		t.second->Release();
-		t.second = 0;
-	}
-}
-
-void ResourceManager::LoadResources(ID3D11Device* device, ID3D11DeviceContext* deviceContext) {
+void ResourceManager::LoadResources(ID3D11Device* device, ID3D11DeviceContext* deviceContext) 
+{
 	/* Mesh Creation */
 	Mesh* sphereMesh = new Mesh("models/sphere.obj", device);
 	Mesh* helixMesh = new Mesh("models/helix.obj", device);
@@ -55,31 +57,38 @@ void ResourceManager::LoadResources(ID3D11Device* device, ID3D11DeviceContext* d
 	AddTexture("Rust_Spec", rustSpecTexture);
 }
 
-ResourceManager* ResourceManager::GetInstance() {
-	if (singleton == nullptr) singleton = new ResourceManager();
-	return singleton;
+ResourceManager* ResourceManager::instance() 
+{
+    static ResourceManager manager;
+    return &manager;
 }
 
-Mesh* ResourceManager::GetMesh(char* id) {
+Mesh* ResourceManager::GetMesh( const std::string& id ) 
+{
 	return meshes[id];
 }
 
-ISimpleShader* ResourceManager::GetShader(char* id) {
+ISimpleShader* ResourceManager::GetShader( const std::string& id ) 
+{
 	return shaders[id];
 }
 
-ID3D11ShaderResourceView* ResourceManager::GetTexture(char* id) {
+ID3D11ShaderResourceView* ResourceManager::GetTexture( const std::string& id ) 
+{
 	return textures[id];
 }
 
-void ResourceManager::AddMesh(char* id, Mesh* toAdd) {
-	meshes.insert(std::pair<char*, Mesh*>(id, toAdd));
+void ResourceManager::AddMesh(std::string&& id, Mesh* toAdd) 
+{
+    meshes.emplace( std::forward<std::string>( id ), toAdd );
 }
 
-void ResourceManager::AddShader(char* id, ISimpleShader* toAdd) {
-	shaders.insert(std::pair<char*, ISimpleShader*>(id, toAdd));
+void ResourceManager::AddShader(std::string&& id, ISimpleShader* toAdd) 
+{
+    shaders.emplace( std::forward<std::string>( id ), toAdd );
 }
 
-void ResourceManager::AddTexture(char* id, ID3D11ShaderResourceView* toAdd) {
-	textures.insert(std::pair<char*, ID3D11ShaderResourceView*>(id, toAdd));
+void ResourceManager::AddTexture(std::string&& id, ID3D11ShaderResourceView* toAdd) 
+{
+    textures.emplace( std::forward<std::string>( id ), toAdd );
 }
