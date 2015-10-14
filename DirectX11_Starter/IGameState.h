@@ -3,6 +3,7 @@
 
 class IGameState
 {
+private:
     template <typename T>
     friend class StateMachine;
 
@@ -10,6 +11,8 @@ class IGameState
     virtual void Update( float deltaTime, float totalTime ) = 0;
     virtual void Render( float deltaTime, float totalTime ) = 0;
     virtual void Exit( void ) = 0;
+public:
+    virtual ~IGameState() {}
 };
 
 #endif

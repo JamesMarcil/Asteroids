@@ -14,6 +14,7 @@ public:
         : m_pDevice( pDevice ), m_pDeviceContext( pDeviceContext ), m_pSwapChain( pSwapChain ), m_pRenderTargetView( pRenderTargetView ), m_pDepthStencilView( pDepthStencilView )
     {}
 
+	virtual ~MenuState() {}
 private:
     ID3D11Device*           const m_pDevice;
     ID3D11DeviceContext*    const m_pDeviceContext;

@@ -25,6 +25,8 @@ public:
     ExitState( ID3D11Device* const pDevice, ID3D11DeviceContext* const pDeviceContext, IDXGISwapChain* pSwapChain, ID3D11RenderTargetView* const pRenderTargetView, ID3D11DepthStencilView* const pDepthStencilView )
         : m_pDevice( pDevice ), m_pDeviceContext( pDeviceContext ), m_pSwapChain( pSwapChain ), m_pRenderTargetView( pRenderTargetView ), m_pDepthStencilView( pDepthStencilView )
     {}
+
+	virtual ~ExitState() {}
 };
 
 #endif
