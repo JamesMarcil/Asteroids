@@ -1,70 +1,22 @@
-#include "MyDemoGame.h"
+#include "GameState.h"
 
 // Managers
 #include "InputManager.h"
 #include "CameraManager.h"
 #include "ResourceManager.h"
 
+// State
+#include "StateMachine.h"
+#include "GameStates.h"
+
 // DirectX
 #include <DirectXMath.h>
+#include "DXMacros.h"
 #include "Vertex.h"
 #include "SimpleShader.h"
 
 // For the DirectX Math library
 using namespace DirectX;
-
-#pragma region Win32 Entry Point (WinMain)
-
-// Include run-time memory checking in debug builds, so 
-// we can be notified of memory leaks
-#if defined(DEBUG) || defined(_DEBUG)
-#define _CRTDBG_MAP_ALLOC
-#include <crtdbg.h>
-#endif
-
-// --------------------------------------------------------
-// Win32 Entry Point - Where your program starts
-// --------------------------------------------------------
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
-				   PSTR cmdLine, int showCmd)
-{
-	// Enable run-time memory check for debug builds.
-#if defined(DEBUG) | defined(_DEBUG)
-	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-#endif
-
-	// Create the game object.
-	MyDemoGame game(hInstance);
-	
-	// This is where we'll create the window, initialize DirectX, 
-	// set up geometry and shaders, etc.
-	if( !game.Init() )
-		return 0;
-	
-	// All set to run the game loop
-	return game.Run();
-}
-
-#pragma endregion
-
-#pragma region Constructor / Destructor
-// --------------------------------------------------------
-// Base class constructor will set up all of the underlying
-// fields, and then we can overwrite any that we'd like
-// --------------------------------------------------------
-MyDemoGame::MyDemoGame(HINSTANCE hInstance) 
-	: DirectXGameCore(hInstance)
-{
-	windowCaption = L"Galactic Bulge presents: Asteroids";
-
-	// Custom window size - will be created by Init() later
-	windowWidth = 800;
-	windowHeight = 600;
-}
-
-MyDemoGame::~MyDemoGame() {}
-
-#pragma endregion
 
 #pragma region Initialization
 
@@ -72,14 +24,13 @@ MyDemoGame::~MyDemoGame() {}
 // Initializes the base class (including the window and D3D),
 // sets up our geometry and loads the shaders (among other things)
 // --------------------------------------------------------
-bool MyDemoGame::Init()
+void GameState::Enter( void )
 {
-	if( !DirectXGameCore::Init() )
-		return false;
-
+    // Register resources with the ResourceManager
+    if( !isInitialized )
     {
         ResourceManager* pManager = ResourceManager::instance();
-        pManager->RegisterDeviceAndContext( device, deviceContext );
+        pManager->RegisterDeviceAndContext( m_pDevice, m_pDeviceContext );
 
         /* Mesh Creation */
         pManager->RegisterMesh( "Sphere", "models/sphere.obj" );
@@ -109,12 +60,11 @@ bool MyDemoGame::Init()
         entities.emplace_back( pManager->GetMesh("Sphere") );
         entities.emplace_back( pManager->GetMesh("Helix") );
         entities.emplace_back( pManager->GetMesh( "Cube" ) );
+
+        isInitialized = true;
     }
 
 	currentEntity = 1;
-
-	// Successfully initialized
-	return true;
 }
 
 #pragma endregion
@@ -124,35 +74,38 @@ bool MyDemoGame::Init()
 // --------------------------------------------------------
 // Update your game here - take input, move objects, etc.
 // --------------------------------------------------------
-void MyDemoGame::UpdateScene(float deltaTime, float totalTime)
+void GameState::Update( float deltaTime, float totalTime )
 {
-	// Quit if the escape key is pressed
-	InputManager* pManager = InputManager::instance();
-	if ( pManager->IsKeyDown( VK_ESCAPE ) )
+	// Handle Input
+    InputManager* pInput = InputManager::instance();
+    StateMachine<GameStates>* pState = StateMachine<GameStates>::instance();
+
+    if( pInput->IsKeyDown( '1' ) )
     {
-		Quit();
+        pState->GoToState( GameStates::MENU );
+    }
+    else if( pInput->IsKeyDown( '3' ) )
+    {
+        pState->GoToState( GameStates::EXIT );
     }
 
-    // Check for entity swap
-    bool currentSpacebar = pManager->IsKeyDown( VK_TAB );
-	if ( currentSpacebar && !prevSpaceBar )
-	{
+    // Check for entity swap.
+    bool currentSpacebar = pInput->IsKeyDown( VK_TAB );
+    if ( currentSpacebar && !prevSpaceBar )
+    {
         currentEntity = (currentEntity + 1) % entities.size();
-	}
+    }
     prevSpaceBar = currentSpacebar;
 }
 
-// --------------------------------------------------------
-// Clear the screen, redraw everything, present to the user
-// --------------------------------------------------------
-void MyDemoGame::DrawScene(float deltaTime, float totalTime)
+void GameState::Render( float deltaTime, float totalTime )
 {
 	// Background color (Cornflower Blue in this case) for clearing
 	const float color[4] = {0.4f, 0.6f, 0.75f, 0.0f};
 
 	// Clear the render target and depth buffer (erases what's on the screen)
-	deviceContext->ClearRenderTargetView( renderTargetView, color );
-	deviceContext->ClearDepthStencilView( depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
+	m_pDeviceContext->ClearRenderTargetView( m_pRenderTargetView, color );
+	m_pDeviceContext->ClearDepthStencilView( m_pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
 
     GameEntity* ge = &entities[currentEntity];
     Mesh* mesh = ge->GetMesh();
@@ -190,16 +143,20 @@ void MyDemoGame::DrawScene(float deltaTime, float totalTime)
     }
 
     // Set the Vertex and Index buffers
-    deviceContext->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
-    deviceContext->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
+    m_pDeviceContext->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
+    m_pDeviceContext->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
 
     // We are drawing triangles
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     // Draw the GameEntity
-    deviceContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
+    m_pDeviceContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
    
 	// Present the buffer
-	HR(swapChain->Present(0, 0));
+	HR( m_pSwapChain->Present( 0, 0 ) );
 }
-#pragma endregion
+
+void GameState::Exit( void )
+{
+    /* Nothing to do. */
+}

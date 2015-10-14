@@ -10,10 +10,23 @@
 // -------------------------------------------------------------
 
 #include "DirectXGameCore.h"
+
+// Windows
 #include <WindowsX.h>
+
+// STD
 #include <sstream>
+
+// Managers
 #include "InputManager.h"
 #include "CameraManager.h"
+
+// State
+#include "StateMachine.h"
+#include "GameStates.h"
+#include "MenuState.h"
+#include "GameState.h"
+#include "ExitState.h"
 
 #pragma region Global Window Callback
 
@@ -42,7 +55,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 // --------------------------------------------------------
 DirectXGameCore::DirectXGameCore(HINSTANCE hInstance)
 	: hAppInst(hInstance),
-	windowCaption(L"DirectX Game"),
+	windowCaption(L"Galactic Bulge presents: Asteroids"),
 	windowWidth(800),
 	windowHeight(600),
 	hMainWnd(0),
@@ -115,6 +128,13 @@ bool DirectXGameCore::Init()
 	// DirectX (specifically Direct3D)
 	if(!InitDirect3D())
 		return false;
+
+	// Register Game States
+    StateMachine<GameStates>* pState = StateMachine<GameStates>::instance();
+    pState->RegisterState<MenuState>( GameStates::MENU, device, deviceContext, swapChain, renderTargetView, depthStencilView );
+    pState->RegisterState<GameState>( GameStates::GAME, device, deviceContext, swapChain, renderTargetView, depthStencilView );
+    pState->RegisterState<ExitState>( GameStates::EXIT, device, deviceContext, swapChain, renderTargetView, depthStencilView );
+    pState->GoToState( GameStates::MENU );
 
 	// Everything was set up properly
 	return true;
@@ -351,10 +371,12 @@ int DirectXGameCore::Run()
 
 			// Standard game loop type stuff
 			CalculateFrameStats();
+
 			InputManager::instance()->Update( deltaTime );
+
             CameraManager::instance()->Update( deltaTime );
-			UpdateScene(deltaTime, totalTime);
-			DrawScene(deltaTime, totalTime);			
+
+            StateMachine<GameStates>::instance()->Update( deltaTime, totalTime );
 		}
 	}
 

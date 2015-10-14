@@ -32,8 +32,6 @@ public:
 	// derived classes to implement custom functionality
 	virtual bool Init();
 	virtual void OnResize(); 
-	virtual void UpdateScene(float deltaTime, float totalTime) = 0;
-	virtual void DrawScene(float deltaTime, float totalTime)   = 0;
 	virtual LRESULT ProcessMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 protected:
