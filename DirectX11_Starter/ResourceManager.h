@@ -10,6 +10,7 @@
 #include <d3d11.h>
 #include "Mesh.h"
 #include "SimpleShader.h"
+#include "Material.h"
 
 class ResourceManager
 {
@@ -17,7 +18,8 @@ private:
     std::unordered_map<std::string, Mesh> meshes;
     std::unordered_map<std::string, ISimpleShader*> shaders;
     std::unordered_map<std::string, ID3D11ShaderResourceView*> textures;
-    std::unordered_map<std::string, ID3D11SamplerState*> samplers;
+	std::unordered_map<std::string, ID3D11SamplerState*> samplers;
+	std::unordered_map<std::string, Material*> materials;
 
     ID3D11Device* device;
     ID3D11DeviceContext* deviceContext;
@@ -37,12 +39,15 @@ public:
     Mesh*                           GetMesh( const std::string& id );
     ISimpleShader*                  GetShader( const std::string& id );
     ID3D11ShaderResourceView*       GetTexture( const std::string& id );
-    ID3D11SamplerState*             GetSamplerState( const std::string& id );
+	ID3D11SamplerState*             GetSamplerState(const std::string& id);
+	Material*						GetMaterial(const std::string& id);
 
     /*
      * Access the ResourceManager Singleton
      */
     static ResourceManager* instance();
+
+	ID3D11DeviceContext* GetDeviceContext() { return this->deviceContext; }
 
     /*
      * Register an ID3D11Device and ID3D11DeviceContext with the ResourceManager.
@@ -125,13 +130,39 @@ public:
      */
     bool RegisterTexture( std::string&& id, LPCWSTR filename );
 
-    /*
-     * Register an ID3D11SamplerState* with the ResourceManager.
-     * @param       id          The id to store the ID3D11SamplerState* at.
-     * @param       filename    The description used to create the ID3D11SamplerState.
-     * @return  A bool indicating if the operation was successful.
-     */
-    bool RegisterSamplerState( std::string&& id, D3D11_SAMPLER_DESC pSamplerDesc );
+	/*
+	* Register an ID3D11SamplerState* with the ResourceManager.
+	* @param       id          The id to store the ID3D11SamplerState* at.
+	* @param       filename    The description used to create the ID3D11SamplerState.
+	* @return  A bool indicating if the operation was successful.
+	*/
+	bool RegisterSamplerState(std::string&& id, D3D11_SAMPLER_DESC pSamplerDesc);
+
+	/*
+	* Register a material with the ResourceManager
+	* @param       id        The id to store the Material at.
+	* @param       material  The material to add.
+	* @return  A bool indicating if the operation was successful.
+	*/
+	bool RegisterMaterial(std::string&& id, Material* material)
+	{
+		// Bail if there is not a registered ID3D11Device or ID3D11DeviceContext
+		if (!device || !deviceContext)
+		{
+			return false;
+		}
+
+		// Bail is there is already a Material stored at that id
+		if (materials.find(id) != materials.cend())
+		{
+			return false;
+		}
+
+		// Add the Mesh
+		materials.emplace(std::forward<std::string>(id), material);
+
+		return true;
+	}
 };
 
 #endif

@@ -1,6 +1,8 @@
 #include "GameState.h"
 
 // Managers
+#include "Material.h"
+class Material;
 #include "InputManager.h"
 #include "CameraManager.h"
 #include "ResourceManager.h"
@@ -42,10 +44,18 @@ void GameState::Enter( void )
         pManager->RegisterShader<SimpleVertexShader>( "StandardVertex", L"VertexShader.cso" );
         pManager->RegisterShader<SimplePixelShader>( "StandardPixel", L"PixelShader.cso" );
 
-        /* Texture Creation */
+		/* Texture Creation */
         pManager->RegisterTexture("Diffuse", L"textures/crate.png" );
         pManager->RegisterTexture("Rust", L"textures/rusty.jpg" );
         pManager->RegisterTexture("Rust_Spec", L"textures/rustySpec.png" );
+
+		/* Material Creation */
+		Material* defaultMat = new Material((SimpleVertexShader*)pManager->GetShader("StandardVertex"), (SimplePixelShader*)pManager->GetShader("StandardPixel"));
+		
+		defaultMat->AddTexture("diffuseTexture", "Diffuse");
+		defaultMat->AddTexture("rustTexture", "Rust");
+		defaultMat->AddTexture("specMapTexture", "Rust_Spec");
+		pManager->RegisterMaterial("default", defaultMat);
 
         /* Sampler Creation */
         D3D11_SAMPLER_DESC samplerDesc;
@@ -58,9 +68,9 @@ void GameState::Enter( void )
         pManager->RegisterSamplerState( "trilinear", samplerDesc );
 
         /* GameEntity Creation */
-        entities.emplace_back( pManager->GetMesh("Sphere") );
-        entities.emplace_back( pManager->GetMesh("Helix") );
-        entities.emplace_back( pManager->GetMesh( "Cube" ) );
+		entities.emplace_back( pManager->GetMesh("Sphere"), pManager->GetMaterial("default") );
+        entities.emplace_back( pManager->GetMesh("Helix"),  pManager->GetMaterial("default") );
+        entities.emplace_back( pManager->GetMesh( "Cube" ), pManager->GetMaterial("default") );
 
         isInitialized = true;
     }
@@ -109,11 +119,7 @@ void GameState::Render( float deltaTime, float totalTime, ID3D11RenderTargetView
 	m_pDeviceContext->ClearDepthStencilView( pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
 
     GameEntity* ge = &entities[currentEntity];
-    Mesh* mesh = ge->GetMesh();
-    ID3D11Buffer* vb = mesh->GetVertexBuffer();
-    ID3D11Buffer* ib = mesh->GetIndexBuffer();
-    UINT stride = sizeof(Vertex);
-    UINT offset = 0;
+	Renderer* ren = &ge->GetRenderer();
 
     // Update the Shaders
     {
@@ -124,9 +130,9 @@ void GameState::Render( float deltaTime, float totalTime, ID3D11RenderTargetView
         XMFLOAT4 camPos = pCamera->transform.GetTranslation();
 
         // Update the Vertex Shader
-        pVertexShader->SetMatrix4x4("world", ge->transform.GetTransform());
         pVertexShader->SetMatrix4x4("view", pCamera->GetViewMatrix());
         pVertexShader->SetMatrix4x4("projection", pCamera->GetProjectionMatrix());
+
         pVertexShader->SetShader(true);
 
         // Update the Pixel Shader
@@ -136,22 +142,14 @@ void GameState::Render( float deltaTime, float totalTime, ID3D11RenderTargetView
         pPixelShader->SetFloat4("PointLightColor", XMFLOAT4(1, 1, 1, 1));
         pPixelShader->SetFloat3("CameraPosition", XMFLOAT3(camPos.x, camPos.y, camPos.z));
         pPixelShader->SetFloat("time", totalTime);
-        pPixelShader->SetShaderResourceView("diffuseTexture", pManager->GetTexture("Diffuse"));
-        pPixelShader->SetShaderResourceView("rustTexture", pManager->GetTexture("Rust"));
-        pPixelShader->SetShaderResourceView("specMapTexture", pManager->GetTexture("Rust_Spec"));
-        pPixelShader->SetSamplerState("trilinear", pManager->GetSamplerState( "trilinear" ) );
+
         pPixelShader->SetShader(true);
     }
 
-    // Set the Vertex and Index buffers
-    m_pDeviceContext->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
-    m_pDeviceContext->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
-
-    // We are drawing triangles
+	// We are drawing triangles
 	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    // Draw the GameEntity
-    m_pDeviceContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
+	ge->Draw();
    
 	// Present the buffer
 	HR( m_pSwapChain->Present( 0, 0 ) );

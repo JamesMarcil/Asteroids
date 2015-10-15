@@ -2,16 +2,21 @@
 
 using namespace DirectX;
 
-GameEntity::GameEntity(Mesh* mesh)
+GameEntity::GameEntity(Mesh* mesh, Material* mat)
 {
-	// Save the mesh
-	this->mesh = mesh;
+	this->renderer = Renderer(mesh, mat);
 }
 
 GameEntity::~GameEntity(void)
 {
+	
 }
 
 void GameEntity::Update(float dt) {
 
+}
+
+void GameEntity::Draw()
+{
+	renderer.Draw(transform);
 }

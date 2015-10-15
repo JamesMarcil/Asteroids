@@ -22,11 +22,17 @@ ResourceManager::~ResourceManager()
         ReleaseMacro( pair.second );
 	}
 
-    // Release SamplerStates
-    for( auto& pair : samplers )
-    {
-        ReleaseMacro( pair.second );
-    }
+	// Release SamplerStates
+	for (auto& pair : samplers)
+	{
+		ReleaseMacro(pair.second);
+	}
+
+	// Release Materials
+	for (auto& pair : materials)
+	{
+		delete pair.second;
+	}
 }
 
 /*
@@ -93,6 +99,17 @@ ID3D11SamplerState* ResourceManager::GetSamplerState( const std::string& id )
     }
 
     return iter->second;
+}
+
+Material* ResourceManager::GetMaterial(const std::string& id)
+{
+	auto& iter = materials.find(id);
+	if (iter == materials.cend())
+	{
+		return nullptr;
+	}
+
+	return iter->second;
 }
 
 #pragma endregion

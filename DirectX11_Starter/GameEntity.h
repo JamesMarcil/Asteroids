@@ -1,8 +1,9 @@
 #pragma once
 
 #include <DirectXMath.h>
-#include "Mesh.h"
+
 #include "Transform.h"
+#include "Renderer.h"
 
 /*
 TODO 
@@ -16,14 +17,15 @@ class GameEntity
 public:
 	Transform transform;
 
-	GameEntity(Mesh* mesh);
+	GameEntity(Mesh* mesh, Material* mat);
 	~GameEntity(void);
 
 	void Update(float dt);
+	void Draw();
 
-	Mesh* GetMesh() { return mesh; }
+	Renderer GetRenderer() { return renderer; }
 
 private:
-	Mesh* mesh;
+	Renderer renderer;
 };
 
