@@ -10,6 +10,7 @@
 #include "GameStates.h"
 
 // DirectX
+#include <d3d11.h>
 #include <DirectXMath.h>
 #include "DXMacros.h"
 #include "Vertex.h"
@@ -98,14 +99,14 @@ void GameState::Update( float deltaTime, float totalTime )
     prevSpaceBar = currentSpacebar;
 }
 
-void GameState::Render( float deltaTime, float totalTime )
+void GameState::Render( float deltaTime, float totalTime, ID3D11RenderTargetView* const pRenderTargetView, ID3D11DepthStencilView* const pDepthStencilView )
 {
 	// Background color (Cornflower Blue in this case) for clearing
 	const float color[4] = {0.4f, 0.6f, 0.75f, 0.0f};
 
 	// Clear the render target and depth buffer (erases what's on the screen)
-	m_pDeviceContext->ClearRenderTargetView( m_pRenderTargetView, color );
-	m_pDeviceContext->ClearDepthStencilView( m_pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
+	m_pDeviceContext->ClearRenderTargetView( pRenderTargetView, color );
+	m_pDeviceContext->ClearDepthStencilView( pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
 
     GameEntity* ge = &entities[currentEntity];
     Mesh* mesh = ge->GetMesh();

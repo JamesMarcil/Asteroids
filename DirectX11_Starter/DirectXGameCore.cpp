@@ -131,9 +131,9 @@ bool DirectXGameCore::Init()
 
 	// Register Game States
     StateMachine<GameStates>* pState = StateMachine<GameStates>::instance();
-    pState->RegisterState<MenuState>( GameStates::MENU, device, deviceContext, swapChain, renderTargetView, depthStencilView );
-    pState->RegisterState<GameState>( GameStates::GAME, device, deviceContext, swapChain, renderTargetView, depthStencilView );
-    pState->RegisterState<ExitState>( GameStates::EXIT, device, deviceContext, swapChain, renderTargetView, depthStencilView );
+    pState->RegisterState<MenuState>( GameStates::MENU, device, deviceContext, swapChain );
+    pState->RegisterState<GameState>( GameStates::GAME, device, deviceContext, swapChain );
+    pState->RegisterState<ExitState>( GameStates::EXIT, device, deviceContext, swapChain );
     pState->GoToState( GameStates::MENU );
 
 	// Everything was set up properly
@@ -376,7 +376,7 @@ int DirectXGameCore::Run()
 
             CameraManager::instance()->Update( deltaTime );
 
-            StateMachine<GameStates>::instance()->Update( deltaTime, totalTime );
+            StateMachine<GameStates>::instance()->Update( deltaTime, totalTime, renderTargetView, depthStencilView );
 		}
 	}
 
