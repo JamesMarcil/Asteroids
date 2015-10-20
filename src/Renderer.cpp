@@ -12,22 +12,22 @@ Renderer::~Renderer()
 
 }
 
-void Renderer::Draw(Transform t)
+void Renderer::Draw(Transform& t)
 {
 	ResourceManager* pManager = ResourceManager::instance();
 	if(this->deviceContext == nullptr)
 		this->deviceContext = pManager->GetDeviceContext();
 
 	SimpleVertexShader* vert = (SimpleVertexShader*)material->GetVertexShader();
-	vert->SetMatrix4x4("world", t.GetTransform());
+	vert->SetMatrix4x4("world", t.GetWorldMatrix());
 
 	SimplePixelShader* pixel = (SimplePixelShader*)material->GetPixelShader();
 	pixel->SetSamplerState("trilinear", pManager->GetSamplerState("trilinear"));
 
 	material->WriteShaderInfo();
 
-	vert->CopyAllBufferData();
-	pixel->CopyAllBufferData();
+	vert->SetShader(true);
+	pixel->SetShader(true);
 
 	ID3D11Buffer* vb = mesh->GetVertexBuffer();
 	ID3D11Buffer* ib = mesh->GetIndexBuffer();

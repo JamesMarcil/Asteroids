@@ -1,20 +1,14 @@
 #include "GameEntity.h"
 
-using namespace DirectX;
-
 GameEntity::GameEntity(Mesh* mesh, Material* mat)
-{
-	this->renderer = Renderer(mesh, mat);
-}
+    : renderer( mesh, mat )
+{ /* Nothing to do. */ }
 
 GameEntity::~GameEntity(void)
-{
-	
-}
+{ /* Nothing to do. */ }
 
-void GameEntity::Update(float dt) {
-
-}
+void GameEntity::Update(float dt)
+{ /* Nothing to do. */ }
 
 void GameEntity::Draw()
 {

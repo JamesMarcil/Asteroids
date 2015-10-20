@@ -2,7 +2,6 @@
 
 // Managers
 #include "Material.h"
-class Material;
 #include "InputManager.h"
 #include "CameraManager.h"
 #include "ResourceManager.h"
@@ -50,8 +49,11 @@ void GameState::Enter( void )
         pManager->RegisterTexture("Rust_Spec", L"textures/rustySpec.png" );
 
 		/* Material Creation */
-		Material* defaultMat = new Material((SimpleVertexShader*)pManager->GetShader("StandardVertex"), (SimplePixelShader*)pManager->GetShader("StandardPixel"));
-		
+		Material* defaultMat = new Material
+        (
+            static_cast<SimpleVertexShader*>(pManager->GetShader("StandardVertex")),
+            static_cast<SimplePixelShader*>(pManager->GetShader("StandardPixel"))
+        );
 		defaultMat->AddTexture("diffuseTexture", "Diffuse");
 		defaultMat->AddTexture("rustTexture", "Rust");
 		defaultMat->AddTexture("specMapTexture", "Rust_Spec");
@@ -68,9 +70,18 @@ void GameState::Enter( void )
         pManager->RegisterSamplerState( "trilinear", samplerDesc );
 
         /* GameEntity Creation */
-		entities.emplace_back( pManager->GetMesh("Sphere"), pManager->GetMaterial("default") );
-        entities.emplace_back( pManager->GetMesh("Helix"),  pManager->GetMaterial("default") );
-        entities.emplace_back( pManager->GetMesh( "Cube" ), pManager->GetMaterial("default") );
+        entities.emplace_back(pManager->GetMesh("Sphere"), pManager->GetMaterial("default"));
+        entities.emplace_back(pManager->GetMesh("Helix"),  pManager->GetMaterial("default"));
+        entities.emplace_back(pManager->GetMesh("Cube"), pManager->GetMaterial("default"));
+
+        GameEntity* sphere = &entities[ 0 ];
+        GameEntity* helix = &entities[ 1 ];
+        GameEntity* cube = &entities[ 2 ];
+
+        sphere->GetTransform()->AddChild(helix->GetTransform());
+        helix->GetTransform()->AddChild(cube->GetTransform());
+        helix->GetTransform()->Translate(0.0f, 0.0f, 2.0f);
+        cube->GetTransform()->Translate(2.0f, 0.0f, 0.0f);
 
         isInitialized = true;
     }
@@ -100,26 +111,22 @@ void GameState::Update( float deltaTime, float totalTime )
         pState->GoToState( GameStates::EXIT );
     }
 
-    // Check for entity swap.
-    bool currentSpacebar = pInput->IsKeyDown( VK_TAB );
-    if ( currentSpacebar && !prevSpaceBar )
-    {
-        currentEntity = (currentEntity + 1) % entities.size();
-    }
-    prevSpaceBar = currentSpacebar;
+    // Translate the cube forward, and slowly rotate all three GameEntities
+    entities[0].GetTransform()->Translate(0.5f * deltaTime, 0.0f, 0.0f);
+	for (GameEntity& ge : entities)
+	{
+		ge.GetTransform()->Rotate(0.0f, deltaTime * 5.0f * XM_PI / 180.0f, 0.0f);
+	}
 }
 
 void GameState::Render( float deltaTime, float totalTime, ID3D11RenderTargetView* const pRenderTargetView, ID3D11DepthStencilView* const pDepthStencilView )
 {
-	// Background color (Cornflower Blue in this case) for clearing
-	const float color[4] = {0.4f, 0.6f, 0.75f, 0.0f};
+    // Background color (Cornflower Blue in this case) for clearing
+    const float color[4] = {0.4f, 0.6f, 0.75f, 0.0f};
 
-	// Clear the render target and depth buffer (erases what's on the screen)
-	m_pDeviceContext->ClearRenderTargetView( pRenderTargetView, color );
-	m_pDeviceContext->ClearDepthStencilView( pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
-
-    GameEntity* ge = &entities[currentEntity];
-	Renderer* ren = &ge->GetRenderer();
+    // Clear the render target and depth buffer (erases what's on the screen)
+    m_pDeviceContext->ClearRenderTargetView( pRenderTargetView, color );
+    m_pDeviceContext->ClearDepthStencilView( pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
 
     // Update the Shaders
     {
@@ -127,13 +134,11 @@ void GameState::Render( float deltaTime, float totalTime, ID3D11RenderTargetView
         ISimpleShader   *pVertexShader = pManager->GetShader( "StandardVertex" ),
                         *pPixelShader = pManager->GetShader( "StandardPixel" );
         Camera* pCamera = CameraManager::instance()->GetActiveCamera();
-        XMFLOAT4 camPos = pCamera->transform.GetTranslation();
+        XMFLOAT3 camPos = pCamera->transform.GetTranslation();
 
         // Update the Vertex Shader
         pVertexShader->SetMatrix4x4("view", pCamera->GetViewMatrix());
         pVertexShader->SetMatrix4x4("projection", pCamera->GetProjectionMatrix());
-
-        pVertexShader->SetShader(true);
 
         // Update the Pixel Shader
         pPixelShader->SetFloat3("DirLightDirection", XMFLOAT3(1, 1, 1));
@@ -142,20 +147,19 @@ void GameState::Render( float deltaTime, float totalTime, ID3D11RenderTargetView
         pPixelShader->SetFloat4("PointLightColor", XMFLOAT4(1, 1, 1, 1));
         pPixelShader->SetFloat3("CameraPosition", XMFLOAT3(camPos.x, camPos.y, camPos.z));
         pPixelShader->SetFloat("time", totalTime);
-
-        pPixelShader->SetShader(true);
     }
 
-	// We are drawing triangles
-	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    // We are drawing triangles
+    m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	ge->Draw();
-   
-	// Present the buffer
-	HR( m_pSwapChain->Present( 0, 0 ) );
+    // Render each GameEntity
+    for( GameEntity& ge : entities )
+    {
+        ge.Draw();
+    }
+
+    // Present the buffer
+    HR( m_pSwapChain->Present( 0, 0 ) );
 }
 
-void GameState::Exit( void )
-{
-    /* Nothing to do. */
-}
+void GameState::Exit( void ) { /* Nothing to do. */ }

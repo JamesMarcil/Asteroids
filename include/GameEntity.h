@@ -1,21 +1,20 @@
-#pragma once
+#ifndef GAME_ENTITY_H
+#define GAME_ENTITY_H
 
+// DirectX
 #include <DirectXMath.h>
+#include "Renderer.h"
 
 #include "Transform.h"
-#include "Renderer.h"
 
 /*
 TODO 
-Split off rendering to Renderer class
-Split off position to Transform class
 Handle velocity and movement
 Abstract this class for use as custom entities
 */
 class GameEntity
 {
 public:
-	Transform transform;
 
 	GameEntity(Mesh* mesh, Material* mat);
 	~GameEntity(void);
@@ -24,8 +23,11 @@ public:
 	void Draw();
 
 	Renderer GetRenderer() { return renderer; }
+    Transform* GetTransform() { return &transform; }
 
 private:
 	Renderer renderer;
+	Transform transform;
 };
 
+#endif

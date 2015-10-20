@@ -12,7 +12,7 @@ public:
 	Renderer(Mesh*, Material*);
 	~Renderer();
 
-	void Draw(Transform t);
+	void Draw(Transform& t);
 
 	Mesh* GetMesh() { return mesh; }
 	Material* GetMaterial() { return material; }

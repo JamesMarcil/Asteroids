@@ -15,9 +15,7 @@ const float Camera::DEFAULT_ROTATION_SPEED = 5.0f;
 Camera::Camera(float x, float y, float z)
 	: m_xRotation(0.0f), m_yRotation(0.0f), m_moveSpeed(Camera::DEFAULT_MOVE_SPEED), m_rotationSpeed(Camera::DEFAULT_ROTATION_SPEED)
 {
-
-	transform = Transform(XMFLOAT4(x, y, z, 1));
-
+	transform = Transform(XMFLOAT3(x, y, z));
 	RecalculateViewMatrix();
 	UpdateProjectionMatrix(Camera::DEFAULT_FOV, Camera::DEFAULT_ASPECT_RATIO, Camera::DEFAULT_NEAR_PLANE, Camera::DEFAULT_FAR_PLANE);
 }
@@ -44,9 +42,7 @@ void Camera::MoveRelative(float x, float y, float z)
 {
 	// Rotate the desired movement vector and move in that direction
 	XMVECTOR dir = XMVector3Rotate(XMVectorSet(x, y, z, 0), XMLoadFloat4(&transform.GetRotation()));
-	XMFLOAT3 translation;
-	XMStoreFloat3(&translation, dir);
-	transform.Translate(translation);
+	transform.Translate(dir);
 
 	// Update the View matrix
 	RecalculateViewMatrix();
@@ -97,9 +93,7 @@ void Camera::Rotate(float x, float y)
 		m_yRotation = XM_2PI;
 	}
 
-	XMVECTOR rot = XMQuaternionRotationRollPitchYaw(m_xRotation, m_yRotation, 0.0f);
-
-	transform.SetRotation(rot, 1.0f);
+	transform.SetRotation(m_xRotation, m_yRotation, 0.0f);
 
 	// Update the View matrix
 	RecalculateViewMatrix();
@@ -143,11 +137,11 @@ void Camera::SetRotationSpeed(float rotationSpeed)
  */
 void Camera::RecalculateViewMatrix()
 {
-	XMVECTOR	position = XMLoadFloat4(&transform.GetTranslation()),
-		rotation = XMLoadFloat4(&transform.GetRotation()),
-		forward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f),
-		up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f),
-		dir = XMVector3Rotate(forward, rotation);
+	XMVECTOR	position = XMLoadFloat3(&transform.GetTranslation()),
+		        rotation = XMLoadFloat4(&transform.GetRotation()),
+		        forward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f),
+		        up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f),
+		        dir = XMVector3Rotate(forward, rotation);
 
 	XMMATRIX view = XMMatrixLookToLH(position, dir, up);
 	XMStoreFloat4x4(&m_viewMatrix, XMMatrixTranspose(view));
