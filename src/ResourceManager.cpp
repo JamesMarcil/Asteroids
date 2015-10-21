@@ -120,7 +120,7 @@ Material* ResourceManager::GetMaterial(const std::string& id)
  * @param       filename    The filename of the texture.
  * @return  A bool indicating if the operation was successful.
  */
-bool ResourceManager::RegisterTexture( std::string&& id, LPCWSTR filename )
+bool ResourceManager::RegisterTexture( const std::string& id, LPCWSTR filename )
 {
     // Bail if there is not a registered ID3D11Device or ID3D11DeviceContext
     if( !device || !deviceContext )
@@ -138,7 +138,7 @@ bool ResourceManager::RegisterTexture( std::string&& id, LPCWSTR filename )
     {
         ID3D11ShaderResourceView* pTexture;
         DirectX::CreateWICTextureFromFile(device, deviceContext, filename, 0, &pTexture);
-        textures.emplace( std::forward<std::string>( id ), pTexture );
+        textures.emplace( id, pTexture );
     }
 
     return true;
@@ -151,7 +151,7 @@ bool ResourceManager::RegisterTexture( std::string&& id, LPCWSTR filename )
  * @param       filename    The description used to create the ID3D11SamplerState.
  * @return  A bool indicating if the operation was successful.
  */
-bool ResourceManager::RegisterSamplerState( std::string&& id, D3D11_SAMPLER_DESC pSamplerDesc )
+bool ResourceManager::RegisterSamplerState( const std::string& id, D3D11_SAMPLER_DESC pSamplerDesc )
 {
     // Bail if there is not a registered ID3D11Device or ID3D11DeviceContext
     if( !device || !deviceContext )
@@ -169,7 +169,7 @@ bool ResourceManager::RegisterSamplerState( std::string&& id, D3D11_SAMPLER_DESC
     {
         ID3D11SamplerState* pSamplerState;
         device->CreateSamplerState( &pSamplerDesc, &pSamplerState );
-        samplers.emplace( std::forward<std::string>( id ), pSamplerState );
+        samplers.emplace( id, pSamplerState );
     }
 
     return true;

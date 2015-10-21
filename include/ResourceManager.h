@@ -36,9 +36,9 @@ private:
 public:
 
     // Getters
-    Mesh*                           GetMesh( const std::string& id );
-    ISimpleShader*                  GetShader( const std::string& id );
-    ID3D11ShaderResourceView*       GetTexture( const std::string& id );
+    Mesh*                           GetMesh(const std::string& id );
+    ISimpleShader*                  GetShader(const std::string& id );
+    ID3D11ShaderResourceView*       GetTexture(const std::string& id );
 	ID3D11SamplerState*             GetSamplerState(const std::string& id);
 	Material*						GetMaterial(const std::string& id);
 
@@ -63,7 +63,7 @@ public:
      * @return  A bool indicating if the operation was successful.
      */
     template <typename... Args>
-    bool RegisterMesh( std::string&& id, Args&&... args )
+    bool RegisterMesh( const std::string& id, Args&&... args )
     {
         // Bail if there is not a registered ID3D11Device or ID3D11DeviceContext
         if( !device || !deviceContext )
@@ -95,7 +95,7 @@ public:
      * @return  A bool indicating if the operation was successful.
      */
     template <typename T>
-    bool RegisterShader( std::string&& id, LPCWSTR filename )
+    bool RegisterShader( const std::string& id, LPCWSTR filename )
     {
         static_assert( std::is_base_of<ISimpleShader, T>::value, "Must be an instance of ISimpleShader!" );
 
@@ -116,7 +116,7 @@ public:
             T* shader = new T( device, deviceContext );
             shader->LoadShaderFile( filename );
 
-            shaders.emplace( std::forward<std::string>( id ), shader );
+            shaders.emplace( id, shader );
         }
 
         return true;
@@ -128,7 +128,7 @@ public:
      * @param       filename    The filename of the texture.
      * @return  A bool indicating if the operation was successful.
      */
-    bool RegisterTexture( std::string&& id, LPCWSTR filename );
+    bool RegisterTexture(const std::string& id, LPCWSTR filename );
 
 	/*
 	* Register an ID3D11SamplerState* with the ResourceManager.
@@ -136,7 +136,7 @@ public:
 	* @param       filename    The description used to create the ID3D11SamplerState.
 	* @return  A bool indicating if the operation was successful.
 	*/
-	bool RegisterSamplerState(std::string&& id, D3D11_SAMPLER_DESC pSamplerDesc);
+	bool RegisterSamplerState(const std::string& id, D3D11_SAMPLER_DESC pSamplerDesc);
 
 	/*
 	* Register a material with the ResourceManager
@@ -144,7 +144,7 @@ public:
 	* @param       material  The material to add.
 	* @return  A bool indicating if the operation was successful.
 	*/
-	bool RegisterMaterial(std::string&& id, Material* material)
+	bool RegisterMaterial(const std::string& id, Material* material)
 	{
 		// Bail if there is not a registered ID3D11Device or ID3D11DeviceContext
 		if (!device || !deviceContext)
@@ -159,7 +159,7 @@ public:
 		}
 
 		// Add the Mesh
-		materials.emplace(std::forward<std::string>(id), material);
+		materials.emplace(id, material);
 
 		return true;
 	}

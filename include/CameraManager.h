@@ -73,7 +73,7 @@ public:
      *      pManager->SetActiveCamera( "debug_camera" );
      */
     template <typename T, typename... Args>
-    bool RegisterCamera( std::string&& id, Args&&... args )
+    bool RegisterCamera( const std::string& id, Args&&... args )
     {
         // Assert that T is a child of the Camera class.
         static_assert( std::is_base_of<Camera, T>::value, "Must be an instance of class Camera!" );
@@ -87,7 +87,7 @@ public:
 
         // Construct the Camera.
         Camera* c = new T( std::forward<Args>( args )... );
-        m_cameras.emplace( std::forward<std::string>( id ), c );
+        m_cameras.emplace( id, c );
 
         return true;
     }
