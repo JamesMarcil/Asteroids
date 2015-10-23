@@ -23,7 +23,7 @@ private:
     bool     isInitialized;
     bool	 prevSpaceBar;
     unsigned currentEntity;
-	std::vector<GameEntity> entities;
+    std::vector<GameEntity*> entities;
 
     virtual void Enter( void ) override;
     virtual void Update( float deltaTime, float totalTime ) override;
@@ -32,11 +32,16 @@ private:
 
 public:
     GameState( ID3D11Device* const pDevice, ID3D11DeviceContext* const pDeviceContext, IDXGISwapChain* const pSwapChain )
-        : m_pDevice( pDevice ), m_pDeviceContext( pDeviceContext ), m_pSwapChain( pSwapChain )
-    {
-    }
+        : isInitialized( false ), m_pDevice( pDevice ), m_pDeviceContext( pDeviceContext ), m_pSwapChain( pSwapChain )
+    { /* Nothing to do */ }
 
-	virtual ~GameState() {}
+	virtual ~GameState()
+    {
+        for( GameEntity* e : entities )
+        {
+            delete e;
+        }
+    }
 };
 
 #endif

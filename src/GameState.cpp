@@ -17,6 +17,13 @@
 #include "Vertex.h"
 #include "SimpleShader.h"
 
+// Components
+#include "IComponent.h"
+#include "TransformComponent.h"
+#include "RenderComponent.h"
+#include "PhysicsComponent.h"
+#include "InputComponent.h"
+
 // For the DirectX Math library
 using namespace DirectX;
 
@@ -70,18 +77,31 @@ void GameState::Enter( void )
         pManager->RegisterSamplerState( "trilinear", samplerDesc );
 
         /* GameEntity Creation */
-        entities.emplace_back(pManager->GetMesh("Sphere"), pManager->GetMaterial("default"));
-        entities.emplace_back(pManager->GetMesh("Helix"),  pManager->GetMaterial("default"));
-        entities.emplace_back(pManager->GetMesh("Cube"), pManager->GetMaterial("default"));
-
-        GameEntity* sphere = &entities[ 0 ];
-        GameEntity* helix = &entities[ 1 ];
-        GameEntity* cube = &entities[ 2 ];
-
-        sphere->GetTransform()->AddChild(helix->GetTransform());
-        helix->GetTransform()->AddChild(cube->GetTransform());
-        helix->GetTransform()->Translate(0.0f, 0.0f, 2.0f);
-        cube->GetTransform()->Translate(2.0f, 0.0f, 0.0f);
+        {
+            GameEntity* e = new GameEntity();
+            e->AddComponent<TransformComponent>();
+            e->AddComponent<RenderComponent>(pManager->GetMesh("Sphere"), defaultMat);
+            PhysicsComponent* pPhysics = e->AddComponent<PhysicsComponent>();
+            XMStoreFloat3(&pPhysics->GetAcceleration(), XMVectorSet(0.0f, -0.5f, 0.0f, 0.0f));
+            entities.push_back(e);
+        }
+        {
+            GameEntity* e = new GameEntity();
+            e->AddComponent<TransformComponent>();
+            TransformComponent* pTransform = e->AddComponent<TransformComponent>();
+            pTransform->GetTransform().Translate(5.0f, 0.0f, 0.0f);
+            e->AddComponent<RenderComponent>(pManager->GetMesh("Cube"), defaultMat);
+            entities.push_back(e);
+        }
+        {
+            GameEntity* e = new GameEntity();
+            e->AddComponent<TransformComponent>();
+            TransformComponent* pTransform = e->AddComponent<TransformComponent>();
+            pTransform->GetTransform().Translate(-5.0f, 0.0f, 0.0f);
+            e->AddComponent<RenderComponent>(pManager->GetMesh("Helix"), defaultMat);
+            e->AddComponent<InputComponent>(5.0f);
+            entities.push_back(e);
+        }
 
         isInitialized = true;
     }
@@ -110,13 +130,6 @@ void GameState::Update( float deltaTime, float totalTime )
     {
         pState->GoToState( GameStates::EXIT );
     }
-
-    // Translate the cube forward, and slowly rotate all three GameEntities
-    entities[0].GetTransform()->Translate(0.5f * deltaTime, 0.0f, 0.0f);
-	for (GameEntity& ge : entities)
-	{
-		ge.GetTransform()->Rotate(0.0f, deltaTime * 5.0f * XM_PI / 180.0f, 0.0f);
-	}
 }
 
 void GameState::Render( float deltaTime, float totalTime, ID3D11RenderTargetView* const pRenderTargetView, ID3D11DepthStencilView* const pDepthStencilView )
@@ -152,10 +165,10 @@ void GameState::Render( float deltaTime, float totalTime, ID3D11RenderTargetView
     // We are drawing triangles
     m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    // Render each GameEntity
-    for( GameEntity& ge : entities )
+    // Update the GameEntities
+    for( GameEntity* e : entities )
     {
-        ge.Draw();
+        e->Update( deltaTime, totalTime );
     }
 
     // Present the buffer
