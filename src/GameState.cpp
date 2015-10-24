@@ -31,7 +31,7 @@ void GameState::Enter( void )
     // Register resources with the ResourceManager
     if( !isInitialized )
     {
-        ResourceManager* pManager = ResourceManager::instance();
+        ResourceManager* pManager = ResourceManager::Instance();
         pManager->RegisterDeviceAndContext( m_pDevice, m_pDeviceContext );
 
         /* Mesh Creation */
@@ -99,8 +99,8 @@ void GameState::Enter( void )
 void GameState::Update( float deltaTime, float totalTime )
 {
 	// Handle Input
-    InputManager* pInput = InputManager::instance();
-    StateMachine<GameStates>* pState = StateMachine<GameStates>::instance();
+    InputManager* pInput = InputManager::Instance();
+    StateMachine<GameStates>* pState = StateMachine<GameStates>::Instance();
 
     if( pInput->IsKeyDown( '1' ) )
     {
@@ -130,10 +130,10 @@ void GameState::Render( float deltaTime, float totalTime, ID3D11RenderTargetView
 
     // Update the Shaders
     {
-        ResourceManager* pManager = ResourceManager::instance();
+        ResourceManager* pManager = ResourceManager::Instance();
         ISimpleShader   *pVertexShader = pManager->GetShader( "StandardVertex" ),
                         *pPixelShader = pManager->GetShader( "StandardPixel" );
-        Camera* pCamera = CameraManager::instance()->GetActiveCamera();
+        Camera* pCamera = CameraManager::Instance()->GetActiveCamera();
         XMFLOAT3 camPos = pCamera->transform.GetTranslation();
 
         // Update the Vertex Shader
