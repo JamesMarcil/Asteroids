@@ -47,6 +47,26 @@ void ResourceManager::RegisterDeviceAndContext( ID3D11Device* const device, ID3D
 }
 
 /*
+ * Register an ID3D11RenderView and ID3D11DepthStencilView with the ResourceManager.
+ * @param   pRender             The ID3D11RenderTargetView to register.
+ * @param   pDepthStencil       The ID3D11DepthStencilView to register.
+ */
+void ResourceManager::RegisterRenderTargetAndDepthStencilView(ID3D11RenderTargetView* pRender, ID3D11DepthStencilView* pDepthStencil)
+{
+    this->renderTargetView = pRender;
+    this->depthStencilView = pDepthStencil;
+}
+
+/*
+ * Register an IDXGISwapChain
+ * @param   pSwapChain          The IDXGISwapChain to register.
+ */
+void ResourceManager::RegisterSwapChain(IDXGISwapChain* pSwapChain)
+{
+    this->swapChain = pSwapChain;
+}
+
+/*
  * Access the ResourceManager Singleton
  */
 ResourceManager* ResourceManager::instance() 

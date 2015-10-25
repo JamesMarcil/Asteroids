@@ -31,15 +31,6 @@ void MenuState::Update( float deltaTime, float totalTime )
     }
 }
 
-void MenuState::Render( float deltaTime, float totalTime, ID3D11RenderTargetView* const pRenderTargetView, ID3D11DepthStencilView* const pDepthStencilView )
-{
-    // Render the screen black
-	const float black[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	m_pDeviceContext->ClearRenderTargetView( pRenderTargetView, black );
-	m_pDeviceContext->ClearDepthStencilView( pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
-    HR( m_pSwapChain->Present( 0, 0 ) ); 
-}
-
 void MenuState::Exit( void )
 {
 	/* Nothing to do. */

@@ -46,6 +46,12 @@
     <Filter Include="Source Files\Components">
       <UniqueIdentifier>{813ea535-ba94-4741-9773-a84b08d37505}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Systems">
+      <UniqueIdentifier>{4df01824-061e-45b6-ae06-591bd74d2dc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Systems">
+      <UniqueIdentifier>{6240158d-ed88-4ee4-a3ff-25bc23de4ce3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -55,9 +61,6 @@
       <Filter>Header Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="..\include\DebugCamera.h">
-      <Filter>Header Files\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\GameEntity.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Transform.h">
@@ -120,14 +123,29 @@
     <ClInclude Include="..\include\TransformComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\IComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\RenderComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\include\InputComponent.h">
       <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Component.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\EntityManager.h">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\GameEntity.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\System.h">
+      <Filter>Header Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\PhysicsSystem.h">
+      <Filter>Header Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\RenderSystem.h">
+      <Filter>Header Files\Systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -170,9 +188,6 @@
     <ClCompile Include="..\src\DebugCamera.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\GameEntity.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Transform.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
@@ -182,20 +197,17 @@
     <ClCompile Include="..\src\SimpleShader.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\TransformComponent.cpp">
+    <ClCompile Include="..\src\Component.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\RenderComponent.cpp">
-      <Filter>Source Files\Components</Filter>
+    <ClCompile Include="..\src\System.cpp">
+      <Filter>Source Files\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\PhysicsComponent.cpp">
-      <Filter>Source Files\Components</Filter>
+    <ClCompile Include="..\src\PhysicsSystem.cpp">
+      <Filter>Source Files\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\IComponent.cpp">
-      <Filter>Source Files\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\InputComponent.cpp">
-      <Filter>Source Files\Components</Filter>
+    <ClCompile Include="..\src\RenderSystem.cpp">
+      <Filter>Source Files\Systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

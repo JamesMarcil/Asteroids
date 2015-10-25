@@ -95,12 +95,11 @@ public:
         return true;
     }
 
-    void Update( float deltaTime, float totalTime, ID3D11RenderTargetView* const pRenderTargetView, ID3D11DepthStencilView* const pDepthStencilView )
+    void Update( float deltaTime, float totalTime )
     {
         if( m_pCurrState )
         {
             m_pCurrState->Update( deltaTime, totalTime );
-            m_pCurrState->Render( deltaTime, totalTime, pRenderTargetView, pDepthStencilView );
         }
     }
 };

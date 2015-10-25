@@ -2,36 +2,19 @@
 #define INPUT_COMPONENT_H
 
 // Components
-#include "IComponent.h"
-#include "TransformComponent.h"
+#include "Component.h"
 
-// Managers
-#include "InputManager.h"
-
-class InputComponent : public IComponent
+struct InputComponent : public Component<InputComponent>
 {
-private:
-    float m_movementSpeed;
-    TransformComponent* m_pTransform;
-    InputManager* m_pInput;
+    float movementSpeed;
 
-public:
-    /*
-     * Construct an instance of a InputComponent.
-     * @param   pParent         A pointer to the GameEntity that owns this IComponent.
-     * @param   speed           The speed this InputComponent will use.
-     */
-    InputComponent(GameEntity* pParent, float speed);
+    InputComponent(float speed)
+        : movementSpeed(speed)
+    {
+        /* Nothing to do. */
+    }
 
-    /*
-     * Destroy this InputComponent.
-     */
-    virtual ~InputComponent();
-
-    /* IComponent interface functions */
-    virtual void OnEnable(void) override;
-    virtual void OnDisable(void) override;
-    virtual void Update(float dt, float tt) override;
+    virtual ~InputComponent(void){}
 };
 
 #endif

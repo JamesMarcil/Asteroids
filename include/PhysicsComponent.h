@@ -1,46 +1,35 @@
 #ifndef PHYSICS_COMPONENT_H
 #define PHYSICS_COMPONENT_H
 
+#include "Component.h"
+
 // DirectX
 #include <DirectXMath.h>
 
-#include "IComponent.h"
-#include "TransformComponent.h"
-
-class PhysicsComponent : public IComponent
+struct PhysicsComponent : public Component<PhysicsComponent>
 {
-private:
-    DirectX::XMFLOAT3 m_velocity;
-    DirectX::XMFLOAT3 m_acceleration;
-    TransformComponent* m_pTransform;
+    DirectX::XMFLOAT3 velocity;
+    DirectX::XMFLOAT3 acceleration;
 
-public:
-    /*
-     * Construct an instance of a PhysicsComponent.
-     * @param   pParent     A pointer to the GameEntity that owns this PhysicsComponent.
-     */
-    PhysicsComponent(GameEntity* pParent);
-
-    /*
-     * Destroy this PhysicsComponent.
-     */
-    virtual ~PhysicsComponent(void);
-
-    /* Getters */
-    DirectX::XMFLOAT3& GetVelocity(void)
+    PhysicsComponent(float vx, float vy, float vz, float ax, float ay, float az)
     {
-        return m_velocity;
+        velocity = DirectX::XMFLOAT3( vx, vy, vz );
+        acceleration = DirectX::XMFLOAT3( ax, ay, az );
     }
 
-    DirectX::XMFLOAT3& GetAcceleration(void)
+    PhysicsComponent(DirectX::XMVECTOR& v, DirectX::XMVECTOR& a)
     {
-        return m_acceleration;
+        DirectX::XMStoreFloat3(&velocity, v);
+        DirectX::XMStoreFloat3(&acceleration, a);
     }
 
-    /* IComponent inteface functions */
-    virtual void OnEnable(void) override;
-    virtual void OnDisable(void) override;
-    virtual void Update(float dt, float tt) override;
+    PhysicsComponent(DirectX::XMFLOAT3 v, DirectX::XMFLOAT3 a)
+    {
+        velocity = v;
+        acceleration = a;
+    }
+
+    ~PhysicsComponent(void){}
 };
 
 #endif
