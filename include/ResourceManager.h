@@ -23,8 +23,11 @@ private:
 	std::unordered_map<std::string, ID3D11SamplerState*> samplers;
 	std::unordered_map<std::string, Material*> materials;
 
-    ID3D11Device* device;
-    ID3D11DeviceContext* deviceContext;
+    ID3D11Device*           device;
+    ID3D11DeviceContext*    deviceContext;
+    ID3D11RenderTargetView* renderTargetView;
+    ID3D11DepthStencilView* depthStencilView;
+    IDXGISwapChain*         swapChain;
 
 public:
     ResourceManager(void);
@@ -32,12 +35,15 @@ public:
 
     // Getters
     Mesh*                           GetMesh(const std::string& id );
+	Material*						GetMaterial(const std::string& id);
     ISimpleShader*                  GetShader(const std::string& id );
     ID3D11ShaderResourceView*       GetTexture(const std::string& id );
 	ID3D11SamplerState*             GetSamplerState(const std::string& id);
-	Material*						GetMaterial(const std::string& id);
-
-	ID3D11DeviceContext* GetDeviceContext() { return this->deviceContext; }
+    ID3D11Device*                   GetDevice() { return this->device; }
+	ID3D11DeviceContext*            GetDeviceContext() { return this->deviceContext; }
+    ID3D11RenderTargetView*         GetRenderTargetView() { return this->renderTargetView; }
+    ID3D11DepthStencilView*         GetDepthStencilView() { return this->depthStencilView; }
+    IDXGISwapChain*                 GetSwapChain() { return this->swapChain; }
 
     /*
      * Register an ID3D11Device and ID3D11DeviceContext with the ResourceManager.
@@ -45,6 +51,19 @@ public:
      * @param   deviceContext       The ID3D11DeviceContext to register.
      */
     void RegisterDeviceAndContext( ID3D11Device* const device, ID3D11DeviceContext* const deviceContext );
+
+    /*
+     * Register an ID3D11RenderView and ID3D11DepthStencilView with the ResourceManager.
+     * @param   pRender             The ID3D11RenderTargetView to register.
+     * @param   pDepthStencil       The ID3D11DepthStencilView to register.
+     */
+    void RegisterRenderTargetAndDepthStencilView(ID3D11RenderTargetView* pRender, ID3D11DepthStencilView* pDepthStencil);
+
+    /*
+     * Register an IDXGISwapChain
+     * @param   pSwapChain          The IDXGISwapChain to register.
+     */
+    void RegisterSwapChain(IDXGISwapChain* pSwapChain);
 
     /*
      * Register a 3D Mesh with the ResourceManager

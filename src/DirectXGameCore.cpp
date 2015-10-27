@@ -20,6 +20,8 @@
 // Managers
 #include "InputManager.h"
 #include "CameraManager.h"
+#include "EntityManager.h"
+#include "ResourceManager.h"
 
 // State
 #include "StateMachine.h"
@@ -131,9 +133,9 @@ bool DirectXGameCore::Init()
 
 	// Register Game States
     StateMachine<GameStates>* pState = StateMachine<GameStates>::Instance();
-    pState->RegisterState<MenuState>( GameStates::MENU, device, deviceContext, swapChain );
-    pState->RegisterState<GameState>( GameStates::GAME, device, deviceContext, swapChain );
-    pState->RegisterState<ExitState>( GameStates::EXIT, device, deviceContext, swapChain );
+    pState->RegisterState<MenuState>( GameStates::MENU );
+    pState->RegisterState<GameState>( GameStates::GAME );
+    pState->RegisterState<ExitState>( GameStates::EXIT );
     pState->GoToState( GameStates::MENU );
 
 	// Everything was set up properly
@@ -260,6 +262,9 @@ bool DirectXGameCore::InitDirect3D()
 		return false;
 	}
 
+	ResourceManager::Instance()->RegisterDeviceAndContext(device, deviceContext);
+    ResourceManager::Instance()->RegisterSwapChain(swapChain);
+
 	// There are several remaining steps before we can reasonably use DirectX.
 	// These steps also need to happen each time the window is resized, 
 	// so we simply call the OnResize method here.
@@ -318,6 +323,9 @@ void DirectXGameCore::OnResize()
 	// uses the underlying textures
 	deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
 
+    // Update the ResourceManager with the new RenderTarget and DepthStencil Views
+    ResourceManager::Instance()->RegisterRenderTargetAndDepthStencilView(renderTargetView, depthStencilView);
+
 	// Update the viewport to match the new window size and set it on the device
 	viewport.TopLeftX	= 0;
 	viewport.TopLeftY	= 0;
@@ -372,11 +380,10 @@ int DirectXGameCore::Run()
 			// Standard game loop type stuff
 			CalculateFrameStats();
 
-			InputManager::Instance()->Update( deltaTime );
-
-            CameraManager::Instance()->Update( deltaTime );
-
-            StateMachine<GameStates>::Instance()->Update( deltaTime, totalTime, renderTargetView, depthStencilView );
+			InputManager::Instance()->Update(deltaTime);
+            CameraManager::Instance()->Update(deltaTime);
+            StateMachine<GameStates>::Instance()->Update(deltaTime, totalTime);
+            EntityManager::Instance()->Update(deltaTime, totalTime);
 		}
 	}
 
