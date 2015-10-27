@@ -14,7 +14,7 @@ Renderer::~Renderer()
 
 void Renderer::Draw(Transform& t)
 {
-	ResourceManager* pManager = ResourceManager::instance();
+	ResourceManager* pManager = ResourceManager::Instance();
 	if(this->deviceContext == nullptr)
 		this->deviceContext = pManager->GetDeviceContext();
 

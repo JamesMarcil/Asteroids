@@ -110,6 +110,7 @@
     <ClInclude Include="..\include\RenderSystem.h" />
     <ClInclude Include="..\include\ResourceManager.h" />
     <ClInclude Include="..\include\SimpleShader.h" />
+    <ClInclude Include="..\include\Singleton.h" />
     <ClInclude Include="..\include\StateMachine.h" />
     <ClInclude Include="..\include\System.h" />
     <ClInclude Include="..\include\Transform.h" />

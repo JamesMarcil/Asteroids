@@ -37,7 +37,7 @@ void GameState::Enter( void )
     // Register resources with the ResourceManager
     if( !isInitialized )
     {
-        ResourceManager* pManager = ResourceManager::instance();
+        ResourceManager* pManager = ResourceManager::Instance();
 
         /* Mesh Creation */
         pManager->RegisterMesh( "Sphere", "models/sphere.obj" );
@@ -107,8 +107,8 @@ void GameState::Enter( void )
 void GameState::Update( float deltaTime, float totalTime )
 {
 	// Handle Input
-    InputManager* pInput = InputManager::instance();
-    StateMachine<GameStates>* pState = StateMachine<GameStates>::instance();
+    InputManager* pInput = InputManager::Instance();
+    StateMachine<GameStates>* pState = StateMachine<GameStates>::Instance();
 
     if( pInput->IsKeyDown( '1' ) )
     {

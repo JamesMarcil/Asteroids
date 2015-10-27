@@ -1,14 +1,14 @@
 #include "CameraManager.h"
 #include "DebugCamera.h"
 
-CameraManager::CameraManager()
+CameraManager::CameraManager(void)
 {
     // Always create a DebugCamera.
     m_pDebugCamera = new DebugCamera( 0.0f, 0.0f, -5.0f );
     m_pActiveCamera = m_pDebugCamera;
 }
 
-CameraManager::~CameraManager()
+CameraManager::~CameraManager(void)
 {
     // Cleanup all registered Cameras.
     delete m_pDebugCamera;
@@ -16,15 +16,6 @@ CameraManager::~CameraManager()
     {
         delete pair.second;
     }
-}
-
-/*
- * Access the CameraManager Singleton.
- */
-CameraManager* CameraManager::instance( void )
-{
-    static CameraManager manager;
-    return &manager;
 }
 
 /*

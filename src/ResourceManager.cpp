@@ -4,9 +4,9 @@
 #include "WICTextureLoader.h"
 #include "DXMacros.h"
 
-ResourceManager::ResourceManager() {}
+ResourceManager::ResourceManager(void) {}
 
-ResourceManager::~ResourceManager()
+ResourceManager::~ResourceManager(void)
 {
     // Meshes are stack-allocated and automatically cleaned up.
 
@@ -64,15 +64,6 @@ void ResourceManager::RegisterRenderTargetAndDepthStencilView(ID3D11RenderTarget
 void ResourceManager::RegisterSwapChain(IDXGISwapChain* pSwapChain)
 {
     this->swapChain = pSwapChain;
-}
-
-/*
- * Access the ResourceManager Singleton
- */
-ResourceManager* ResourceManager::instance() 
-{
-    static ResourceManager manager;
-    return &manager;
 }
 
 #pragma region Getters 

@@ -19,8 +19,8 @@ void ExitState::Enter( void )
 void ExitState::Update( float deltaTime, float totalTime )
 {
     // Check input
-    InputManager* pInput = InputManager::instance();
-    StateMachine<GameStates>* pState = StateMachine<GameStates>::instance();
+    InputManager* pInput = InputManager::Instance();
+    StateMachine<GameStates>* pState = StateMachine<GameStates>::Instance();
 
     if( pInput->IsKeyDown( '1' ) )
     {

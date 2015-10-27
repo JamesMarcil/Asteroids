@@ -12,7 +12,9 @@
 #include "SimpleShader.h"
 #include "Material.h"
 
-class ResourceManager
+#include "Singleton.h"
+
+class ResourceManager : public Singleton<ResourceManager>
 {
 private:
     std::unordered_map<std::string, Mesh> meshes;
@@ -27,16 +29,9 @@ private:
     ID3D11DepthStencilView* depthStencilView;
     IDXGISwapChain*         swapChain;
 
-    // Private to prevent instantiation/destruction outside of instance() method.
-    ResourceManager();
-    ~ResourceManager();
-
-    // Deleted to prevent copying/moving
-    ResourceManager( const ResourceManager& rhs ) = delete;
-    ResourceManager( ResourceManager&& rhs ) = delete;
-    ResourceManager& operator=( const ResourceManager& rhs ) = delete;
-    ResourceManager& operator=( ResourceManager&& rhs ) = delete;
 public:
+    ResourceManager(void);
+    virtual ~ResourceManager(void);
 
     // Getters
     Mesh*                           GetMesh(const std::string& id );
@@ -49,12 +44,6 @@ public:
     ID3D11RenderTargetView*         GetRenderTargetView() { return this->renderTargetView; }
     ID3D11DepthStencilView*         GetDepthStencilView() { return this->depthStencilView; }
     IDXGISwapChain*                 GetSwapChain() { return this->swapChain; }
-
-    /*
-     * Access the ResourceManager Singleton
-     */
-    static ResourceManager* instance();
-
 
     /*
      * Register an ID3D11Device and ID3D11DeviceContext with the ResourceManager.

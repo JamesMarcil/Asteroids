@@ -1,6 +1,7 @@
 #ifndef ENTITY_MANAGER_H
 #define ENTITY_MANAGER_H
 
+#include "Singleton.h"
 #include "GameEntity.h"
 #include "Component.h"
 #include "System.h"
@@ -17,7 +18,7 @@
 using ComponentMask = std::bitset<ComponentBase::MAX_COMPONENTS>;   // Bitset used to determine which Components are attached to a GameEntity, indexed via Component ID.
 using ComponentPool = std::vector<ComponentBase*>;                  // Vector of Components attached to a GameEntity, indexed via Component ID.
 
-class EntityManager
+class EntityManager : public Singleton<EntityManager>
 {
 private:
     constexpr static std::uint32_t ENTITY_COUNT = 50;               // Increment in which GameEntities are allocated.
@@ -40,6 +41,27 @@ private:
     std::vector<SystemBase*>                m_systemPool;           // Vector containing all Systems, indexed via System ID.
     std::bitset<SystemBase::MAX_SYSTEMS>    m_attachedSystems;      // Bitset indicating which Systems are active, indexed via System ID.
     std::vector<SystemPriority>             m_systemPriorities;     // Vector containing the priority and index of each active System.
+
+    /*
+     * This method allocates an additional ENTITY_COUNT GameEntities once the
+     * current cap has been reached.
+     */
+    void Resize(void)
+    {
+        // Generate ENTITY_COUNT additional GameEntities
+        std::fill_n(std::back_inserter(m_entities), ENTITY_COUNT, GameEntity());
+
+        // Generate ENTITY_COUNT additional IDs for GameEntities
+        std::generate_n(std::back_inserter(m_entityIDs), ENTITY_COUNT, [this](void){ return this->m_highestID++; });
+
+        // Generate ENTITY_COUNT additional ComponentMasks
+        std::fill_n(std::back_inserter(m_entityMasks), ENTITY_COUNT, ComponentMask());
+
+        // Generate ENTITY_COUNT additional ComponentPools
+        std::fill_n(std::back_inserter(m_entityComponents), ENTITY_COUNT, ComponentPool(ComponentBase::MAX_COMPONENTS, nullptr));
+    }
+
+public:
 
     /*
      * Construct an instance of the EntityManager.
@@ -72,7 +94,7 @@ private:
      * This method is resonsible for cleaning up any allocated Components and
      * Systems.
      */
-    ~EntityManager()
+    ~EntityManager(void)
     {
         // Cleanup created Components
         for(auto& pool : m_entityComponents)
@@ -94,43 +116,6 @@ private:
                 delete system;
             }
         }
-    }
-
-    // Deleted to prevent copying/moving
-    EntityManager(const EntityManager& rhs) = delete;
-    EntityManager& operator=(const EntityManager& rhs) = delete;
-    EntityManager(EntityManager&& rhs) = delete;
-    EntityManager& operator=(EntityManager&& rhs) = delete;
-
-    /*
-     * This method allocates an additional ENTITY_COUNT GameEntities once the
-     * current cap has been reached.
-     */
-    void Resize(void)
-    {
-        // Generate ENTITY_COUNT additional GameEntities
-        std::fill_n(std::back_inserter(m_entities), ENTITY_COUNT, GameEntity());
-
-        // Generate ENTITY_COUNT additional IDs for GameEntities
-        std::generate_n(std::back_inserter(m_entityIDs), ENTITY_COUNT, [this](void){ return this->m_highestID++; });
-
-        // Generate ENTITY_COUNT additional ComponentMasks
-        std::fill_n(std::back_inserter(m_entityMasks), ENTITY_COUNT, ComponentMask());
-
-        // Generate ENTITY_COUNT additional ComponentPools
-        std::fill_n(std::back_inserter(m_entityComponents), ENTITY_COUNT, ComponentPool(ComponentBase::MAX_COMPONENTS, nullptr));
-    }
-
-public:
-
-    /*
-     * This method allows access to the EntityManager Singleton.
-     * @return A pointer to the EntityManager instance.
-     */
-    static EntityManager* Instance(void)
-    {
-        static EntityManager manager;
-        return &manager;
     }
 
 #pragma region Entity Functions

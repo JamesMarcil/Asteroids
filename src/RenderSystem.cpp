@@ -20,7 +20,7 @@ using namespace DirectX;
 
 void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
 {
-    ResourceManager* pResource = ResourceManager::instance();
+    ResourceManager* pResource = ResourceManager::Instance();
     ID3D11Device* pDevice = pResource->GetDevice();
     ID3D11DeviceContext* pDeviceContext = pResource->GetDeviceContext();
     ID3D11RenderTargetView* pRender = pResource->GetRenderTargetView();
@@ -38,7 +38,7 @@ void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
     // Update the Shaders
     ISimpleShader   *pVertexShader = pResource->GetShader( "StandardVertex" ),
                     *pPixelShader = pResource->GetShader( "StandardPixel" );
-    Camera* pCamera = CameraManager::instance()->GetActiveCamera();
+    Camera* pCamera = CameraManager::Instance()->GetActiveCamera();
     XMFLOAT3 camPos = pCamera->transform.GetTranslation();
 
     // Update the Vertex Shader
