@@ -9,28 +9,18 @@
 
 #include "Camera.h"
 
-class CameraManager
+#include "Singleton.h"
+
+class CameraManager : public Singleton<CameraManager>
 {
 private:
     Camera* m_pActiveCamera;                        // The Camera currently in-use 
     Camera* m_pDebugCamera;                         // An instance of the DebugCamera 
     std::map<std::string, Camera*> m_cameras;       // std:::map of all registered Cameras
 
-    // Private to prevent construction outside instance().
-    CameraManager();
-    ~CameraManager();
-
-    // Deleted to prevent copying/moving
-    CameraManager( const CameraManager& rhs ) = delete;
-    CameraManager( CameraManager&& rhs ) = delete;
-    CameraManager& operator=( const CameraManager& rhs ) = delete;
-    CameraManager& operator=( CameraManager&& rhs ) = delete;
-
 public:
-    /*
-     * Access the CameraManager Singleton.
-     */
-    static CameraManager* instance( void );
+    CameraManager(void);
+    virtual ~CameraManager(void);
 
     /*
      * Returns an instance of the in-use Camera.

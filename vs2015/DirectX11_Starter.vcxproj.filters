@@ -111,6 +111,9 @@
     <ClInclude Include="..\include\SimpleShader.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\Singleton.h">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ExitState.cpp">

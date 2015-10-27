@@ -12,7 +12,9 @@
 #include "SimpleShader.h"
 #include "Material.h"
 
-class ResourceManager
+#include "Singleton.h"
+
+class ResourceManager : public Singleton<ResourceManager>
 {
 private:
     std::unordered_map<std::string, Mesh> meshes;
@@ -24,16 +26,9 @@ private:
     ID3D11Device* device;
     ID3D11DeviceContext* deviceContext;
 
-    // Private to prevent instantiation/destruction outside of instance() method.
-    ResourceManager();
-    ~ResourceManager();
-
-    // Deleted to prevent copying/moving
-    ResourceManager( const ResourceManager& rhs ) = delete;
-    ResourceManager( ResourceManager&& rhs ) = delete;
-    ResourceManager& operator=( const ResourceManager& rhs ) = delete;
-    ResourceManager& operator=( ResourceManager&& rhs ) = delete;
 public:
+    ResourceManager(void);
+    virtual ~ResourceManager(void);
 
     // Getters
     Mesh*                           GetMesh(const std::string& id );
@@ -41,11 +36,6 @@ public:
     ID3D11ShaderResourceView*       GetTexture(const std::string& id );
 	ID3D11SamplerState*             GetSamplerState(const std::string& id);
 	Material*						GetMaterial(const std::string& id);
-
-    /*
-     * Access the ResourceManager Singleton
-     */
-    static ResourceManager* instance();
 
 	ID3D11DeviceContext* GetDeviceContext() { return this->deviceContext; }
 
