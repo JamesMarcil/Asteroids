@@ -114,8 +114,8 @@ void GameState::Enter( void )
             (
                 e,                                          // Entity
                 XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),           // Color
-                XMFLOAT3(0.0f, 10.0f, 0.0f),                // Position
-                XMFLOAT3(0.0f, -1.0f, 0.0f),                // Direction
+                XMFLOAT3(0.0f, 0.0f, -1.0f),                // Position
+                XMFLOAT3(0.0f, 0.0f, 1.0f),                 // Direction
                 30.0f,                                      // Specular Exponent
                 1.0f                                        // SpotLight Power
             );
