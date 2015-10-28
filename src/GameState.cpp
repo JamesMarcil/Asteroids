@@ -8,7 +8,7 @@
 #include "EntityManager.h"
 #include "InputManager.h"
 #include "ResourceManager.h"
-
+#include "CameraManager.h"
 // State
 #include "StateMachine.h"
 #include "GameStates.h"
@@ -23,6 +23,7 @@
 // Systems
 #include "PhysicsSystem.h"
 #include "RenderSystem.h"
+#include "InputControllerSystem.h"
 
 // For the DirectX Math library
 using namespace DirectX;
@@ -38,6 +39,10 @@ void GameState::Enter( void )
     // Register resources with the ResourceManager
     if( !isInitialized )
     {
+		CameraManager* camMan = CameraManager::Instance();
+		camMan->RegisterCamera<Camera>("Main Camera", 0.0f, 0.0f, -5.0f);
+		camMan->SetActiveCamera("Main Camera");
+
         ResourceManager* pManager = ResourceManager::Instance();
 
         /* Mesh Creation */
@@ -80,16 +85,18 @@ void GameState::Enter( void )
         // Register Systems for demonstration.
         pEntity->AddSystem<PhysicsSystem>();
         pEntity->AddSystemWithPriority<RenderSystem, 0>();
+		pEntity->AddSystemWithPriority<InputControllerSystem, 1>();
 
         // Generate 50 GameEntities for demonstration.
         srand(time(0));
-		for (int i = 0; i < 15; ++i)
+		int span = 2;
+		for (int i = 0; i < 30; ++i)
 		{
 			GameEntity e = pEntity->Create();
-			XMFLOAT3 position = XMFLOAT3(rand() % 25 + 1, rand() % 25 + 1, rand() % 25 + 1);
+			XMFLOAT3 position = XMFLOAT3(rand() % (span*2) - span, rand() % (span*2) - span, i * 5 + 15);
 			pEntity->AddComponent<TransformComponent>(e, position);
             pEntity->AddComponent<RenderComponent>(e, defaultMat, pManager->GetMesh("Sphere"));
-            pEntity->AddComponent<PhysicsComponent>(e, XMVectorZero(), XMVectorSet(0.0f, -0.1f, 0.0f, 0.0f));
+            pEntity->AddComponent<PhysicsComponent>(e, XMVectorZero(), XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f));
 		}
 		for (int i = 0; i < 15; ++i)
 		{
@@ -113,6 +120,16 @@ void GameState::Enter( void )
                 1.0f                                        // SpotLight Power
             );
         }
+
+		//Make Player
+		GameEntity player = pEntity->Create();
+		pEntity->AddComponent<TransformComponent>(player, XMFLOAT3(0, 0, 0));
+		pEntity->AddComponent<RenderComponent>(player, defaultMat, pManager->GetMesh("Cube"));
+		pEntity->AddComponent<PhysicsComponent>(player, XMVectorZero(), XMVectorSet(0, 0, 0, 0));
+		pEntity->AddComponent<InputComponent>(player, 50.0f);
+		PhysicsComponent* pPhysics = pEntity->GetComponent<PhysicsComponent>(player);
+		pPhysics->drag = 0.95f;
+		pPhysics->rotationalDrag = 0.85f;
 
         isInitialized = true;
     }

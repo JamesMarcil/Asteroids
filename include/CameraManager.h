@@ -18,6 +18,7 @@ private:
     Camera* m_pDebugCamera;                         // An instance of the DebugCamera 
     std::map<std::string, Camera*> m_cameras;       // std:::map of all registered Cameras
 
+	bool debugActive;
 public:
     CameraManager(void);
     virtual ~CameraManager(void);
@@ -26,6 +27,11 @@ public:
      * Returns an instance of the in-use Camera.
      */
     Camera* const GetActiveCamera( void ) const;
+
+	/*
+	 * Returns whether the debug camera is the active camera
+	 */
+	bool IsDebugActive() { return debugActive; }
 
     /*
      * Attempt to retrieve the Camera associated with the provided id.
