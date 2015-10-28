@@ -8,7 +8,7 @@
 #include "EntityManager.h"
 #include "InputManager.h"
 #include "ResourceManager.h"
-
+#include "CameraManager.h"
 // State
 #include "StateMachine.h"
 #include "GameStates.h"
@@ -37,6 +37,10 @@ void GameState::Enter( void )
     // Register resources with the ResourceManager
     if( !isInitialized )
     {
+		CameraManager* camMan = CameraManager::Instance();
+		camMan->RegisterCamera<Camera>("Main Camera", 0.0f, 0.0f, -5.0f);
+		camMan->SetActiveCamera("Main Camera");
+
         ResourceManager* pManager = ResourceManager::Instance();
 
         /* Mesh Creation */

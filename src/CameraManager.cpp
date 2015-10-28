@@ -1,6 +1,8 @@
 #include "CameraManager.h"
 #include "DebugCamera.h"
 
+#include "InputManager.h"
+
 CameraManager::CameraManager(void)
 {
     // Always create a DebugCamera.
@@ -76,5 +78,9 @@ void CameraManager::ActivateDebugCamera( void )
 void CameraManager::Update( float deltaTime )
 {
     m_pActiveCamera->Update( deltaTime );
+
+	InputManager* pManager = InputManager::Instance();
+	if (pManager->IsKeyDown('P')) this->ActivateDebugCamera();
+	else if (pManager->IsKeyDown('O')) this->SetActiveCamera("Main Camera");
 }
 
