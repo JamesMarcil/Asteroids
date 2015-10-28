@@ -22,6 +22,7 @@
 // Systems
 #include "PhysicsSystem.h"
 #include "RenderSystem.h"
+#include "InputControllerSystem.h"
 
 // For the DirectX Math library
 using namespace DirectX;
@@ -83,6 +84,7 @@ void GameState::Enter( void )
         // Register Systems for demonstration.
         pEntity->AddSystem<PhysicsSystem>();
         pEntity->AddSystemWithPriority<RenderSystem, 0>();
+		pEntity->AddSystemWithPriority<InputControllerSystem, 1>();
 
         // Generate 50 GameEntities for demonstration.
         srand(time(0));
@@ -94,6 +96,16 @@ void GameState::Enter( void )
             pEntity->AddComponent<RenderComponent>(e, defaultMat, pManager->GetMesh("Sphere"));
             pEntity->AddComponent<PhysicsComponent>(e, XMVectorZero(), XMVectorSet(0.0f, -0.1f, 0.0f, 0.0f));
 		}
+
+		//Make Player
+		GameEntity player = pEntity->Create();
+		pEntity->AddComponent<TransformComponent>(player, XMFLOAT3(0, 0, 0));
+		pEntity->AddComponent<RenderComponent>(player, defaultMat, pManager->GetMesh("Cube"));
+		pEntity->AddComponent<PhysicsComponent>(player, XMVectorZero(), XMVectorSet(0, 0, 0, 0));
+		pEntity->AddComponent<InputComponent>(player, 50.0f);
+		PhysicsComponent* pPhysics = pEntity->GetComponent<PhysicsComponent>(player);
+		pPhysics->drag = 0.95f;
+		pPhysics->rotationalDrag = 0.85f;
 
         isInitialized = true;
     }
