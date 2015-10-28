@@ -16,7 +16,7 @@
 #include <type_traits>
 
 using ComponentMask = std::bitset<ComponentBase::MAX_COMPONENTS>;   // Bitset used to determine which Components are attached to a GameEntity, indexed via Component ID.
-using ComponentPool = std::vector<ComponentBase*>;                  // Vector of Components attached to a GameEntity, indexed via Component ID.
+using ComponentPool = std::vector<ComponentBase*>;                  // Pool of Component<T> for a particular T, indexed via GameEntity ID.
 
 class EntityManager : public Singleton<EntityManager>
 {
@@ -26,7 +26,7 @@ private:
     std::vector<GameEntity>     m_entities;                         // Vector containing all GameEntities, indexed via GameEntity ID
     std::vector<std::uint32_t>  m_entityIDs;                        // Vector containing all available GameEntity IDs.
     std::vector<ComponentMask>  m_entityMasks;                      // Vector containing the ComponentMask for each GameEntity, indexed via GameEntity ID.
-    std::vector<ComponentPool>  m_entityComponents;                 // Vector containing the components for each GameEntity, indexed via GameEntity ID.
+    std::vector<ComponentPool>  m_entityComponents;                 // Vector containing the ComponentPools for each Component<T>, indexed via Component ID.
 
     // Simple object used to sort Systems by their priority.
     struct SystemPriority
@@ -200,17 +200,14 @@ public:
         m_entityMasks[entity_id - 1].reset();
 
         // Delete all Components belonging to this GameEntity
-        ComponentPool& pool = m_entityComponents[entity_id - 1];
-        for(auto& component : pool)
+        for(auto& pool : m_entityComponents)
         {
-            if(component)
+            if(pool[entity_id - 1])
             {
-                delete component;
+                delete pool[entity_id - 1];
+                pool[entity_id - 1] = nullptr;
             }
         }
-
-        // Refill the ComponentPool with nullptrs
-        std::fill(pool.begin(), pool.end(), nullptr);
 
         // Re-add the ID to pool
         m_entityIDs.push_back(entity_id);
@@ -256,7 +253,7 @@ public:
 
         // Create the Component of type T.
         ComponentBase* c = new T(std::forward<Args>(args)...);
-        m_entityComponents[entity_id - 1][component_id] = c;
+        m_entityComponents[component_id][entity_id - 1] = c;
 
         // Set the mask for this Component type.
         m_entityMasks[entity_id - 1].set(component_id);
@@ -296,13 +293,13 @@ public:
         }
 
         // Delete the Component.
-        delete static_cast<T*>(m_entityComponents[entity_id - 1][component_id]);
+        delete static_cast<T*>(m_entityComponents[component_id][entity_id - 1]);
 
         // Set the mask to false.
         m_entityMasks[entity_id - 1].set(component_id, false);
 
         // Null the entry in the pool.
-        m_entityComponents[entity_id - 1][component_id] = nullptr;
+        m_entityComponents[component_id][entity_id - 1] = nullptr;
 
         return true;
     }
@@ -333,7 +330,7 @@ public:
             return false;
         }
 
-        return m_entityMasks[entity_id - 1][component_id];
+        return m_entityMasks[component_id][entity_id - 1];
     }
 
     /*
@@ -369,7 +366,32 @@ public:
         }
 
         // Return the component.
-        return static_cast<T*>(m_entityComponents[entity_id - 1][component_id]);
+        return static_cast<T*>(m_entityComponents[component_id][entity_id - 1]);
+    }
+
+    template <typename T>
+    std::vector<T*> GetComponents(void)
+    {
+        static_assert(std::is_base_of<Component<T>,T>::value, "Must be an instance of Component!");
+
+        const std::uint32_t component_id = Component<T>::GetComponentID();
+
+        std::vector<T*> components;
+        if(component_id >= ComponentBase::MAX_COMPONENTS)
+        {
+            return components;
+        }
+
+        ComponentPool pool = m_entityComponents[component_id];
+        for(auto& component : pool)
+        {
+            if(component)
+            {
+                components.push_back(static_cast<T*>(component));
+            }
+        }
+
+        return components;
     }
 
     /*

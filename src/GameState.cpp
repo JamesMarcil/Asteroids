@@ -18,6 +18,7 @@
 #include "RenderComponent.h"
 #include "PhysicsComponent.h"
 #include "InputComponent.h"
+#include "LightComponent.h"
 
 // Systems
 #include "PhysicsSystem.h"
@@ -90,6 +91,28 @@ void GameState::Enter( void )
             pEntity->AddComponent<RenderComponent>(e, defaultMat, pManager->GetMesh("Sphere"));
             pEntity->AddComponent<PhysicsComponent>(e, XMVectorZero(), XMVectorSet(0.0f, -0.1f, 0.0f, 0.0f));
 		}
+		for (int i = 0; i < 15; ++i)
+		{
+			GameEntity e = pEntity->Create();
+			XMFLOAT3 position = XMFLOAT3(rand() % 25 + 1, rand() % 25 + 1, rand() % 25 + 1);
+			pEntity->AddComponent<TransformComponent>(e, position);
+            pEntity->AddComponent<RenderComponent>(e, defaultMat, pManager->GetMesh("Cube"));
+            pEntity->AddComponent<PhysicsComponent>(e, XMVectorZero(), XMVectorSet(0.0f, -0.1f, 0.0f, 0.0f));
+		}
+
+        // Make a SpotLight
+        {
+            GameEntity e = pEntity->Create();
+            pEntity->AddComponent<SpotLightComponent>
+            (
+                e,                                          // Entity
+                XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),           // Color
+                XMFLOAT3(0.0f, 10.0f, 0.0f),                // Position
+                XMFLOAT3(0.0f, -1.0f, 0.0f),                // Direction
+                30.0f,                                      // Specular Exponent
+                1.0f                                        // SpotLight Power
+            );
+        }
 
         isInitialized = true;
     }

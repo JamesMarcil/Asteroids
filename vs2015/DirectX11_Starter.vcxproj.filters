@@ -69,9 +69,6 @@
     <ClInclude Include="..\include\Mesh.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Renderer.h">
-      <Filter>Header Files\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Vertex.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
@@ -150,6 +147,12 @@
     <ClInclude Include="..\include\Singleton.h">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\PhysicsComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\LightComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ExitState.cpp">
@@ -180,9 +183,6 @@
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Mesh.cpp">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Renderer.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Camera.cpp">
