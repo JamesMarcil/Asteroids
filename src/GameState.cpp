@@ -88,13 +88,14 @@ void GameState::Enter( void )
 
         // Generate 50 GameEntities for demonstration.
         srand(time(0));
-		for (int i = 0; i < 15; ++i)
+		int span = 2;
+		for (int i = 0; i < 30; ++i)
 		{
 			GameEntity e = pEntity->Create();
-			XMFLOAT3 position = XMFLOAT3(rand() % 25 + 1, rand() % 25 + 1, rand() % 25 + 1);
+			XMFLOAT3 position = XMFLOAT3(rand() % (span*2) - span, rand() % (span*2) - span, i * 5 + 15);
 			pEntity->AddComponent<TransformComponent>(e, position);
             pEntity->AddComponent<RenderComponent>(e, defaultMat, pManager->GetMesh("Sphere"));
-            pEntity->AddComponent<PhysicsComponent>(e, XMVectorZero(), XMVectorSet(0.0f, -0.1f, 0.0f, 0.0f));
+            pEntity->AddComponent<PhysicsComponent>(e, XMVectorZero(), XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f));
 		}
 
 		//Make Player
