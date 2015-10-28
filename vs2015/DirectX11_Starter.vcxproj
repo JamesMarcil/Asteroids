@@ -116,6 +116,7 @@
     <ClInclude Include="..\include\Transform.h" />
     <ClInclude Include="..\include\TransformComponent.h" />
     <ClInclude Include="..\include\Vertex.h" />
+    <ClInclude Include="..\include\InputControllerSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Camera.cpp" />
@@ -138,6 +139,7 @@
     <ClCompile Include="..\src\SimpleShader.cpp" />
     <ClCompile Include="..\src\System.cpp" />
     <ClCompile Include="..\src\Transform.cpp" />
+    <ClCompile Include="..\src\InputControllerSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\shaders\PixelShader.hlsl">
