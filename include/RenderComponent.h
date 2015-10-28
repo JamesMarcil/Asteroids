@@ -3,17 +3,17 @@
 
 #include "Component.h"
 
-#include "Renderer.h"
+#include "Material.h"
+#include "Mesh.h"
 
 struct RenderComponent : public Component<RenderComponent>
 {
-    Renderer renderer;
+    Material* material;
+    Mesh* mesh;
 
     RenderComponent(Material* const pMaterial, Mesh* const pMesh)
-        : renderer(pMesh, pMaterial)
-    {
-        /* Nothing to do */
-    }
+        : material(pMaterial), mesh(pMesh)
+    { /* Nothing to do */ }
 
     ~RenderComponent(void){}
 };

@@ -20,5 +20,4 @@ void Material::WriteShaderInfo()
 	{
 		pixelShader->SetShaderResourceView(pair.first, pManager->GetTexture(pair.second));
 	}
-	pixelShader->SetShader(true);
 }
