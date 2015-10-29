@@ -1,8 +1,9 @@
 #include "ResourceManager.h"
 
 // DirectX
-#include "WICTextureLoader.h"
 #include "DXMacros.h"
+#include "WICTextureLoader.h"
+#include "DDSTextureLoader.h"
 
 ResourceManager::ResourceManager(void) {}
 
@@ -17,7 +18,7 @@ ResourceManager::~ResourceManager(void)
     }
 
     // Release Textures
-	for ( auto& pair : textures) 
+	for ( auto& pair : textures)
     {
         ReleaseMacro( pair.second );
 	}
@@ -27,6 +28,18 @@ ResourceManager::~ResourceManager(void)
 	{
 		ReleaseMacro(pair.second);
 	}
+
+    // Release RasterizerStates.
+    for(auto& pair : rasterizers)
+    {
+        ReleaseMacro(pair.second);
+    }
+
+    // Release DepthStencilStates.
+    for(auto& pair : depthStencils)
+    {
+        ReleaseMacro(pair.second);
+    }
 
 	// Release Materials
 	for (auto& pair : materials)
@@ -66,9 +79,9 @@ void ResourceManager::RegisterSwapChain(IDXGISwapChain* pSwapChain)
     this->swapChain = pSwapChain;
 }
 
-#pragma region Getters 
+#pragma region Getters
 
-Mesh* ResourceManager::GetMesh( const std::string& id ) 
+Mesh* ResourceManager::GetMesh( const std::string& id )
 {
     auto& iter = meshes.find( id );
     if( iter == meshes.cend() )
@@ -79,7 +92,7 @@ Mesh* ResourceManager::GetMesh( const std::string& id )
     return &iter->second;
 }
 
-ISimpleShader* ResourceManager::GetShader( const std::string& id ) 
+ISimpleShader* ResourceManager::GetShader( const std::string& id )
 {
     auto& iter = shaders.find( id );
     if( iter == shaders.cend() )
@@ -90,7 +103,7 @@ ISimpleShader* ResourceManager::GetShader( const std::string& id )
     return iter->second;
 }
 
-ID3D11ShaderResourceView* ResourceManager::GetTexture( const std::string& id ) 
+ID3D11ShaderResourceView* ResourceManager::GetTexture( const std::string& id )
 {
     auto& iter = textures.find( id );
     if( iter == textures.cend() )
@@ -109,6 +122,26 @@ ID3D11SamplerState* ResourceManager::GetSamplerState( const std::string& id )
         return nullptr;
     }
 
+    return iter->second;
+}
+
+ID3D11RasterizerState*      ResourceManager::GetRasterizerState(const std::string& id)
+{
+    auto& iter = rasterizers.find(id);
+    if(iter == rasterizers.cend())
+    {
+        return nullptr;
+    }
+    return iter->second;
+}
+
+ID3D11DepthStencilState*    ResourceManager::GetDepthStencilState(const std::string& id)
+{
+    auto& iter = depthStencils.find(id);
+    if(iter == depthStencils.cend())
+    {
+        return nullptr;
+    }
     return iter->second;
 }
 
@@ -131,7 +164,7 @@ Material* ResourceManager::GetMaterial(const std::string& id)
  * @param       filename    The filename of the texture.
  * @return  A bool indicating if the operation was successful.
  */
-bool ResourceManager::RegisterTexture( const std::string& id, LPCWSTR filename )
+bool ResourceManager::RegisterTexture( const std::string& id, const std::wstring& filename )
 {
     // Bail if there is not a registered ID3D11Device or ID3D11DeviceContext
     if( !device || !deviceContext )
@@ -145,12 +178,19 @@ bool ResourceManager::RegisterTexture( const std::string& id, LPCWSTR filename )
         return false;
     }
 
-    // Create the ID3D11ShaderResourceView*
+    ID3D11ShaderResourceView* pTexture;
+
+    // Check if we are loading a DDS texture
+    std::size_t index = filename.find(L".dds");
+    if(index == std::string::npos)
     {
-        ID3D11ShaderResourceView* pTexture;
-        DirectX::CreateWICTextureFromFile(device, deviceContext, filename, 0, &pTexture);
-        textures.emplace( id, pTexture );
+        DirectX::CreateWICTextureFromFile(device, deviceContext, filename.c_str(), 0, &pTexture);
     }
+    else
+    {
+        DirectX::CreateDDSTextureFromFile(device, deviceContext, filename.c_str(), 0, &pTexture);
+    }
+    textures.emplace( id, pTexture );
 
     return true;
 }
@@ -182,6 +222,62 @@ bool ResourceManager::RegisterSamplerState( const std::string& id, D3D11_SAMPLER
         device->CreateSamplerState( &pSamplerDesc, &pSamplerState );
         samplers.emplace( id, pSamplerState );
     }
+
+    return true;
+}
+
+/*
+ * Register an ID3D11RasterizerState with the ResourceManager.
+ * @param       id                  The id to store the ID3D11RasterizerState* at.
+ * @param       rasterizerDesc      The description used to instantiate the ID3D11RasterizerState.
+ * @return A boolean indicating if the operation was successful.
+ */
+bool ResourceManager::RegisterRasterizerState(const std::string& id, D3D11_RASTERIZER_DESC rasterizerDesc)
+{
+    // Bail if there is not a registered ID3D11Device or ID3D11DeviceContext
+    if(!device || !deviceContext)
+    {
+        return false;
+    }
+
+    // Bail if there is already an ID3D11RasterizerState* stored at that id
+    if(rasterizers.find(id) != rasterizers.cend())
+    {
+        return false;
+    }
+
+    // Create the ID3D11RasterizerState*
+    ID3D11RasterizerState* pRasterizerState;
+    HR(device->CreateRasterizerState(&rasterizerDesc, &pRasterizerState));
+    rasterizers.emplace(id, pRasterizerState);
+
+    return true;
+}
+
+/*
+ * Register an ID3D11DepthStencilState with the ResourceManager.
+ * @param       id                  The id to store the ID3D11DepthStencilState at.
+ * @param       depthStencilDesc    The description used to instantiate the ID3D11DepthStencilState.
+ * @return A boolean indicating if the operation was successful.
+ */
+bool ResourceManager::RegisterDepthStencilState(const std::string& id, D3D11_DEPTH_STENCIL_DESC depthStencilDesc)
+{
+    // Bail if there is not a registered ID3D11Device or ID3D11DeviceContext
+    if(!device || !deviceContext)
+    {
+        return false;
+    }
+
+    // Bail if there is already an ID3D11DepthStencilState* stored at that id
+    if(depthStencils.find(id) != depthStencils.cend())
+    {
+        return false;
+    }
+
+    // Create the ID3D11DepthStencilState*
+	ID3D11DepthStencilState* pDepthStencilState;
+    HR(device->CreateDepthStencilState(&depthStencilDesc, &pDepthStencilState));
+    depthStencils.emplace(id, pDepthStencilState);
 
     return true;
 }
