@@ -41,15 +41,12 @@ void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
     pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     // Update the Shaders
-    ISimpleShader   *pVertexShader = pResource->GetShader( "StandardVertex" ),
-                    *pPixelShader = pResource->GetShader( "StandardPixel" );
+    //ISimpleShader   *pVertexShader = pResource->GetShader( "StandardVertex" ),
+                    //*pPixelShader = pResource->GetShader( "StandardPixel" );
+
+
     Camera* pCamera = CameraManager::Instance()->GetActiveCamera();
     XMFLOAT3 camPos = pCamera->transform.GetTranslation();
-
-    // Update "PerFrame" Vertex Shader data.
-    pVertexShader->SetMatrix4x4("view", pCamera->GetViewMatrix());
-    pVertexShader->SetMatrix4x4("projection", pCamera->GetProjectionMatrix());
-    pVertexShader->CopyBufferData("PerFrame");
 
     // Declare a MAX_LIGHTS sized array for each type of LightComponent
     DirectionalLightComponent::Light dirLights[DirectionalLightComponent::MAX_LIGHTS];
@@ -82,21 +79,12 @@ void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
         spotLights[i] = spotComponents[i]->light;
     }
 
-    // Update "Lights" Constant Buffer.
-    pPixelShader->SetData("directionalLights", reinterpret_cast<void*>(dirLights), DirectionalLightComponent::MAX_LIGHTS * sizeof(DirectionalLightComponent::Light));
-    pPixelShader->SetData("pointLights", reinterpret_cast<void*>(pointLights), PointLightComponent::MAX_LIGHTS * sizeof(PointLightComponent::Light));
-    pPixelShader->SetData("spotLights", reinterpret_cast<void*>(spotLights), SpotLightComponent::MAX_LIGHTS * sizeof(SpotLightComponent::Light));
-    pPixelShader->CopyBufferData("Lights");
-
-    // Update "PerFrame" Constant Buffer.
-    pPixelShader->SetFloat3("cameraPosition", XMFLOAT3(camPos.x, camPos.y, camPos.z));
-    pPixelShader->CopyBufferData("PerFrame");
-
-    pPixelShader->SetSamplerState("trilinear", pResource->GetSamplerState("trilinear"));
-
     // Render every GameEntity.
     Material* pMaterial = nullptr;
     Mesh* pMesh = nullptr;
+	ISimpleShader   *pVertexShader = nullptr;
+	ISimpleShader	*pPixelShader = nullptr;
+
     for(auto& entity : pManager->EntitiesWithComponents<RenderComponent, TransformComponent>())
     {
         RenderComponent* pRender = pManager->GetComponent<RenderComponent>(entity);
@@ -126,6 +114,34 @@ void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
             // Update Material information.
             pMaterial->WriteShaderInfo();
         }
+
+		if (!pVertexShader || pVertexShader != pRender->material->GetVertexShader())
+		{
+			pVertexShader = pRender->material->GetVertexShader();
+
+			// Update "PerFrame" Vertex Shader data.
+			pVertexShader->SetMatrix4x4("view", pCamera->GetViewMatrix());
+			pVertexShader->SetMatrix4x4("projection", pCamera->GetProjectionMatrix());
+			pVertexShader->CopyBufferData("PerFrame");
+
+		}
+
+		if (!pPixelShader || pPixelShader != pRender->material->GetPixelShader())
+		{
+			pPixelShader = pRender->material->GetPixelShader();
+
+			// Update "Lights" Constant Buffer.
+			pPixelShader->SetData("directionalLights", reinterpret_cast<void*>(dirLights), DirectionalLightComponent::MAX_LIGHTS * sizeof(DirectionalLightComponent::Light));
+			pPixelShader->SetData("pointLights", reinterpret_cast<void*>(pointLights), PointLightComponent::MAX_LIGHTS * sizeof(PointLightComponent::Light));
+			pPixelShader->SetData("spotLights", reinterpret_cast<void*>(spotLights), SpotLightComponent::MAX_LIGHTS * sizeof(SpotLightComponent::Light));
+			pPixelShader->CopyBufferData("Lights");
+
+			// Update "PerFrame" Constant Buffer.
+			pPixelShader->SetFloat3("cameraPosition", XMFLOAT3(camPos.x, camPos.y, camPos.z));
+			pPixelShader->CopyBufferData("PerFrame");
+
+			pPixelShader->SetSamplerState("trilinear", pResource->GetSamplerState("trilinear"));
+		}
 
         // Update "PerObject" Constant Buffer.
         Transform& t = pTransform->transform;

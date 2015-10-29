@@ -49,15 +49,20 @@ void GameState::Enter( void )
         pManager->RegisterMesh( "Sphere", "models/sphere.obj" );
         pManager->RegisterMesh( "Helix", "models/helix.obj" );
         pManager->RegisterMesh( "Cube", "models/cube.obj" );
+		pManager->RegisterMesh( "Ship", "models/ship.obj");
 
         /* Shader Creation */
         pManager->RegisterShader<SimpleVertexShader>( "StandardVertex", L"VertexShader.cso" );
         pManager->RegisterShader<SimplePixelShader>( "StandardPixel", L"PixelShader.cso" );
+		pManager->RegisterShader<SimpleVertexShader>("ShipVertex", L"ShipVS.cso");
+		pManager->RegisterShader<SimplePixelShader>("ShipPixel", L"ShipPS.cso");
 
 		/* Texture Creation */
         pManager->RegisterTexture("Diffuse", L"textures/crate.png" );
         pManager->RegisterTexture("Rust", L"textures/rusty.jpg" );
         pManager->RegisterTexture("Rust_Spec", L"textures/rustySpec.png" );
+		pManager->RegisterTexture("Ship_Spec", L"textures/ship_spec_map.png");
+		pManager->RegisterTexture("Ship", L"textures/ship_texture.png");
 
 		/* Material Creation */
 		Material* defaultMat = new Material
@@ -69,6 +74,15 @@ void GameState::Enter( void )
 		defaultMat->AddTexture("rustTexture", "Rust");
 		defaultMat->AddTexture("specMapTexture", "Rust_Spec");
 		pManager->RegisterMaterial("default", defaultMat);
+
+		Material* shipMat = new Material
+		(
+				static_cast<SimpleVertexShader*>(pManager->GetShader("ShipVertex")),
+				static_cast<SimplePixelShader*>(pManager->GetShader("ShipPixel"))
+		);
+		shipMat->AddTexture("shipTexture", "Ship");
+		shipMat->AddTexture("shipSpecMap", "Ship_Spec");
+		pManager->RegisterMaterial("ship", shipMat);
 
         /* Sampler Creation */
         D3D11_SAMPLER_DESC samplerDesc;
@@ -124,9 +138,11 @@ void GameState::Enter( void )
 		//Make Player
 		GameEntity player = pEntity->Create();
 		pEntity->AddComponent<TransformComponent>(player, XMFLOAT3(0, 0, 0));
-		pEntity->AddComponent<RenderComponent>(player, defaultMat, pManager->GetMesh("Cube"));
+		pEntity->AddComponent<RenderComponent>(player, shipMat, pManager->GetMesh("Ship"));
 		pEntity->AddComponent<PhysicsComponent>(player, XMVectorZero(), XMVectorSet(0, 0, 0, 0));
 		pEntity->AddComponent<InputComponent>(player, 50.0f);
+		TransformComponent* pTrans = pEntity->GetComponent<TransformComponent>(player);
+		pTrans->transform.SetScale(.001f);
 		PhysicsComponent* pPhysics = pEntity->GetComponent<PhysicsComponent>(player);
 		pPhysics->drag = 0.95f;
 		pPhysics->rotationalDrag = 0.85f;
