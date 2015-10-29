@@ -80,9 +80,37 @@ void GameState::Enter( void )
         samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
         pManager->RegisterSamplerState( "trilinear", samplerDesc );
 
-        EntityManager* pEntity = EntityManager::Instance();
+        // Create the shaders for the Skybox.
+        pManager->RegisterShader<SimpleVertexShader>("SkyboxVertex", L"SkyboxVertex.cso");
+        pManager->RegisterShader<SimplePixelShader>("SkyboxPixel", L"SkyboxPixel.cso");
+
+        // Load the DDS texture necessary for the Skybox
+        pManager->RegisterTexture("CubeMap", L"textures/SpaceCubeMap.dds");
+
+        // Create the ID3D11RasterizerState for the Skybox.
+        {
+            D3D11_RASTERIZER_DESC desc;
+            ZeroMemory(&desc, sizeof(D3D11_RASTERIZER_DESC));
+            desc.FillMode = D3D11_FILL_SOLID;
+            desc.CullMode = D3D11_CULL_FRONT;
+            desc.DepthClipEnable = true;
+
+            pManager->RegisterRasterizerState("Skybox_Rasterizer", desc);
+        }
+
+        // Create the ID3D11DepthStencilState for the Skybox.
+        {
+            D3D11_DEPTH_STENCIL_DESC desc;
+            ZeroMemory(&desc, sizeof(D3D11_DEPTH_STENCIL_DESC));
+            desc.DepthEnable = true;
+            desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+            desc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+
+            pManager->RegisterDepthStencilState("Skybox_DepthStencil", desc);
+        }
 
         // Register Systems for demonstration.
+        EntityManager* pEntity = EntityManager::Instance();
         pEntity->AddSystem<PhysicsSystem>();
         pEntity->AddSystemWithPriority<RenderSystem, 0>();
 		pEntity->AddSystemWithPriority<InputControllerSystem, 1>();
