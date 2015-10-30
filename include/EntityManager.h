@@ -58,7 +58,10 @@ private:
         std::fill_n(std::back_inserter(m_entityMasks), ENTITY_COUNT, ComponentMask());
 
         // Generate ENTITY_COUNT additional ComponentPools
-        std::fill_n(std::back_inserter(m_entityComponents), ENTITY_COUNT, ComponentPool(ComponentBase::MAX_COMPONENTS, nullptr));
+        for(auto& pool : m_entityComponents)
+        {
+            std::fill_n(std::back_inserter(pool), ENTITY_COUNT, nullptr);
+        }
     }
 
 public:
@@ -82,7 +85,7 @@ public:
         m_entityMasks = std::vector<ComponentMask>(ENTITY_COUNT, ComponentMask());
 
         // Generate ENTITY_COUNT initial GameEntity component pools
-        m_entityComponents = std::vector<ComponentPool>(ENTITY_COUNT, ComponentPool(ComponentBase::MAX_COMPONENTS, nullptr));
+        m_entityComponents = std::vector<ComponentPool>(ComponentBase::MAX_COMPONENTS, ComponentPool(ENTITY_COUNT, nullptr));
 
         // Setup the System pool
         m_systemPool = std::vector<SystemBase*>(SystemBase::MAX_SYSTEMS, nullptr);
