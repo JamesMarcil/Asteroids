@@ -52,10 +52,11 @@ void GameState::Enter( void )
 		pManager->RegisterMesh( "Ship", "models/ship.obj");
 
         /* Shader Creation */
-        pManager->RegisterShader<SimpleVertexShader>( "StandardVertex", L"VertexShader.cso" );
-        pManager->RegisterShader<SimplePixelShader>( "StandardPixel", L"PixelShader.cso" );
+        pManager->RegisterShader<SimpleVertexShader>("StandardVertex", L"VertexShader.cso" );
+        pManager->RegisterShader<SimplePixelShader>("StandardPixel", L"PixelShader.cso" );
 		pManager->RegisterShader<SimpleVertexShader>("ShipVertex", L"ShipVS.cso");
 		pManager->RegisterShader<SimplePixelShader>("ShipPixel", L"ShipPS.cso");
+		pManager->RegisterShader<SimplePixelShader>("ColliderPixel", L"ColliderPS.cso");
 
 		/* Texture Creation */
         pManager->RegisterTexture("Diffuse", L"textures/crate.png" );
@@ -63,6 +64,8 @@ void GameState::Enter( void )
         pManager->RegisterTexture("Rust_Spec", L"textures/rustySpec.png" );
 		pManager->RegisterTexture("Ship_Spec", L"textures/ship_spec_map.png");
 		pManager->RegisterTexture("Ship", L"textures/ship_texture.png");
+		pManager->RegisterTexture("Loam", L"textures/loam.jpg");	// Collision Texture
+		pManager->RegisterTexture("Rock", L"textures/rock.jpg");	// Collision Texture
 
 		/* Material Creation */
 		Material* defaultMat = new Material

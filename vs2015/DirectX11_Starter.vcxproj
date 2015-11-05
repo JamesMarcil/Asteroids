@@ -87,6 +87,8 @@
   <ItemGroup>
     <ClInclude Include="..\include\Camera.h" />
     <ClInclude Include="..\include\CameraManager.h" />
+    <ClInclude Include="..\include\CollisionComponent.h" />
+    <ClInclude Include="..\include\CollisionSphere.h" />
     <ClInclude Include="..\include\Component.h" />
     <ClInclude Include="..\include\DebugCamera.h" />
     <ClInclude Include="..\include\DirectXGameCore.h" />
@@ -124,6 +126,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\Camera.cpp" />
     <ClCompile Include="..\src\CameraManager.cpp" />
+    <ClCompile Include="..\src\CollisionSphere.cpp" />
     <ClCompile Include="..\src\Component.cpp" />
     <ClCompile Include="..\src\DebugCamera.cpp" />
     <ClCompile Include="..\src\DirectXGameCore.cpp" />
@@ -145,6 +148,12 @@
     <ClCompile Include="..\src\InputControllerSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="..\shaders\ColliderPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="..\shaders\PixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
