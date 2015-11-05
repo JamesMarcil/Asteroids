@@ -93,6 +93,8 @@
     <ClInclude Include="..\include\dxerr.h" />
     <ClInclude Include="..\include\DXMacros.h" />
     <ClInclude Include="..\include\EntityManager.h" />
+    <ClInclude Include="..\include\Event.h" />
+    <ClInclude Include="..\include\EventManager.h" />
     <ClInclude Include="..\include\ExitState.h" />
     <ClInclude Include="..\include\GameEntity.h" />
     <ClInclude Include="..\include\GameState.h" />
@@ -126,6 +128,7 @@
     <ClCompile Include="..\src\DebugCamera.cpp" />
     <ClCompile Include="..\src\DirectXGameCore.cpp" />
     <ClCompile Include="..\src\dxerr.cpp" />
+    <ClCompile Include="..\src\EventManager.cpp" />
     <ClCompile Include="..\src\ExitState.cpp" />
     <ClCompile Include="..\src\GameState.cpp" />
     <ClCompile Include="..\src\InputManager.cpp" />
