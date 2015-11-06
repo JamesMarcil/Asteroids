@@ -1,17 +1,16 @@
 
 #include "Singleton.h"
-#include "Event.h"
+#include "EventListener.h"
 #include <unordered_map>
 #include <string>
 
-class EventManager : public Singleton<EventManager> 
+using namespace std;
+
+class EventManager : public Singleton<EventManager>, EventListener
 {
 public:
-
 	EventManager(void)
 	{
-		Register("test", &TestFunction);
-
 
 	}
 
@@ -20,16 +19,14 @@ public:
 
 	}
 
-	void TestFunction(Event evt)
-	{
+	void Register(string name, EventListener* listener);
 
-	}
+	void UnRegister(string name, EventListener* listener);
 
-	void Register(string name, void(*callback)(Event));
-	bool Fire(string name, uintptr_t data);
-
+	void Fire(string name, void* data);
 private:
-	std::unordered_map<string, std::vector<void(*) (Event)>> callbacks;
+
+	unordered_map<string, vector<EventListener*>> listeners;
 	
 };
 

@@ -1,29 +1,41 @@
 #include "EventManager.h"
 
-void EventManager::Register(string name, void(*callback)(Event))
+// Register an EventListener Class with the specified event
+void EventManager::Register(string name, EventListener* listener)
 {
-	std::vector<void(*)(Event)> methods = callbacks[name];
-	for (auto& ec : methods)
+	// make sure there are no duplicate registers
+	for (auto& l : listeners[name])
 	{
-		if (ec == callback)
+		if (l == listener)
 			return;
 	}
 
-	methods.emplace_back(callback);
-	callbacks[name] = methods;
+	listeners[name].emplace_back(listener);
 }
 
-bool EventManager::Fire(string name, uintptr_t data)
+// Remove the Given EventListener Class from the Given Event
+void EventManager::UnRegister(string name, EventListener* listener)
 {
-	if (callbacks[name].empty)
-		return false;
+	vector<EventListener*> list = listeners[name];
 
-	std::vector<void(*)(Event)> methods = callbacks[name];
+	vector<EventListener*>::iterator it = list.begin();
 
-	for (auto& ec : methods)
+	while (it != list.end())
 	{
-		ec({ name,data });
+		if (*it == listener)
+		{
+			list.erase(it);
+			break;
+		}
 	}
-
-	return true;
 }
+
+// Find all the EventListeners Registered to the Event and Route the Event
+void EventManager::Fire(string name, void* data)
+{
+	for (auto& l : listeners[name])
+	{
+		l->EventRouter(name, data);
+	}
+}
+

@@ -9,6 +9,9 @@
 #include "InputManager.h"
 #include "ResourceManager.h"
 #include "CameraManager.h"
+#include "EventManager.h"
+#include "EventListener.h"
+
 // State
 #include "StateMachine.h"
 #include "GameStates.h"
@@ -44,6 +47,11 @@ void GameState::Enter( void )
 		camMan->SetActiveCamera("Main Camera");
 
         ResourceManager* pManager = ResourceManager::Instance();
+		EventManager* pEventManager = EventManager::Instance();
+		pEventManager->Register("Test", this);
+		int i = 8;
+		pEventManager->Fire("Test", &i);
+		pEventManager->UnRegister("Test", this);
 
         /* Mesh Creation */
         pManager->RegisterMesh( "Sphere", "models/sphere.obj" );
@@ -186,6 +194,22 @@ void GameState::Enter( void )
 
 #pragma endregion
 
+void CastDataToInt(void * data)
+{
+	//cast to an int pointer then dereference to get the value
+	int i = *((int*)data);
+}
+
+// Test route
+void GameState::EventRouter(string name, void* data)
+{
+	// One Listener can route multiple events, check the name to route properly
+	if(name == "Test")
+		CastDataToInt(data);
+}
+
+
+
 #pragma region Game Loop
 
 // --------------------------------------------------------
@@ -208,3 +232,4 @@ void GameState::Update( float deltaTime, float totalTime )
 }
 
 void GameState::Exit( void ) { /* Nothing to do. */ }
+#pragma endregion 
