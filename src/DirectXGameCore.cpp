@@ -14,6 +14,10 @@
 // Windows
 #include <WindowsX.h>
 
+// DirectXTK
+#include <Keyboard.h>
+#include <Mouse.h>
+
 // STD
 #include <sstream>
 
@@ -199,6 +203,9 @@ bool DirectXGameCore::InitMainWindow()
 		MessageBox(0, L"CreateWindow Failed.", 0, 0);
 		return false;
 	}
+
+    // Register the HWND with the InputManager
+    InputManager::Instance()->SetWindow(hMainWnd);
 
 	// Finally show the window to the user
 	ShowWindow(hMainWnd, SW_SHOW);
@@ -587,27 +594,33 @@ LRESULT DirectXGameCore::ProcessMessage(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 		((MINMAXINFO*)lParam)->ptMinTrackSize.y = 200; 
 		return 0;
 
-	// Messages that correspond to mouse button being pressed while the cursor
-	// is currently over our window
+    case WM_ACTIVATEAPP:
+        DirectX::Keyboard::ProcessMessage(msg, wParam, lParam);
+        DirectX::Mouse::ProcessMessage(msg, wParam, lParam);
+        return 0;
+
+    case WM_INPUT:
 	case WM_LBUTTONDOWN:
 	case WM_MBUTTONDOWN:
 	case WM_RBUTTONDOWN:
-        InputManager::Instance()->ReceiveMouseDown( hwnd, wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
-		return 0;
-
-	// Messages that correspond to mouse button being released while the cursor
-	// is currently over our window
+    case WM_XBUTTONDOWN:
 	case WM_LBUTTONUP:
 	case WM_MBUTTONUP:
 	case WM_RBUTTONUP:
-        InputManager::Instance()->ReceiveMouseUp( hwnd, wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
-		return 0;
-
-	// Message that occurs while the mouse moves over the window or while
-	// we're currently capturing it
+    case WM_XBUTTONUP:
 	case WM_MOUSEMOVE:
-        InputManager::Instance()->ReceiveMouseMove( hwnd, wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
-		return 0;
+    case WM_MOUSEHOVER:
+    case WM_MOUSEWHEEL:
+        DirectX::Mouse::ProcessMessage(msg, wParam, lParam);
+        return 0;
+
+    case WM_KEYDOWN:
+    case WM_SYSKEYDOWN:
+    case WM_KEYUP:
+    case WM_SYSKEYUP:
+        DirectX::Keyboard::ProcessMessage(msg, wParam, lParam);
+        return 0;
+
 	}
 
 	// Some other message was sent, so call the default window procedure for it
@@ -615,7 +628,3 @@ LRESULT DirectXGameCore::ProcessMessage(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 }
 
 #pragma endregion
-
-
-
-
