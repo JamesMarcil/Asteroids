@@ -1,41 +1,85 @@
 #include "EventManager.h"
 
-// Register an EventListener Class with the specified event
-void EventManager::Register(string name, EventListener* listener)
+// STD
+#include <algorithm>
+
+/*
+ * Register an IEventListener with the specified event.
+ * @param   name        The Event the listener is observing.
+ * @param   listener    The listener to be attached.
+ * @returns A boolean indicating if this operation was successful.
+ */
+bool EventManager::Register(const std::string& name, IEventListener* listener)
 {
-	// make sure there are no duplicate registers
-	for (auto& l : listeners[name])
+    std::vector<IEventListener*>& listeners = m_listeners[name];
+
+	// Make sure there are no duplicate listeners.
+	for (auto& l : listeners)
 	{
 		if (l == listener)
-			return;
+        {
+			return false;
+        }
 	}
 
-	listeners[name].emplace_back(listener);
+    // Attach the listener.
+    listeners.push_back(listener);
+
+    return true;
 }
 
-// Remove the Given EventListener Class from the Given Event
-void EventManager::UnRegister(string name, EventListener* listener)
+/*
+ * Remove the given IEventListener from the given Event.
+ * @param   name        The Event the listener is observing.
+ * @param   listener   The listener to be detached.
+ * @returns A boolea indicating if this operation was successful.
+ */
+bool EventManager::UnRegister(const std::string& name, IEventListener* listener)
 {
-	vector<EventListener*> list = listeners[name];
+    // Check that the listener exists.
+    auto iter = m_listeners.find(name);
+    if(iter == m_listeners.cend())
+    {
+        return false;
+    }
 
-	vector<EventListener*>::iterator it = list.begin();
+    // C++ Erase-Remove Idiom
+    std::vector<IEventListener*>& list = m_listeners[name];
+    list.erase
+    (
+        std::remove_if
+        (
+            list.begin(),
+            list.end(),
+            [&listener](auto& l){ return listener == l; }
+        ),
+        list.end()
+    );
 
-	while (it != list.end())
-	{
-		if (*it == listener)
-		{
-			list.erase(it);
-			break;
-		}
-	}
+    return true;
 }
 
-// Find all the EventListeners Registered to the Event and Route the Event
-void EventManager::Fire(string name, void* data)
+/*
+ * Find all the IEventListeners registered to the Event and Route the Event
+ * @param   name    The name of the Event to trigger.
+ * @param   data    The data associated with the Event.
+ * @returns A boolean indicating if this operation was successful.
+ */
+bool EventManager::Fire(const std::string& name, void* data)
 {
-	for (auto& l : listeners[name])
+    // Check that the listener exists.
+    auto iter = m_listeners.find(name);
+    if(iter == m_listeners.cend())
+    {
+        return false; // EARLY RETURN
+    }
+
+    // Notify all listening parties.
+    std::vector<IEventListener*>& listeners = m_listeners[name];
+	for (auto& l : listeners)
 	{
 		l->EventRouter(name, data);
 	}
-}
 
+    return true;
+}

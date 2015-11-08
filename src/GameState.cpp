@@ -9,8 +9,10 @@
 #include "InputManager.h"
 #include "ResourceManager.h"
 #include "CameraManager.h"
+
+// Events
 #include "EventManager.h"
-#include "EventListener.h"
+#include "IEventListener.h"
 
 // State
 #include "StateMachine.h"
@@ -201,7 +203,7 @@ void CastDataToInt(void * data)
 }
 
 // Test route
-void GameState::EventRouter(string name, void* data)
+void GameState::EventRouter(const std::string& name, void* data)
 {
 	// One Listener can route multiple events, check the name to route properly
 	if(name == "Test")

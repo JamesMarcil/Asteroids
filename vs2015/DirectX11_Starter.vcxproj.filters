@@ -165,7 +165,7 @@
     <ClInclude Include="..\include\EventManager.h">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\EventListener.h">
+    <ClInclude Include="..\include\IEventListener.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -235,9 +235,6 @@
     </ClCompile>
     <ClCompile Include="..\src\EventManager.cpp">
       <Filter>Source Files\Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\EventListener.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

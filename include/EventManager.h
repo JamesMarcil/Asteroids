@@ -1,32 +1,48 @@
+#ifndef EVENT_MANAGER_H
+#define EVENT_MANAGER_H
 
+// Singleton
 #include "Singleton.h"
-#include "EventListener.h"
-#include <unordered_map>
+
+// Events
+#include "IEventListener.h"
+
+// STD
+#include <vector>
 #include <string>
+#include <unordered_map>
 
-using namespace std;
-
-class EventManager : public Singleton<EventManager>, EventListener
+class EventManager : public Singleton<EventManager>
 {
-public:
-	EventManager(void)
-	{
-
-	}
-
-	virtual ~EventManager()
-	{
-
-	}
-
-	void Register(string name, EventListener* listener);
-
-	void UnRegister(string name, EventListener* listener);
-
-	void Fire(string name, void* data);
 private:
+    std::unordered_map<std::string, std::vector<IEventListener*>> m_listeners;
 
-	unordered_map<string, vector<EventListener*>> listeners;
-	
+public:
+	virtual ~EventManager(void) {}
+
+    /*
+     * Register an IEventListener with the specified event.
+     * @param   name        The Event the listener is observing.
+     * @param   listener    The listener to be attached.
+     * @returns A boolean indicating if this operation was successful.
+     */
+	bool Register(const std::string& name, IEventListener* listener);
+
+    /*
+     * Remove the given IEventListener from the given Event.
+     * @param   name        The Event the listener is observing.
+     * @param   listener   The listener to be detached.
+     * @returns A boolea indicating if this operation was successful.
+     */
+	bool UnRegister(const std::string& name, IEventListener* listener);
+
+    /*
+     * Find all the IEventListeners registered to the Event and Route the Event
+     * @param   name    The name of the Event to trigger.
+     * @param   data    The data associated with the Event.
+     * @returns A boolean indicating if this operation was successful.
+     */
+	bool Fire(const std::string& name, void* data);
 };
 
+#endif
