@@ -7,10 +7,13 @@
 // State
 #include "IGameState.h"
 
+// Events
+#include "IEventListener.h"
+
 // STD
 #include <vector>
 
-class GameState : public IGameState
+class GameState : public IGameState, public IEventListener
 {
 private:
     bool     isInitialized;
@@ -23,6 +26,7 @@ private:
 
 public:
     virtual ~GameState() {}
+	virtual void EventRouter(const std::string& name, void* data) override;
 };
 
 #endif
