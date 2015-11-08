@@ -162,6 +162,15 @@
     <ClInclude Include="..\include\CollisionComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\ClearSystem.h">
+      <Filter>Header Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\SkyboxSystem.h">
+      <Filter>Header Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\SwapSystem.h">
+      <Filter>Header Files\Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ExitState.cpp">
@@ -226,6 +235,15 @@
     </ClCompile>
     <ClCompile Include="..\src\CollisionSphere.cpp">
       <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ClearSystem.cpp">
+      <Filter>Source Files\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SkyboxSystem.cpp">
+      <Filter>Source Files\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SwapSystem.cpp">
+      <Filter>Source Files\Systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
