@@ -87,6 +87,7 @@
   <ItemGroup>
     <ClInclude Include="..\include\Camera.h" />
     <ClInclude Include="..\include\CameraManager.h" />
+    <ClInclude Include="..\include\ClearSystem.h" />
     <ClInclude Include="..\include\CollisionComponent.h" />
     <ClInclude Include="..\include\CollisionSphere.h" />
     <ClInclude Include="..\include\Component.h" />
@@ -116,7 +117,9 @@
     <ClInclude Include="..\include\ResourceManager.h" />
     <ClInclude Include="..\include\SimpleShader.h" />
     <ClInclude Include="..\include\Singleton.h" />
+    <ClInclude Include="..\include\SkyboxSystem.h" />
     <ClInclude Include="..\include\StateMachine.h" />
+    <ClInclude Include="..\include\SwapSystem.h" />
     <ClInclude Include="..\include\System.h" />
     <ClInclude Include="..\include\Transform.h" />
     <ClInclude Include="..\include\TransformComponent.h" />
@@ -126,6 +129,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\Camera.cpp" />
     <ClCompile Include="..\src\CameraManager.cpp" />
+    <ClCompile Include="..\src\ClearSystem.cpp" />
     <ClCompile Include="..\src\CollisionSphere.cpp" />
     <ClCompile Include="..\src\Component.cpp" />
     <ClCompile Include="..\src\DebugCamera.cpp" />
@@ -143,6 +147,8 @@
     <ClCompile Include="..\src\RenderSystem.cpp" />
     <ClCompile Include="..\src\ResourceManager.cpp" />
     <ClCompile Include="..\src\SimpleShader.cpp" />
+    <ClCompile Include="..\src\SkyboxSystem.cpp" />
+    <ClCompile Include="..\src\SwapSystem.cpp" />
     <ClCompile Include="..\src\System.cpp" />
     <ClCompile Include="..\src\Transform.cpp" />
     <ClCompile Include="..\src\InputControllerSystem.cpp" />
