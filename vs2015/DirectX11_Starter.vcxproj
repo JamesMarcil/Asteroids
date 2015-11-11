@@ -105,7 +105,6 @@
     <ClInclude Include="..\include\IGameState.h" />
     <ClInclude Include="..\include\InputComponent.h" />
     <ClInclude Include="..\include\InputManager.h" />
-    <ClInclude Include="..\include\Keycodes.h" />
     <ClInclude Include="..\include\LightComponent.h" />
     <ClInclude Include="..\include\Material.h" />
     <ClInclude Include="..\include\MenuState.h" />

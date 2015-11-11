@@ -78,9 +78,6 @@
     <ClInclude Include="..\include\InputManager.h">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Keycodes.h">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\ResourceManager.h">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
