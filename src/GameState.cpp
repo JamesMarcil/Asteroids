@@ -27,8 +27,11 @@
 
 // Systems
 #include "PhysicsSystem.h"
-#include "RenderSystem.h"
 #include "InputControllerSystem.h"
+#include "ClearSystem.h"
+#include "RenderSystem.h"
+#include "SkyboxSystem.h"
+#include "SwapSystem.h"
 
 // For the DirectX Math library
 using namespace DirectX;
@@ -139,8 +142,11 @@ void GameState::Enter( void )
         // Register Systems for demonstration.
         EntityManager* pEntity = EntityManager::Instance();
         pEntity->AddSystem<PhysicsSystem>();
-        pEntity->AddSystemWithPriority<RenderSystem, 0>();
-		pEntity->AddSystemWithPriority<InputControllerSystem, 1>();
+		pEntity->AddSystem<InputControllerSystem>();
+        pEntity->AddSystem<ClearSystem>();
+        pEntity->AddSystem<RenderSystem>();
+        pEntity->AddSystem<SkyboxSystem>();
+        pEntity->AddSystem<SwapSystem>();
 
         // Generate 50 GameEntities for demonstration.
         srand(time(0));
