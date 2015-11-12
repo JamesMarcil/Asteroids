@@ -51,71 +51,22 @@ void GameState::Enter( void )
 		camMan->RegisterCamera<Camera>("Main Camera", 0.0f, 0.0f, -5.0f);
 		camMan->SetActiveCamera("Main Camera");
 
+        // Parse "resources.json" for any resources.
         ResourceManager* pManager = ResourceManager::Instance();
-		EventManager* pEventManager = EventManager::Instance();
-		pEventManager->Register("Test", this);
-		int i = 8;
-		pEventManager->Fire("Test", &i);
-		pEventManager->UnRegister("Test", this);
-
-        /* Mesh Creation */
-        pManager->RegisterMesh( "Sphere", "models/sphere.obj" );
-        pManager->RegisterMesh( "Helix", "models/helix.obj" );
-        pManager->RegisterMesh( "Cube", "models/cube.obj" );
-		pManager->RegisterMesh( "Ship", "models/ship.obj");
-
-        /* Shader Creation */
-        pManager->RegisterShader<SimpleVertexShader>("StandardVertex", L"VertexShader.cso" );
-        pManager->RegisterShader<SimplePixelShader>("StandardPixel", L"PixelShader.cso" );
-		pManager->RegisterShader<SimpleVertexShader>("ShipVertex", L"ShipVS.cso");
-		pManager->RegisterShader<SimplePixelShader>("ShipPixel", L"ShipPS.cso");
-		pManager->RegisterShader<SimplePixelShader>("ColliderPixel", L"ColliderPS.cso");
-
-		/* Texture Creation */
-        pManager->RegisterTexture("Diffuse", L"textures/crate.png" );
-        pManager->RegisterTexture("Rust", L"textures/rusty.jpg" );
-        pManager->RegisterTexture("Rust_Spec", L"textures/rustySpec.png" );
-		pManager->RegisterTexture("Ship_Spec", L"textures/ship_spec_map.png");
-		pManager->RegisterTexture("Ship", L"textures/ship_texture.png");
-		pManager->RegisterTexture("Loam", L"textures/loam.jpg");	// Collision Texture
-		pManager->RegisterTexture("Rock", L"textures/rock.jpg");	// Collision Texture
-
-		/* Material Creation */
-		Material* defaultMat = new Material
-        (
-            static_cast<SimpleVertexShader*>(pManager->GetShader("StandardVertex")),
-            static_cast<SimplePixelShader*>(pManager->GetShader("StandardPixel"))
-        );
-		defaultMat->AddTexture("diffuseTexture", "Diffuse");
-		defaultMat->AddTexture("rustTexture", "Rust");
-		defaultMat->AddTexture("specMapTexture", "Rust_Spec");
-		pManager->RegisterMaterial("default", defaultMat);
-
-		Material* shipMat = new Material
-		(
-				static_cast<SimpleVertexShader*>(pManager->GetShader("ShipVertex")),
-				static_cast<SimplePixelShader*>(pManager->GetShader("ShipPixel"))
-		);
-		shipMat->AddTexture("shipTexture", "Ship");
-		shipMat->AddTexture("shipSpecMap", "Ship_Spec");
-		pManager->RegisterMaterial("ship", shipMat);
+        pManager->ParseJSONFile("json/resources.json");
 
         /* Sampler Creation */
-        D3D11_SAMPLER_DESC samplerDesc;
-        ZeroMemory(&samplerDesc, sizeof(samplerDesc));
-        samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-        samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-        samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-        samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-        samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-        pManager->RegisterSamplerState( "trilinear", samplerDesc );
+        {
+            D3D11_SAMPLER_DESC desc;
+            ZeroMemory(&desc, sizeof(desc));
+            desc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+            desc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+            desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+            desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+            desc.MaxLOD = D3D11_FLOAT32_MAX;
 
-        // Create the shaders for the Skybox.
-        pManager->RegisterShader<SimpleVertexShader>("SkyboxVertex", L"SkyboxVertex.cso");
-        pManager->RegisterShader<SimplePixelShader>("SkyboxPixel", L"SkyboxPixel.cso");
-
-        // Load the DDS texture necessary for the Skybox
-        pManager->RegisterTexture("CubeMap", L"textures/SpaceCubeMap.dds");
+            pManager->RegisterSamplerState( "trilinear", desc);
+        }
 
         // Create the ID3D11RasterizerState for the Skybox.
         {
@@ -139,6 +90,12 @@ void GameState::Enter( void )
             pManager->RegisterDepthStencilState("Skybox_DepthStencil", desc);
         }
 
+		EventManager* pEventManager = EventManager::Instance();
+		pEventManager->Register("Test", this);
+		int i = 8;
+		pEventManager->Fire("Test", &i);
+		pEventManager->UnRegister("Test", this);
+
         // Register Systems for demonstration.
         EntityManager* pEntity = EntityManager::Instance();
         pEntity->AddSystem<PhysicsSystem>();
@@ -156,7 +113,7 @@ void GameState::Enter( void )
 			GameEntity e = pEntity->Create();
 			XMFLOAT3 position = XMFLOAT3(rand() % (span*2) - span, rand() % (span*2) - span, i * 5 + 15);
 			pEntity->AddComponent<TransformComponent>(e, position);
-            pEntity->AddComponent<RenderComponent>(e, defaultMat, pManager->GetMesh("Sphere"));
+            pEntity->AddComponent<RenderComponent>(e, pManager->GetMaterial("default"), pManager->GetMesh("Sphere"));
             pEntity->AddComponent<PhysicsComponent>(e, XMVectorZero(), XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f));
 		}
 		for (int i = 0; i < 15; ++i)
@@ -164,7 +121,7 @@ void GameState::Enter( void )
 			GameEntity e = pEntity->Create();
 			XMFLOAT3 position = XMFLOAT3(rand() % 25 + 1, rand() % 25 + 1, rand() % 25 + 1);
 			pEntity->AddComponent<TransformComponent>(e, position);
-            pEntity->AddComponent<RenderComponent>(e, defaultMat, pManager->GetMesh("Cube"));
+            pEntity->AddComponent<RenderComponent>(e, pManager->GetMaterial("default"), pManager->GetMesh("Cube"));
             pEntity->AddComponent<PhysicsComponent>(e, XMVectorZero(), XMVectorSet(0.0f, -0.1f, 0.0f, 0.0f));
 		}
 
@@ -185,7 +142,7 @@ void GameState::Enter( void )
 		//Make Player
 		GameEntity player = pEntity->Create();
 		pEntity->AddComponent<TransformComponent>(player, XMFLOAT3(0, 0, 0));
-		pEntity->AddComponent<RenderComponent>(player, shipMat, pManager->GetMesh("Ship"));
+		pEntity->AddComponent<RenderComponent>(player, pManager->GetMaterial("ship"), pManager->GetMesh("Ship"));
 		pEntity->AddComponent<PhysicsComponent>(player, XMVectorZero(), XMVectorSet(0, 0, 0, 0));
 		pEntity->AddComponent<InputComponent>(player, 50.0f);
 		TransformComponent* pTrans = pEntity->GetComponent<TransformComponent>(player);
