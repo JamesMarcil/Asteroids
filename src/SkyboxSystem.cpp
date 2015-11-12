@@ -57,6 +57,7 @@ void SkyboxSystem::Update(EntityManager* pManager, float dt, float tt)
     pDeviceContext->OMSetDepthStencilState(pDepthStencil, 0);
 
     // Render the Skybox.
+    pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     pDeviceContext->DrawIndexed(pCube->GetIndexCount(), 0, 0);
 
     // Reset Rasterizer and DepthStencil.
