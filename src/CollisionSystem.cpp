@@ -15,8 +15,8 @@ void CollisionSystem::Update(EntityManager* pManager, float dt, float tt) {
 	GameEntity e1;
 	GameEntity e2;
 
-	for (int i = 0; i < collidibles.size(); i++) {
-		for (int j = 0; j < collidibles.size(); j++) {
+	for (std::size_t i = 0; i < collidibles.size(); i++) {
+		for (std::size_t j = 0; j < collidibles.size(); j++) {
 			if (i != j) {
 				e1 = collidibles[i];
 				e2 = collidibles[j];
@@ -36,7 +36,7 @@ void CollisionSystem::Update(EntityManager* pManager, float dt, float tt) {
 		}
 	}
 
-	for (int i = 0; i < toDestroy.size(); i++) {
+	for (std::size_t i = 0; i < toDestroy.size(); i++) {
 		pManager->Destroy(toDestroy[i]);
 	}
 }

@@ -135,7 +135,7 @@ void GameState::Enter( void )
 		pEntity->AddComponent<RenderComponent>(player, pManager->GetMaterial("ship"), pManager->GetMesh("Ship"));
         pEntity->AddComponent<InputComponent>(player, 50.0f);
 		pEntity->AddComponent<CollisionComponent>(player, *pManager->GetMesh("Ship"), XMFLOAT3(0, 0, 0), 0.001f);
-		pEntity->AddComponent<AttackComponent>(player, 5);
+		pEntity->AddComponent<AttackComponent>(player, 5.0f);
 		TransformComponent* pTrans = pEntity->AddComponent<TransformComponent>(player, XMFLOAT3(0, 0, 0));
 		pTrans->transform.SetScale(.001f);
 		PhysicsComponent* pPhysics = pEntity->AddComponent<PhysicsComponent>(player, XMVectorZero(), XMVectorSet(0, 0, 0, 0));
