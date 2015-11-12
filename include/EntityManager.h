@@ -380,7 +380,7 @@ public:
         const std::uint32_t component_id = Component<T>::GetComponentID();
 
         std::vector<T*> components;
-        if(component_id >= ComponentBase::MAX_COMPONENTS)
+        if(component_id >= ComponentBase::MAX_COMPONENTS || component_id >= m_entityComponents.size())
         {
             return components;
         }

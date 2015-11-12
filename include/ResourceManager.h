@@ -12,7 +12,11 @@
 #include "SimpleShader.h"
 #include "Material.h"
 
+// Singleton
 #include "Singleton.h"
+
+// JSON
+#include "json.h"
 
 class ResourceManager : public Singleton<ResourceManager>
 {
@@ -31,9 +35,29 @@ private:
     ID3D11DepthStencilView* depthStencilView;
     IDXGISwapChain*         swapChain;
 
+    /*
+     * JSON Parsing Methods:
+     *  Responsible for registering the appropriate object based on the provided parameters.
+     *  Note: JSON library will throw std::domain_error on missing key/value pairs.
+     *
+     *  Parameters:
+     *      obj --  The JSON object to be parsed.
+     *      parent -- The JSON array containing all other resources.
+     */
+    void ParseTexture(nlohmann::json obj, nlohmann::json parent);
+    void ParseMesh(nlohmann::json obj, nlohmann::json parent);
+    void ParseMaterial(nlohmann::json obj, nlohmann::json parent);
+    void ParseShader(nlohmann::json obj, nlohmann::json parent);
 public:
     ResourceManager(void);
     virtual ~ResourceManager(void);
+
+    /*
+     * Attempts to parse the provided JSON file for resources.
+     * @param   filename    The string indicating the JSON file to be parsed.
+     * @returns A boolean indicating if this operation was successful.
+     */
+    bool ParseJSONFile(const std::string& filename);
 
     // Getters
     Mesh*                           GetMesh(const std::string& id );
@@ -76,7 +100,7 @@ public:
      * @return  A bool indicating if the operation was successful.
      */
     template <typename... Args>
-    bool RegisterMesh( const std::string& id, Args&&... args )
+    bool RegisterMesh(const std::string& id, Args&&... args)
     {
         // Bail if there is not a registered ID3D11Device or ID3D11DeviceContext
         if( !device || !deviceContext )
@@ -108,7 +132,7 @@ public:
      * @return  A bool indicating if the operation was successful.
      */
     template <typename T>
-    bool RegisterShader( const std::string& id, LPCWSTR filename )
+    bool RegisterShader(const std::string& id, LPCWSTR filename)
     {
         static_assert( std::is_base_of<ISimpleShader, T>::value, "Must be an instance of ISimpleShader!" );
 

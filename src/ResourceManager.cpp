@@ -1,5 +1,10 @@
 #include "ResourceManager.h"
 
+// STD
+#include <iostream>
+#include <fstream>
+#include <stdexcept>
+
 // DirectX
 #include "DXMacros.h"
 #include "WICTextureLoader.h"
@@ -281,3 +286,176 @@ bool ResourceManager::RegisterDepthStencilState(const std::string& id, D3D11_DEP
 
     return true;
 }
+
+#pragma region JSON Methods
+
+/*
+ * JSON Parsing Methods:
+ *  Responsible for registering the appropriate object based on the provided parameters.
+ *  Note: JSON library will throw std::domain_error on missing key/value pairs.
+ *
+ *  Parameters:
+ *      obj --  The JSON object to be parsed.
+ *      parent -- The JSON array containing all other resources.
+ */
+
+using json = nlohmann::json;
+
+void ResourceManager::ParseTexture(json obj, json parent)
+{
+    std::string id = obj["ID"];
+    std::string filename = obj["Filename"];
+
+    RegisterTexture(id, std::wstring(filename.begin(), filename.end()).c_str());
+}
+
+void ResourceManager::ParseMesh(json obj, json parent)
+{
+    std::string id = obj["ID"];
+    std::string filename = obj["Filename"];
+
+    RegisterMesh(id, filename);
+}
+
+void ResourceManager::ParseShader(json obj, json parent)
+{
+    std::string id = obj["ID"];
+    std::string filename = obj["Filename"];
+    std::string stage = obj["Stage"];
+
+    // Register the appropriate type of shader.
+    if(stage == "Vertex")
+    {
+        RegisterShader<SimpleVertexShader>(id, std::wstring(filename.begin(), filename.end()).c_str());
+    }
+    else if(stage == "Pixel")
+    {
+        RegisterShader<SimplePixelShader>(id, std::wstring(filename.begin(), filename.end()).c_str());
+    }
+}
+
+void ResourceManager::ParseMaterial(json obj, json parent)
+{
+    std::string id = obj["ID"];
+    std::string vShader = obj["VertexShader"];
+    std::string pShader = obj["PixelShader"];
+
+    // Attempt to locate the Vertex Shader.
+    SimpleVertexShader* pVertex = static_cast<SimpleVertexShader*>(GetShader(vShader));
+    if(!pVertex)
+    {
+        ParseShader(parent[vShader], parent);
+        pVertex = static_cast<SimpleVertexShader*>(GetShader(vShader));
+
+        if(!pVertex)
+        {
+            throw std::domain_error("Missing Vertex Shader!");
+        }
+    }
+
+    // Attempt to locate the Pixel Shader.
+    SimplePixelShader* pPixel = static_cast<SimplePixelShader*>(GetShader(pShader));
+    if(!pPixel)
+    {
+        ParseShader(parent[pShader], parent);
+        pPixel = static_cast<SimplePixelShader*>(GetShader(pShader));
+
+        if(!pPixel)
+        {
+            throw std::domain_error("Missing Pixel Shader!");
+        }
+    }
+
+    // Create the Material.
+    Material* pMaterial = new Material(pVertex, pPixel);
+
+    // Add Textures.
+    auto arr = obj["Textures"];
+    for(auto& texture : arr)
+    {
+        std::string key = texture["Key"];
+        std::string textureName = texture["TextureName"];
+
+        ID3D11ShaderResourceView* pTex = GetTexture(textureName);
+        if(!pTex)
+        {
+            ParseTexture(parent[textureName], parent);
+            pTex = GetTexture(textureName);
+
+            if(!pTex)
+            {
+                delete pMaterial; // Cleanup the Material.
+                throw std::domain_error("Missing Texture!");
+            }
+        }
+
+        pMaterial->AddTexture(key, textureName);
+    }
+
+    // Finally register the Material.
+    RegisterMaterial(id, pMaterial);
+}
+
+/*
+ * Attempts to parse the provided JSON file for resources.
+ * @param   filename    The string indicating the JSON file to be parsed.
+ * @returns A boolean indicating if this operation was successful.
+ */
+bool ResourceManager::ParseJSONFile(const std::string& filename)
+{
+    std::ifstream filestream(filename);
+    if(filestream.is_open())
+    {
+        json jsonObj;
+
+        // Parse the JSON file.
+        try
+        {
+            filestream >> jsonObj;
+        }
+        // JSON library will throw std::invalid_argument on improperly formatted JSON.
+        catch(std::invalid_argument e)
+        {
+            std::cerr << filename << " " << e.what() << std::endl;
+            return false;
+        }
+
+        // Iterate through the objects in the JSON array.
+        for(auto& member : jsonObj)
+        {
+            try
+            {
+                // Attempt to discern the resource's type.
+                std::string type = member["Type"];
+                if(type == "Mesh")
+                {
+                    ParseMesh(member, jsonObj);
+                }
+                else if(type == "Texture")
+                {
+                    ParseTexture(member, jsonObj);
+                }
+                else if(type == "Shader")
+                {
+                    ParseShader(member, jsonObj);
+                }
+                else if(type == "Material")
+                {
+                    ParseMaterial(member, jsonObj);
+                }
+            }
+            // JSON library will throw std::domain_error on missing values.
+            catch(std::domain_error e)
+            {
+                std::cerr << "Error Parsing " << member << ": " << e.what() << std::endl;
+                continue;
+            }
+        }
+
+        return true; // We have finished parsing the file.
+    }
+
+    return false; // We failed to open th file.
+}
+
+#pragma endregion
