@@ -1,28 +1,39 @@
-#pragma once
-#include "ScriptComponent.h"
-#include "GameEntity.h"
+#ifndef AUTO_DESTRUCT_SCRIPT_H
+#define AUTO_DESTRUCT_SCRIPT_H
+
 #include "EntityManager.h"
+#include "ScriptComponent.h"
 #include "Transform.h"
 #include "TransformComponent.h"
-#include <iostream>
-class AutoDestructScript : public Script
+#include "GameEntity.h"
+
+class AutoDestructScript : public IScript
 {
 private :
 	float destroyAtZ;
-  
-public:
-	AutoDestructScript(float destroyAtZ):Script() { this->destroyAtZ = destroyAtZ; }
-	~AutoDestructScript() {}
 
-	void update(GameEntity entity, float dt, float tt) {
+public:
+	AutoDestructScript(float destroyAtZ)
+        : destroyAtZ(destroyAtZ)
+    {
+        /* Nothing to do. */
+    }
+
+	virtual ~AutoDestructScript(void) {}
+
+	virtual void Update(GameEntity entity, float dt, float tt) override
+    {
 		EntityManager* pEntity = EntityManager::Instance();
 
 		TransformComponent* pTransform = pEntity->GetComponent<TransformComponent>(entity);
 		Transform& t = pTransform->transform;
-		if (t.GetTranslation().z <= destroyAtZ) {
+
+		if (t.GetTranslation().z <= destroyAtZ)
+        {
 			pEntity->Destroy(entity);
 			EventManager::Instance()->Fire("AsteroidDestroyed", nullptr);
 		}
 	}
 };
 
+#endif
