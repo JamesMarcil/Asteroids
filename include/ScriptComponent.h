@@ -7,17 +7,21 @@ class ScriptComponent : public Component<ScriptComponent>
 {
 private:
 	std::vector<Script*> scripts;
+	bool deleted = false;
 public:
 	ScriptComponent() {}
 	~ScriptComponent() {
 		for (Script* script : scripts) {
 			delete script;
 		}
+		scripts.clear();
+		deleted = true;
 	};
 
 	void Update(GameEntity& entity, float dt, float tt) {
-		for (Script* script : scripts) {
-			script->update(entity, dt, tt);
+		if (deleted) return; //an update may cause this to be destroyed
+		for (int i = 0; !deleted && i < scripts.size(); i++){
+			scripts[i]->update(entity, dt, tt);
 		}
 	};
 

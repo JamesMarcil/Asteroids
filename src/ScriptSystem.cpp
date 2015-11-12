@@ -9,10 +9,12 @@
 // DirectX
 #include <DirectXMath.h>
 
+#include <iostream>
+
 void ScriptSystem::Update(EntityManager* pManager, float dt, float tt )
 {
     using namespace DirectX;
-
+	
     for(auto& entity : pManager->EntitiesWithComponents<ScriptComponent>())
     {
         ScriptComponent* script = pManager->GetComponent<ScriptComponent>(entity);

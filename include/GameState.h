@@ -20,6 +20,7 @@ private:
     bool	 prevSpaceBar;
     unsigned currentEntity;
 	unsigned int currentLevel = 0;
+	unsigned int asteroids = 0;
 
     virtual void Enter( void ) override;
     virtual void Update( float deltaTime, float totalTime ) override;

@@ -19,8 +19,10 @@ public:
 
 		TransformComponent* pTransform = pEntity->GetComponent<TransformComponent>(entity);
 		Transform& t = pTransform->transform;
-		if(t.GetTranslation().z <= destroyAtZ)
+		if (t.GetTranslation().z <= destroyAtZ) {
 			pEntity->Destroy(entity);
+			EventManager::Instance()->Fire("AsteroidDestroyed", nullptr);
+		}
 	}
 };
 

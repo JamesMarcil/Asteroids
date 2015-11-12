@@ -98,7 +98,8 @@ void GameState::Enter( void )
 		this->LoadCurrentLevel();
 		EventManager* pEventManager = EventManager::Instance();
 		pEventManager->Register("WarpEnd", this);
-		pEventManager->Register("Test", this);
+		pEventManager->Register("AsteroidDestroyed", this); 
+			pEventManager->Register("Test", this);
 		int i = 8;
 		pEventManager->Fire("Test", &i);
 		pEventManager->UnRegister("Test", this);
@@ -110,7 +111,8 @@ void GameState::Enter( void )
         pEntity->AddSystem<ClearSystem>();
         pEntity->AddSystem<RenderSystem>();
         pEntity->AddSystem<SkyboxSystem>();
-        pEntity->AddSystem<SwapSystem>();
+		pEntity->AddSystem<SwapSystem>();
+		pEntity->AddSystem<ScriptSystem>();
 
         // Make a SpotLight
         {
@@ -162,15 +164,17 @@ void GameState::LoadCurrentLevel() {
 	// Generate 50 GameEntities for demonstration.
 	srand(time(0));
 	int span = 2;
-	for (int i = 0; i < 30 + currentLevel *5; ++i)
+	int toAdd = 30 + currentLevel * 5;
+	this->asteroids = toAdd;
+	for (int i = 0; i < toAdd; ++i)
 	{
 		GameEntity e = pEntity->Create();
 		XMFLOAT3 position = XMFLOAT3(rand() % (span * 2) - span, rand() % (span * 2) - span, i * 5 + 15);
 		pEntity->AddComponent<TransformComponent>(e, position);
 		pEntity->AddComponent<RenderComponent>(e, defaultMat, pManager->GetMesh("Sphere"));
 		pEntity->AddComponent<PhysicsComponent>(e, XMVectorZero(), XMVectorSet(0.0f, 0.0f, -1.0f + currentLevel*-2.0f, 0.0f));
-		//ScriptComponent* script = pEntity->AddComponent<ScriptComponent>(e);
-		//script->AddScript(new AutoDestructScript(-5.0f));
+		ScriptComponent* script = pEntity->AddComponent<ScriptComponent>(e);
+		script->AddScript(new AutoDestructScript(-5.0f));
 	}
 }
 
@@ -183,6 +187,13 @@ void GameState::EventRouter(const std::string& name, void* data)
 
 	if (name == "WarpEnd") //finished warp, initialize new level
 		LoadCurrentLevel();
+
+	if (name == "AsteroidDestroyed") { //Called whenever an asteroid is shot or auto destructs
+		asteroids--;
+		if (asteroids <= 0) {
+			EventManager::Instance()->Fire("WarpEnd", nullptr); //TODO change to WarpStart
+		}
+	}
 }
 
 
@@ -205,14 +216,7 @@ void GameState::Update( float deltaTime, float totalTime )
 	{
 		pState->GoToState(GameStates::EXIT);
 	}
-	else if (pInput->IsKeyDown('5'))
-	{
-		EventManager::Instance()->Fire("WarpEnd", nullptr);
-	}
-	else if (pInput->IsKeyDown('6'))
-	{
-		EntityManager::Instance()->Clear();
-	}
+	
 }
 
 void GameState::Exit( void ) { /* Nothing to do. */ }
