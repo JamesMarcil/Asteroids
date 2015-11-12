@@ -52,6 +52,9 @@
     <Filter Include="Header Files\Systems">
       <UniqueIdentifier>{6240158d-ed88-4ee4-a3ff-25bc23de4ce3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Components\Scripts">
+      <UniqueIdentifier>{de7863a6-7971-4a51-b32c-54c4a69cefd1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -168,6 +171,18 @@
     <ClInclude Include="..\include\IEventListener.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\ScriptComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\ScriptSystem.h">
+      <Filter>Header Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\AutoDestructScript.h">
+      <Filter>Header Files\Components\Scripts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Script.h">
+      <Filter>Header Files\Components\Scripts</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ExitState.cpp">
@@ -228,6 +243,9 @@
       <Filter>Source Files\Systems</Filter>
     </ClCompile>
     <ClCompile Include="..\src\InputControllerSystem.cpp">
+      <Filter>Source Files\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ScriptSystem.cpp">
       <Filter>Source Files\Systems</Filter>
     </ClCompile>
     <ClCompile Include="..\src\CollisionSphere.cpp">

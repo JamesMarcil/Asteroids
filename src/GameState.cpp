@@ -24,9 +24,14 @@
 #include "PhysicsComponent.h"
 #include "InputComponent.h"
 #include "LightComponent.h"
+#include "ScriptComponent.h"
+
+// Scripts
+#include "AutoDestructScript.h"
 
 // Systems
 #include "PhysicsSystem.h"
+#include "ScriptSystem.h"
 #include "RenderSystem.h"
 #include "InputControllerSystem.h"
 
@@ -51,6 +56,7 @@ void GameState::Enter( void )
         ResourceManager* pManager = ResourceManager::Instance();
 		EventManager* pEventManager = EventManager::Instance();
 		pEventManager->Register("Test", this);
+		pEventManager->Register("WarpEnd", this);
 		int i = 8;
 		pEventManager->Fire("Test", &i);
 		pEventManager->UnRegister("Test", this);
@@ -136,31 +142,14 @@ void GameState::Enter( void )
             pManager->RegisterDepthStencilState("Skybox_DepthStencil", desc);
         }
 
+		this->LoadCurrentLevel();
+
         // Register Systems for demonstration.
         EntityManager* pEntity = EntityManager::Instance();
         pEntity->AddSystem<PhysicsSystem>();
+		pEntity->AddSystem<ScriptSystem>();
         pEntity->AddSystemWithPriority<RenderSystem, 0>();
 		pEntity->AddSystemWithPriority<InputControllerSystem, 1>();
-
-        // Generate 50 GameEntities for demonstration.
-        srand(time(0));
-		int span = 2;
-		for (int i = 0; i < 30; ++i)
-		{
-			GameEntity e = pEntity->Create();
-			XMFLOAT3 position = XMFLOAT3(rand() % (span*2) - span, rand() % (span*2) - span, i * 5 + 15);
-			pEntity->AddComponent<TransformComponent>(e, position);
-            pEntity->AddComponent<RenderComponent>(e, defaultMat, pManager->GetMesh("Sphere"));
-            pEntity->AddComponent<PhysicsComponent>(e, XMVectorZero(), XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f));
-		}
-		for (int i = 0; i < 15; ++i)
-		{
-			GameEntity e = pEntity->Create();
-			XMFLOAT3 position = XMFLOAT3(rand() % 25 + 1, rand() % 25 + 1, rand() % 25 + 1);
-			pEntity->AddComponent<TransformComponent>(e, position);
-            pEntity->AddComponent<RenderComponent>(e, defaultMat, pManager->GetMesh("Cube"));
-            pEntity->AddComponent<PhysicsComponent>(e, XMVectorZero(), XMVectorSet(0.0f, -0.1f, 0.0f, 0.0f));
-		}
 
         // Make a SpotLight
         {
@@ -202,18 +191,42 @@ void CastDataToInt(void * data)
 	int i = *((int*)data);
 }
 
+void GameState::LoadCurrentLevel() {
+	this->currentLevel++;
+	EntityManager* pEntity = EntityManager::Instance();
+	ResourceManager* pManager = ResourceManager::Instance();
+
+	Material* defaultMat = pManager->GetMaterial("default");
+
+	// Generate 50 GameEntities for demonstration.
+	srand(time(0));
+	int span = 2;
+	for (int i = 0; i < 30 + currentLevel *5; ++i)
+	{
+		GameEntity e = pEntity->Create();
+		XMFLOAT3 position = XMFLOAT3(rand() % (span * 2) - span, rand() % (span * 2) - span, i * 5 + 15);
+		pEntity->AddComponent<TransformComponent>(e, position);
+		pEntity->AddComponent<RenderComponent>(e, defaultMat, pManager->GetMesh("Sphere"));
+		pEntity->AddComponent<PhysicsComponent>(e, XMVectorZero(), XMVectorSet(0.0f, 0.0f, -1.0f + currentLevel*-2.0f, 0.0f));
+		//ScriptComponent* script = pEntity->AddComponent<ScriptComponent>(e);
+		//script->AddScript(new AutoDestructScript(-5.0f));
+	}
+}
+
 // Test route
 void GameState::EventRouter(const std::string& name, void* data)
 {
 	// One Listener can route multiple events, check the name to route properly
 	if(name == "Test")
 		CastDataToInt(data);
+
+	if (name == "WarpEnd") //finished warp, initialize new level
+		LoadCurrentLevel();
 }
 
 
 
 #pragma region Game Loop
-
 // --------------------------------------------------------
 // Update your game here - take input, move objects, etc.
 // --------------------------------------------------------
@@ -227,10 +240,18 @@ void GameState::Update( float deltaTime, float totalTime )
     {
         pState->GoToState( GameStates::MENU );
     }
-    else if( pInput->IsKeyDown( '3' ) )
-    {
-        pState->GoToState( GameStates::EXIT );
-    }
+	else if (pInput->IsKeyDown('3'))
+	{
+		pState->GoToState(GameStates::EXIT);
+	}
+	else if (pInput->IsKeyDown('5'))
+	{
+		EventManager::Instance()->Fire("WarpEnd", nullptr);
+	}
+	else if (pInput->IsKeyDown('6'))
+	{
+		EntityManager::Instance()->Clear();
+	}
 }
 
 void GameState::Exit( void ) { /* Nothing to do. */ }

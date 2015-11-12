@@ -122,6 +122,10 @@
     <ClInclude Include="..\include\TransformComponent.h" />
     <ClInclude Include="..\include\Vertex.h" />
     <ClInclude Include="..\include\InputControllerSystem.h" />
+    <ClInclude Include="..\include\ScriptComponent.h" />
+    <ClInclude Include="..\include\AutoDestructScript.h" />
+    <ClInclude Include="..\include\ScriptSystem.h" />
+    <ClInclude Include="..\include\Script.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Camera.cpp" />
@@ -146,6 +150,7 @@
     <ClCompile Include="..\src\System.cpp" />
     <ClCompile Include="..\src\Transform.cpp" />
     <ClCompile Include="..\src\InputControllerSystem.cpp" />
+    <ClCompile Include="..\src\ScriptSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\shaders\ColliderPS.hlsl">
