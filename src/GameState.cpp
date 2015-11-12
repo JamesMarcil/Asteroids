@@ -50,7 +50,7 @@ using namespace DirectX;
 void GameState::Enter( void )
 {
     // Register resources with the ResourceManager
-    if( !isInitialized )
+    if(!isInitialized)
     {
 		CameraManager* camMan = CameraManager::Instance();
 		camMan->RegisterCamera<Camera>("Main Camera", 0.0f, 0.0f, -5.0f);
@@ -98,13 +98,9 @@ void GameState::Enter( void )
 		this->LoadCurrentLevel();
 		EventManager* pEventManager = EventManager::Instance();
 		pEventManager->Register("WarpEnd", this);
-		pEventManager->Register("AsteroidDestroyed", this); 
-			pEventManager->Register("Test", this);
-		int i = 8;
-		pEventManager->Fire("Test", &i);
-		pEventManager->UnRegister("Test", this);
+		pEventManager->Register("AsteroidDestroyed", this);
 
-        // Register Systems for demonstration.
+        // Register Systems.
         EntityManager* pEntity = EntityManager::Instance();
         pEntity->AddSystem<PhysicsSystem>();
 		pEntity->AddSystem<InputControllerSystem>();
@@ -130,13 +126,11 @@ void GameState::Enter( void )
 
 		//Make Player
 		GameEntity player = pEntity->Create();
-		pEntity->AddComponent<TransformComponent>(player, XMFLOAT3(0, 0, 0));
 		pEntity->AddComponent<RenderComponent>(player, pManager->GetMaterial("ship"), pManager->GetMesh("Ship"));
-		pEntity->AddComponent<PhysicsComponent>(player, XMVectorZero(), XMVectorSet(0, 0, 0, 0));
-		pEntity->AddComponent<InputComponent>(player, 50.0f);
-		TransformComponent* pTrans = pEntity->GetComponent<TransformComponent>(player);
+        pEntity->AddComponent<InputComponent>(player, 50.0f);
+		TransformComponent* pTrans = pEntity->AddComponent<TransformComponent>(player, XMFLOAT3(0, 0, 0));
 		pTrans->transform.SetScale(.001f);
-		PhysicsComponent* pPhysics = pEntity->GetComponent<PhysicsComponent>(player);
+		PhysicsComponent* pPhysics = pEntity->AddComponent<PhysicsComponent>(player, XMVectorZero(), XMVectorSet(0, 0, 0, 0));
 		pPhysics->drag = 0.95f;
 		pPhysics->rotationalDrag = 0.85f;
 
@@ -148,20 +142,14 @@ void GameState::Enter( void )
 
 #pragma endregion
 
-void CastDataToInt(void * data)
+void GameState::LoadCurrentLevel()
 {
-	//cast to an int pointer then dereference to get the value
-	int i = *((int*)data);
-}
-
-void GameState::LoadCurrentLevel() {
 	this->currentLevel++;
 	EntityManager* pEntity = EntityManager::Instance();
 	ResourceManager* pManager = ResourceManager::Instance();
 
 	Material* defaultMat = pManager->GetMaterial("default");
 
-	// Generate 50 GameEntities for demonstration.
 	srand(time(0));
 	int span = 2;
 	int toAdd = 30 + currentLevel * 5;
@@ -178,17 +166,17 @@ void GameState::LoadCurrentLevel() {
 	}
 }
 
-// Test route
+// One Listener can route multiple events, check the name to route properly
 void GameState::EventRouter(const std::string& name, void* data)
 {
-	// One Listener can route multiple events, check the name to route properly
-	if(name == "Test")
-		CastDataToInt(data);
-
-	if (name == "WarpEnd") //finished warp, initialize new level
+    // Finished warp, initialize new level.
+	if (name == "WarpEnd")
+    {
 		LoadCurrentLevel();
-
-	if (name == "AsteroidDestroyed") { //Called whenever an asteroid is shot or auto destructs
+    }
+    // Called whenever an asteroid is shot or auto destructs.
+    else if (name == "AsteroidDestroyed")
+    {
 		asteroids--;
 		if (asteroids <= 0) {
 			EventManager::Instance()->Fire("WarpEnd", nullptr); //TODO change to WarpStart
@@ -216,8 +204,7 @@ void GameState::Update( float deltaTime, float totalTime )
 	{
 		pState->GoToState(GameStates::EXIT);
 	}
-	
 }
 
 void GameState::Exit( void ) { /* Nothing to do. */ }
-#pragma endregion 
+#pragma endregion
