@@ -1,27 +1,4 @@
-#define MAX_LIGHTS 10
-
-struct DirectionalLight
-{
-	float4 color;
-	float3 direction;
-	float specularIntensity;
-};
-
-struct PointLight
-{
-	float4 color;
-	float3 position;
-	float specularIntensity;
-};
-
-struct SpotLight
-{
-	float4 color;
-	float3 position;
-	float specularIntensity;
-	float3 direction;
-	float power;
-};
+#include "Light.hlsl"
 
 struct VertexToPixel
 {
@@ -47,50 +24,6 @@ Texture2D shipTexture    : register(t0);
 Texture2D shipSpecMap       : register(t1);
 SamplerState trilinear      : register(s0);
 
-float4 DirectionalLightCalculation(DirectionalLight light, VertexToPixel input, float specMapValue)
-{
-	float3 normal = input.normal;
-	float3 lightDir = normalize(-light.direction);
-	float3 viewDir = normalize(cameraPosition - input.worldPos);
-	float3 reflection = reflect(-lightDir, normal);
-
-	float4 diffuse = saturate(dot(normal, lightDir));
-	float specular = pow(max(dot(reflection, viewDir), 0), light.specularIntensity);
-
-	return light.color * (diffuse + specular * specMapValue);
-}
-
-float4 PointLightCalculation(PointLight light, VertexToPixel input, float specMapValue)
-{
-	float3 normal = input.normal;
-	float3 lightPos = light.position;
-	float3 lightDir = normalize(lightPos - input.worldPos);
-	float3 viewDir = normalize(cameraPosition - input.worldPos);
-	float3 reflection = reflect(-lightDir, normal);
-
-	float4 diffuse = saturate(dot(normal, lightDir));
-	float specular = pow(max(dot(reflection, viewDir), 0), light.specularIntensity);
-
-	return light.color * (diffuse + specular * specMapValue);
-}
-
-float4 SpotLightCalculation(SpotLight light, VertexToPixel input, float specMapValue)
-{
-	float3 normal = input.normal;
-	float3 lightPos = light.position;
-	float3 lightDir = normalize(lightPos - input.worldPos);
-	float3 viewDir = normalize(cameraPosition - input.worldPos);
-	float3 reflection = reflect(-lightDir, normal);
-
-	float angleFromCenter = max(dot(-lightDir, light.direction), 0);
-	float spotFalloff = pow(angleFromCenter, light.power);
-
-	float4 diffuse = saturate(dot(normal, lightDir));
-	float specular = pow(max(dot(reflection, viewDir), 0), light.specularIntensity);
-
-	return spotFalloff * (light.color * (diffuse + specular * specMapValue));
-}
-
 float4 main(VertexToPixel input) : SV_TARGET
 {
 	input.uv = float2(input.uv.x, -input.uv.y);
@@ -109,19 +42,19 @@ float4 main(VertexToPixel input) : SV_TARGET
 	// Calculate Directional Lighting.
 	[unroll] for (int i = 0; i < MAX_LIGHTS; ++i)
 	{
-		dirColor += DirectionalLightCalculation(directionalLights[i], input, specMapValue);
+		dirColor += DirectionalLightCalculation(directionalLights[i], input.worldPos, input.normal, cameraPosition, specMapValue);
 	}
 
 	// Calculate Point Lighting.
 	[unroll] for (int j = 0; j < MAX_LIGHTS; ++j)
 	{
-		pointColor += PointLightCalculation(pointLights[j], input, specMapValue);
+		pointColor += PointLightCalculation(pointLights[j], input.worldPos, input.normal, cameraPosition, specMapValue);
 	}
 
 	// Calculate Spot Lighting.
 	[unroll] for (int k = 0; k < MAX_LIGHTS; ++k)
 	{
-		spotColor += SpotLightCalculation(spotLights[k], input, specMapValue);
+		spotColor += SpotLightCalculation(spotLights[k], input.worldPos, input.normal, cameraPosition, specMapValue);
 	}
 
 	// Sample the diffuse texture.
@@ -129,5 +62,4 @@ float4 main(VertexToPixel input) : SV_TARGET
 
 	// Calculate the final color.
 	return diffuseColor * (dirColor + pointColor + spotColor);
-	//return float4(input.uv.xy, 0, 1);
 }
