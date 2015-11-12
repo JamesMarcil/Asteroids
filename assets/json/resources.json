@@ -66,9 +66,21 @@
     },
 
     {
-        "ID" : "CubeMap",
+        "ID" : "Space",
         "Type" : "Texture",
         "Filename" : "textures/SpaceCubeMap.dds"
+    },
+
+    {
+        "ID" : "GreenSpace",
+        "Type" : "Texture",
+        "Filename" : "textures/greenSpace.dds"
+    },
+
+    {
+        "ID" : "PurpleSpace",
+        "Type" : "Texture",
+        "Filename" : "textures/purpleSpace.dds"
     },
 
     {
