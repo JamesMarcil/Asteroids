@@ -115,7 +115,10 @@ void GameState::Enter( void )
         pManager->RegisterShader<SimplePixelShader>("SkyboxPixel", L"SkyboxPixel.cso");
 
         // Load the DDS texture necessary for the Skybox
-        pManager->RegisterTexture("CubeMap", L"textures/SpaceCubeMap.dds");
+		// Make sure to update this in WarpSystem
+        pManager->RegisterTexture("GreenSpace", L"textures/greenSpace.dds");
+		pManager->RegisterTexture("PurpleSpace", L"textures/purpleSpace.dds");
+		pManager->RegisterTexture("Space", L"textures/SpaceCubeMap.dds");
 
         // Create the ID3D11RasterizerState for the Skybox.
         {

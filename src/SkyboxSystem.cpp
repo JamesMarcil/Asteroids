@@ -4,6 +4,8 @@
 #include "EntityManager.h"
 #include "ResourceManager.h"
 #include "CameraManager.h"
+#include "EventManager.h"
+#include "InputManager.h"
 
 // DirectX
 #include <d3d11.h>
@@ -14,18 +16,59 @@
 
 using namespace DirectX;
 
+SkyboxSystem::SkyboxSystem()
+{
+	EventManager::Instance()->Register("WarpBegin", this);
+	textureNames[0] = "GreenSpace";
+	textureNames[1] = "PurpleSpace";
+	textureNames[2] = "Space";
+	warping = false;
+	timeElapsed = 0;
+	currentTexture = 0;
+}
+
 SkyboxSystem::~SkyboxSystem(void)
 {
     /* Nothing to do. */
 }
 
+void SkyboxSystem::EventRouter(const std::string& name, void* data)
+{
+	if (name == "WarpBegin")
+	{
+		currentTexture++;
+		currentTexture = currentTexture > 2 ? 0 : currentTexture;
+		warping = true;
+		timeElapsed = 0;
+	}
+}
+
 void SkyboxSystem::Update(EntityManager* pManager, float dt, float tt)
 {
+	if (InputManager::Instance()->IsKeyDown('L') && !warping) EventManager::Instance()->Fire("WarpBegin", nullptr);
+
+	int lastTexture = currentTexture - 1 < 0 ? 2 : currentTexture - 1;
+
+	if (warping)
+	{
+		timeElapsed += dt;
+		if (timeElapsed > warpTime)
+		{
+			warping = false;
+			lerpT = 1;
+		}
+		else
+		{
+			lerpT = timeElapsed / warpTime;
+		}
+	}
+
     ResourceManager* pResource = ResourceManager::Instance();
     ID3D11DeviceContext* pDeviceContext = pResource->GetDeviceContext();
     ID3D11RasterizerState* pRasterizer = pResource->GetRasterizerState("Skybox_Rasterizer");
     ID3D11DepthStencilState* pDepthStencil = pResource->GetDepthStencilState("Skybox_DepthStencil");
-    ID3D11ShaderResourceView* pSkySRV = pResource->GetTexture("CubeMap");
+	ID3D11ShaderResourceView* pToSkySRV = pResource->GetTexture(textureNames[currentTexture]);
+	ID3D11ShaderResourceView* pFromSkySRV = pResource->GetTexture(textureNames[lastTexture]);
     ISimpleShader   *pSkyVertex = pResource->GetShader("SkyboxVertex"),
                     *pSkyPixel = pResource->GetShader("SkyboxPixel");
     Camera* pCamera = CameraManager::Instance()->GetActiveCamera();
@@ -45,8 +88,11 @@ void SkyboxSystem::Update(EntityManager* pManager, float dt, float tt)
     pSkyVertex->CopyBufferData("PerFrame");
 
     // Send the texure and sampler.
-    pSkyPixel->SetShaderResourceView("skybox", pSkySRV);
+	pSkyPixel->SetShaderResourceView("skybox", pToSkySRV);
+	pSkyPixel->SetShaderResourceView("fromSkybox", pFromSkySRV);
+	pSkyPixel->SetFloat("t", lerpT);
     pSkyPixel->SetSamplerState("trilinear", pResource->GetSamplerState("trilinear"));
+	pSkyPixel->CopyBufferData("PerFrame");
 
     // Set Shader without copying buffers.
     pSkyVertex->SetShader(false);
