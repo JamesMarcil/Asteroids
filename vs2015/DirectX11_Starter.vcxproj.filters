@@ -37,6 +37,7 @@
     <ClCompile Include="..\src\InputControllerSystem.cpp" />
     <ClCompile Include="..\src\ScriptSystem.cpp" />
     <ClCompile Include="..\src\CollisionSystem.cpp" />
+    <ClCompile Include="..\src\AttackSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\Camera.h" />
@@ -85,6 +86,8 @@
     <ClInclude Include="..\include\Script.h" />
     <ClInclude Include="..\include\CollisionSystem.h" />
     <ClInclude Include="..\include\IScript.h" />
+    <ClInclude Include="..\include\AttackSystem.h" />
+    <ClInclude Include="..\include\AttackComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

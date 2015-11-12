@@ -87,6 +87,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\AttackComponent.h" />
+    <ClInclude Include="..\include\AttackSystem.h" />
     <ClInclude Include="..\include\Camera.h" />
     <ClInclude Include="..\include\CameraManager.h" />
     <ClInclude Include="..\include\ClearSystem.h" />
@@ -135,6 +137,7 @@
     <ClInclude Include="..\include\Script.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\AttackSystem.cpp" />
     <ClCompile Include="..\src\Camera.cpp" />
     <ClCompile Include="..\src\CameraManager.cpp" />
     <ClCompile Include="..\src\ClearSystem.cpp" />

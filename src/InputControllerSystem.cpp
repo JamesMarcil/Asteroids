@@ -25,8 +25,6 @@ void InputControllerSystem::Update(EntityManager* pManager, float dt, float tt)
 	float horiz = (pInput->IsKeyDown('A') ? -1 : 0) + (pInput->IsKeyDown('D') ? 1 : 0);
 	float vert = (pInput->IsKeyDown('S') ? -1 : 0) + (pInput->IsKeyDown('W') ? 1 : 0);
 
-
-
 	for (auto& entity : pManager->EntitiesWithComponents<InputComponent, PhysicsComponent, TransformComponent>())
 	{
 		TransformComponent* pTransform = pManager->GetComponent<TransformComponent>(entity);

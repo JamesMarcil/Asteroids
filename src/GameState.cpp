@@ -26,6 +26,7 @@
 #include "LightComponent.h"
 #include "ScriptComponent.h"
 #include <CollisionComponent.h>
+#include <AttackComponent.h>
 
 // Scripts
 #include "AutoDestructScript.h"
@@ -39,6 +40,7 @@
 #include "SkyboxSystem.h"
 #include "SwapSystem.h"
 #include <CollisionSystem.h>
+#include <AttackSystem.h>
 
 // For the DirectX Math library
 using namespace DirectX;
@@ -112,6 +114,7 @@ void GameState::Enter( void )
 		pEntity->AddSystem<SwapSystem>();
 		pEntity->AddSystem<ScriptSystem>();
 		pEntity->AddSystem<CollisionSystem>();
+		pEntity->AddSystem<AttackSystem>();
 
         // Make a SpotLight
         {
@@ -132,6 +135,7 @@ void GameState::Enter( void )
 		pEntity->AddComponent<RenderComponent>(player, pManager->GetMaterial("ship"), pManager->GetMesh("Ship"));
         pEntity->AddComponent<InputComponent>(player, 50.0f);
 		pEntity->AddComponent<CollisionComponent>(player, *pManager->GetMesh("Ship"), XMFLOAT3(0, 0, 0), 0.001f);
+		pEntity->AddComponent<AttackComponent>(player, 5);
 		TransformComponent* pTrans = pEntity->AddComponent<TransformComponent>(player, XMFLOAT3(0, 0, 0));
 		pTrans->transform.SetScale(.001f);
 		PhysicsComponent* pPhysics = pEntity->AddComponent<PhysicsComponent>(player, XMVectorZero(), XMVectorSet(0, 0, 0, 0));

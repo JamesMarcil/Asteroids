@@ -13,6 +13,11 @@ struct CollisionComponent : public Component<CollisionComponent>
 	{
 
 	}
+
+	CollisionComponent(float r, DirectX::XMFLOAT3& p)
+		: collider(r, p)
+	{
+	}
 	~CollisionComponent() {}
 };
 
