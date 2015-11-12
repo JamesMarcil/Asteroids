@@ -9,6 +9,8 @@ class RenderSystem : public System<RenderSystem>
 
     /* System interface. */
     virtual void Update(EntityManager* pManager, float dt, float tt ) override;
+
+	void RenderSystem::RenderCollisionSpheres(EntityManager* pManager);
 };
 
 #endif

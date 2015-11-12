@@ -13,9 +13,7 @@ struct CollisionComponent : public Component<CollisionComponent>
 	{
 
 	}
-
 	~CollisionComponent() {}
-
 };
 
 #endif

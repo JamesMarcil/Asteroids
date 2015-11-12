@@ -8,7 +8,7 @@ struct VertexToPixel
     float2 uv           : TEXCOORD1;
 };
 
-int isColliding;
+float isColliding;
 
 Texture2D loamTexture		: register(t0);
 Texture2D rockTexture		: register(t1);

@@ -153,5 +153,16 @@
             { "Key" : "shipTexture", "TextureName" : "Ship" },
             { "Key" : "shipSpecMap", "TextureName" : "Ship_Spec" }
         ]
+    },
+	
+	{
+        "ID" : "collider",
+        "Type" : "Material",
+        "VertexShader" : "StandardVertex",
+        "PixelShader" : "ColliderPixel",
+        "Textures" : [ 
+            { "Key" : "loamTexture", "TextureName" : "Loam" },
+            { "Key" : "rockTexture", "TextureName" : "Rock" }
+        ]
     }
 ]

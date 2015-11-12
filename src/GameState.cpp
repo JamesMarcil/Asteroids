@@ -25,6 +25,7 @@
 #include "InputComponent.h"
 #include "LightComponent.h"
 #include "ScriptComponent.h"
+#include <CollisionComponent.h>
 
 // Scripts
 #include "AutoDestructScript.h"
@@ -37,6 +38,7 @@
 #include "RenderSystem.h"
 #include "SkyboxSystem.h"
 #include "SwapSystem.h"
+#include <CollisionSystem.h>
 
 // For the DirectX Math library
 using namespace DirectX;
@@ -109,6 +111,7 @@ void GameState::Enter( void )
         pEntity->AddSystem<SkyboxSystem>();
 		pEntity->AddSystem<SwapSystem>();
 		pEntity->AddSystem<ScriptSystem>();
+		pEntity->AddSystem<CollisionSystem>();
 
         // Make a SpotLight
         {
@@ -128,6 +131,7 @@ void GameState::Enter( void )
 		GameEntity player = pEntity->Create();
 		pEntity->AddComponent<RenderComponent>(player, pManager->GetMaterial("ship"), pManager->GetMesh("Ship"));
         pEntity->AddComponent<InputComponent>(player, 50.0f);
+		pEntity->AddComponent<CollisionComponent>(player, *pManager->GetMesh("Ship"), XMFLOAT3(0, 0, 0), 0.001f);
 		TransformComponent* pTrans = pEntity->AddComponent<TransformComponent>(player, XMFLOAT3(0, 0, 0));
 		pTrans->transform.SetScale(.001f);
 		PhysicsComponent* pPhysics = pEntity->AddComponent<PhysicsComponent>(player, XMVectorZero(), XMVectorSet(0, 0, 0, 0));
@@ -163,6 +167,7 @@ void GameState::LoadCurrentLevel()
 		pEntity->AddComponent<PhysicsComponent>(e, XMVectorZero(), XMVectorSet(0.0f, 0.0f, -1.0f + currentLevel*-2.0f, 0.0f));
 		ScriptComponent* script = pEntity->AddComponent<ScriptComponent>(e);
 		script->AddScript(new AutoDestructScript(-5.0f));
+		pEntity->AddComponent<CollisionComponent>(e, *pManager->GetMesh("Sphere"), position, 1.3f);
 	}
 }
 

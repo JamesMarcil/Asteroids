@@ -92,6 +92,7 @@
     <ClInclude Include="..\include\ClearSystem.h" />
     <ClInclude Include="..\include\CollisionComponent.h" />
     <ClInclude Include="..\include\CollisionSphere.h" />
+    <ClInclude Include="..\include\CollisionSystem.h" />
     <ClInclude Include="..\include\Component.h" />
     <ClInclude Include="..\include\DebugCamera.h" />
     <ClInclude Include="..\include\DirectXGameCore.h" />
@@ -107,6 +108,7 @@
     <ClInclude Include="..\include\IGameState.h" />
     <ClInclude Include="..\include\InputComponent.h" />
     <ClInclude Include="..\include\InputManager.h" />
+    <ClInclude Include="..\include\IScript.h" />
     <ClInclude Include="..\include\json.h" />
     <ClInclude Include="..\include\LightComponent.h" />
     <ClInclude Include="..\include\Material.h" />
@@ -137,6 +139,7 @@
     <ClCompile Include="..\src\CameraManager.cpp" />
     <ClCompile Include="..\src\ClearSystem.cpp" />
     <ClCompile Include="..\src\CollisionSphere.cpp" />
+    <ClCompile Include="..\src\CollisionSystem.cpp" />
     <ClCompile Include="..\src\Component.cpp" />
     <ClCompile Include="..\src\DebugCamera.cpp" />
     <ClCompile Include="..\src\DirectXGameCore.cpp" />
