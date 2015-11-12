@@ -118,7 +118,7 @@ void GameState::Enter( void )
 
         // Make a SpotLight
         {
-            GameEntity e = pEntity->Create();
+            GameEntity e = pEntity->Create("Light");
             pEntity->AddComponent<SpotLightComponent>
             (
                 e,                                          // Entity
@@ -131,7 +131,7 @@ void GameState::Enter( void )
         }
 
 		//Make Player
-		GameEntity player = pEntity->Create();
+		GameEntity player = pEntity->Create("Player");
 		pEntity->AddComponent<RenderComponent>(player, pManager->GetMaterial("ship"), pManager->GetMesh("Ship"));
         pEntity->AddComponent<InputComponent>(player, 50.0f);
 		pEntity->AddComponent<CollisionComponent>(player, *pManager->GetMesh("Ship"), XMFLOAT3(0, 0, 0), 0.001f);
@@ -164,7 +164,7 @@ void GameState::LoadCurrentLevel()
 	this->asteroids = toAdd;
 	for (int i = 0; i < toAdd; ++i)
 	{
-		GameEntity e = pEntity->Create();
+		GameEntity e = pEntity->Create("Asteroid");
 		XMFLOAT3 position = XMFLOAT3(rand() % (span * 2) - span, rand() % (span * 2) - span, i * 5 + 15);
 		pEntity->AddComponent<TransformComponent>(e, position);
 		pEntity->AddComponent<RenderComponent>(e, defaultMat, pManager->GetMesh("Sphere"));

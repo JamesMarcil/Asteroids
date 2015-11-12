@@ -5,6 +5,7 @@ struct GameEntity
 {
 private:
     std::uint32_t m_id; // Unique ID for this GameEntity.
+	char* tag;			// Tag used to identify entity type
 
 public:
 
@@ -17,10 +18,11 @@ public:
      * Construct a GameEntity with the provided ID.
      * @param   id      The id for this GameEntity.
      */
-    explicit GameEntity(std::uint32_t id) : m_id(id) { /* Nothing to do */ }
+    explicit GameEntity(std::uint32_t id, char* t) : m_id(id), tag(t) { /* Nothing to do */ }
 
     /* Getters */
     std::uint32_t id(void) const { return m_id; }
+	char* GetTag(void) const { return tag; }
 
     GameEntity(const GameEntity& rhs) = default;
     GameEntity& operator=(const GameEntity& rhs) = default;

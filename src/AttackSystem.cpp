@@ -29,7 +29,8 @@ void AttackSystem::FireProjectile(EntityManager* pManager) {
 		projectileCollider = new CollisionSphere(*rManager->GetMesh("Helix"), DirectX::XMFLOAT3(0,0,0), 0.1f);
 	}
 
-	GameEntity projectile = pManager->Create();
+	GameEntity projectile = pManager->Create("Projectile");
+	pManager->AddComponent<RenderComponent>(projectile, rManager->GetMaterial("default"), rManager->GetMesh("Helix"));
 	pManager->AddComponent<TransformComponent>(projectile, pManager->GetComponent<TransformComponent>(player)->transform.GetTranslation());
 	pManager->GetComponent<TransformComponent>(projectile)->transform.SetScale(0.1f);
 	pManager->GetComponent<TransformComponent>(projectile)->transform.Rotate(3.14159f / 2, 0, 0);

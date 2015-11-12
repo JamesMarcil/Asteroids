@@ -165,7 +165,7 @@ public:
      * This method allocates a new GameEntity.
      * @return A reference to the newly allocated GameEntity.
      */
-    GameEntity Create(void)
+    GameEntity Create(char* t)
     {
         // If there are no unused IDs, create more
         if(m_entityIDs.empty())
@@ -180,9 +180,9 @@ public:
         m_entityIDs.pop_back();
 
         // Construct a GameEntity at the indicated ID.
-        m_entities[entity_id - 1] = GameEntity(entity_id);
+        m_entities[entity_id - 1] = GameEntity(entity_id, t);
 
-        return GameEntity(entity_id);
+        return GameEntity(entity_id, t);
     }
 
     /*

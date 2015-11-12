@@ -143,7 +143,7 @@ void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
         pDeviceContext->DrawIndexed(pMesh->GetIndexCount(), 0, 0);
     }
 
-	RenderCollisionSpheres(pManager);
+	//RenderCollisionSpheres(pManager);
 }
 
 void RenderSystem::RenderCollisionSpheres(EntityManager* pManager) {
