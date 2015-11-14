@@ -95,6 +95,53 @@ void GameState::Enter( void )
             pManager->RegisterDepthStencilState("Skybox_DepthStencil", desc);
         }
 
+		ID3D11RenderTargetView* ppRTV;
+		ID3D11ShaderResourceView* ppSRV;
+
+		// Create post-process resources
+		D3D11_TEXTURE2D_DESC textureDesc;
+		ZeroMemory(&textureDesc, sizeof(textureDesc));
+		textureDesc.Width = 800;
+		textureDesc.Height = 600;
+		textureDesc.ArraySize = 1;
+		textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+		textureDesc.CPUAccessFlags = 0;
+		textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		textureDesc.MipLevels = 1;
+		textureDesc.MiscFlags = 0;
+		textureDesc.SampleDesc.Count = 1;
+		textureDesc.SampleDesc.Quality = 0;
+		textureDesc.Usage = D3D11_USAGE_DEFAULT;
+
+		ID3D11Texture2D* ppTexture;
+		pManager->GetDevice()->CreateTexture2D(&textureDesc, 0, &ppTexture);
+		
+		// Create the Render Target View
+		D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
+		ZeroMemory(&rtvDesc, sizeof(rtvDesc));
+		rtvDesc.Format = textureDesc.Format;
+		rtvDesc.Texture2D.MipSlice = 0;
+		rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+
+		pManager->GetDevice()->CreateRenderTargetView(ppTexture, &rtvDesc, &ppRTV);
+
+		// Create the Shader Resource View
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+		ZeroMemory(&srvDesc, sizeof(srvDesc));
+		srvDesc.Format = textureDesc.Format;
+		srvDesc.Texture2D.MipLevels = 1;
+		srvDesc.Texture2D.MostDetailedMip = 0;
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+
+		pManager->GetDevice()->CreateShaderResourceView(ppTexture, &srvDesc, &ppSRV);
+
+		pManager->RegisterTexture("PostEffectTexture", ppSRV);
+
+		// We don't need the texture reference no mo'
+		ppTexture->Release();
+
+		pManager->RegisterRenderTargetView("PostRTV", ppRTV);
+
 		this->LoadCurrentLevel();
 		EventManager* pEventManager = EventManager::Instance();
 		pEventManager->Register("WarpEnd", this);

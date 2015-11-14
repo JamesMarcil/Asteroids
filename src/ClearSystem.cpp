@@ -19,11 +19,13 @@ void ClearSystem::Update(EntityManager* pManager, float dt, float tt)
     ResourceManager* pResource = ResourceManager::Instance();
 
     ID3D11DeviceContext* pDeviceContext = pResource->GetDeviceContext();
-    ID3D11RenderTargetView* pRenderTarget = pResource->GetRenderTargetView();
+	ID3D11RenderTargetView* pEffectRenderTarget = pResource->GetRenderTargetView("PostRTV");
+    ID3D11RenderTargetView* pMainRenderTarget = pResource->GetRenderTargetView("MainRTV");
     ID3D11DepthStencilView* pDepthStencilView = pResource->GetDepthStencilView();
 
     // Clear the screen to black.
     const float color[] = {0.0f, 0.0f, 0.0f, 0.0f };
-    pDeviceContext->ClearRenderTargetView(pRenderTarget, color);
+	pDeviceContext->ClearRenderTargetView(pEffectRenderTarget, color);
+    pDeviceContext->ClearRenderTargetView(pMainRenderTarget, color);
     pDeviceContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }

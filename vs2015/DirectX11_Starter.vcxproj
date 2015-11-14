@@ -114,6 +114,7 @@
     <ClInclude Include="..\include\Mesh.h" />
     <ClInclude Include="..\include\PhysicsComponent.h" />
     <ClInclude Include="..\include\PhysicsSystem.h" />
+    <ClInclude Include="..\include\PostEffectsSystem.h" />
     <ClInclude Include="..\include\RenderComponent.h" />
     <ClInclude Include="..\include\RenderSystem.h" />
     <ClInclude Include="..\include\ResourceManager.h" />
@@ -150,6 +151,7 @@
     <ClCompile Include="..\src\MenuState.cpp" />
     <ClCompile Include="..\src\Mesh.cpp" />
     <ClCompile Include="..\src\PhysicsSystem.cpp" />
+    <ClCompile Include="..\src\PostEffectsSystem.cpp" />
     <ClCompile Include="..\src\RenderSystem.cpp" />
     <ClCompile Include="..\src\ResourceManager.cpp" />
     <ClCompile Include="..\src\SimpleShader.cpp" />

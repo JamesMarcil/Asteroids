@@ -51,6 +51,11 @@ ResourceManager::~ResourceManager(void)
 	{
 		delete pair.second;
 	}
+
+	for (auto& pair : renderTargetViews)
+	{
+		ReleaseMacro(pair.second);
+	}
 }
 
 /*
@@ -64,14 +69,18 @@ void ResourceManager::RegisterDeviceAndContext( ID3D11Device* const device, ID3D
     this->deviceContext = deviceContext;
 }
 
+void ResourceManager::RegisterRenderTargetView(const std::string& id, ID3D11RenderTargetView* pRTV)
+{
+	renderTargetViews.emplace(id, pRTV);
+}
+
 /*
  * Register an ID3D11RenderView and ID3D11DepthStencilView with the ResourceManager.
  * @param   pRender             The ID3D11RenderTargetView to register.
  * @param   pDepthStencil       The ID3D11DepthStencilView to register.
  */
-void ResourceManager::RegisterRenderTargetAndDepthStencilView(ID3D11RenderTargetView* pRender, ID3D11DepthStencilView* pDepthStencil)
+void ResourceManager::RegisterDepthStencilView(ID3D11DepthStencilView* pDepthStencil)
 {
-    this->renderTargetView = pRender;
     this->depthStencilView = pDepthStencil;
 }
 
@@ -85,6 +94,17 @@ void ResourceManager::RegisterSwapChain(IDXGISwapChain* pSwapChain)
 }
 
 #pragma region Getters
+
+ID3D11RenderTargetView* ResourceManager::GetRenderTargetView(const std::string& id)
+{
+	auto& iter = renderTargetViews.find(id);
+	if (iter == renderTargetViews.cend())
+	{
+		return nullptr;
+	}
+
+	return iter->second;
+}
 
 Mesh* ResourceManager::GetMesh( const std::string& id )
 {
@@ -198,6 +218,25 @@ bool ResourceManager::RegisterTexture( const std::string& id, const std::wstring
     textures.emplace( id, pTexture );
 
     return true;
+}
+
+bool ResourceManager::RegisterTexture(const std::string & id, ID3D11ShaderResourceView * srv)
+{
+	// Bail if there is not a registered ID3D11Device or ID3D11DeviceContext
+	if (!device || !deviceContext)
+	{
+		return false;
+	}
+
+	// Bail if there is already an ID3D11ShaderResourceView* stored at that id
+	if (textures.find(id) != textures.cend())
+	{
+		return false;
+	}
+
+	textures.emplace(id, srv);
+
+	return true;
 }
 
 

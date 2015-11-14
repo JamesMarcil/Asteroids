@@ -104,7 +104,7 @@ DirectXGameCore::DirectXGameCore(HINSTANCE hInstance)
 DirectXGameCore::~DirectXGameCore(void)
 {
 	// Release the core DirectX "stuff" we set up
-	ReleaseMacro(renderTargetView);
+	//ReleaseMacro(renderTargetView);
 	ReleaseMacro(depthStencilView);
 	ReleaseMacro(swapChain);
 	ReleaseMacro(depthStencilBuffer);
@@ -331,7 +331,10 @@ void DirectXGameCore::OnResize()
 	deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
 
     // Update the ResourceManager with the new RenderTarget and DepthStencil Views
-    ResourceManager::Instance()->RegisterRenderTargetAndDepthStencilView(renderTargetView, depthStencilView);
+    //ResourceManager::Instance()->RegisterRenderTargetAndDepthStencilView(renderTargetView, depthStencilView);
+	ResourceManager::Instance()->RegisterDepthStencilView(depthStencilView);
+	ResourceManager::Instance()->RegisterRenderTargetView("MainRTV", renderTargetView);
+
 
 	// Update the viewport to match the new window size and set it on the device
 	viewport.TopLeftX	= 0;

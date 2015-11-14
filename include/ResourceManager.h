@@ -28,10 +28,12 @@ private:
 	std::unordered_map<std::string, ID3D11RasterizerState*> rasterizers;
 	std::unordered_map<std::string, ID3D11DepthStencilState*> depthStencils;
 	std::unordered_map<std::string, Material*> materials;
+	std::unordered_map<std::string, ID3D11RenderTargetView*> renderTargetViews;
+
 
     ID3D11Device*           device;
     ID3D11DeviceContext*    deviceContext;
-    ID3D11RenderTargetView* renderTargetView;
+    //ID3D11RenderTargetView* renderTargetView;
     ID3D11DepthStencilView* depthStencilView;
     IDXGISwapChain*         swapChain;
 
@@ -69,8 +71,9 @@ public:
     ID3D11DepthStencilState*        GetDepthStencilState(const std::string& id);
     ID3D11Device*                   GetDevice() { return this->device; }
 	ID3D11DeviceContext*            GetDeviceContext() { return this->deviceContext; }
-    ID3D11RenderTargetView*         GetRenderTargetView() { return this->renderTargetView; }
-    ID3D11DepthStencilView*         GetDepthStencilView() { return this->depthStencilView; }
+    //ID3D11RenderTargetView*         GetRenderTargetView() { return this->renderTargetView; }
+	ID3D11RenderTargetView*         GetRenderTargetView(const std::string& id);
+	ID3D11DepthStencilView*         GetDepthStencilView() { return this->depthStencilView; }
     IDXGISwapChain*                 GetSwapChain() { return this->swapChain; }
 
     /*
@@ -80,12 +83,14 @@ public:
      */
     void RegisterDeviceAndContext( ID3D11Device* const device, ID3D11DeviceContext* const deviceContext );
 
+	void RegisterRenderTargetView(const std::string& id, ID3D11RenderTargetView* pRTV);
+
     /*
      * Register an ID3D11RenderView and ID3D11DepthStencilView with the ResourceManager.
      * @param   pRender             The ID3D11RenderTargetView to register.
      * @param   pDepthStencil       The ID3D11DepthStencilView to register.
      */
-    void RegisterRenderTargetAndDepthStencilView(ID3D11RenderTargetView* pRender, ID3D11DepthStencilView* pDepthStencil);
+    void RegisterDepthStencilView(ID3D11DepthStencilView* pDepthStencil);
 
     /*
      * Register an IDXGISwapChain
@@ -166,6 +171,8 @@ public:
      * @return  A bool indicating if the operation was successful.
      */
     bool RegisterTexture(const std::string& id, const std::wstring& filename );
+
+	bool RegisterTexture(const std::string& id, ID3D11ShaderResourceView* srv);
 
 	/*
 	* Register an ID3D11SamplerState* with the ResourceManager.
