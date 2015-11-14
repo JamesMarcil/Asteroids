@@ -37,6 +37,9 @@ private:
     ID3D11DepthStencilView* depthStencilView;
     IDXGISwapChain*         swapChain;
 
+	int windowWidth;
+	int windowHeight;
+
     /*
      * JSON Parsing Methods:
      *  Responsible for registering the appropriate object based on the provided parameters.
@@ -76,6 +79,13 @@ public:
 	ID3D11DepthStencilView*         GetDepthStencilView() { return this->depthStencilView; }
     IDXGISwapChain*                 GetSwapChain() { return this->swapChain; }
 
+	int								GetWindowHeight() { return this->windowHeight; }
+	int								GetWindowWidth() { return this->windowWidth; }
+
+	// Accessors
+	void							SetWindowHeight(const int& height) { this->windowHeight = height; }
+	void							SetWindowWidth(const int& width) { this->windowWidth = width; }
+
     /*
      * Register an ID3D11Device and ID3D11DeviceContext with the ResourceManager.
      * @param   device              The ID3D11Device to register.
@@ -83,11 +93,15 @@ public:
      */
     void RegisterDeviceAndContext( ID3D11Device* const device, ID3D11DeviceContext* const deviceContext );
 
+	/*
+	* Register an ID3D11RenderTargetView with the ResourceManager.
+	* @param   id				   The name/key for the Render Target View
+	* @param   pRTV				   The ID3D11RenderTargetView to register.
+	*/
 	void RegisterRenderTargetView(const std::string& id, ID3D11RenderTargetView* pRTV);
 
     /*
-     * Register an ID3D11RenderView and ID3D11DepthStencilView with the ResourceManager.
-     * @param   pRender             The ID3D11RenderTargetView to register.
+     * Register an ID3D11DepthStencilView with the ResourceManager.
      * @param   pDepthStencil       The ID3D11DepthStencilView to register.
      */
     void RegisterDepthStencilView(ID3D11DepthStencilView* pDepthStencil);
@@ -172,6 +186,12 @@ public:
      */
     bool RegisterTexture(const std::string& id, const std::wstring& filename );
 
+	/*
+	* Register an ID3D11ShaderResourceView* with the ResourceManager.
+	* @param       id          The id to store the ID3D11ShaderResourceView* at.
+	* @param       srv		   The ID3D11ShaderResourceView to register.
+	* @return  A bool indicating if the operation was successful.
+	*/
 	bool RegisterTexture(const std::string& id, ID3D11ShaderResourceView* srv);
 
 	/*

@@ -296,9 +296,9 @@ void DirectXGameCore::OnResize()
 
 	// Resize the swap chain to match the new window dimensions
 	HR(swapChain->ResizeBuffers(
-		1, 
-		windowWidth, 
-		windowHeight, 
+		1,
+		windowWidth,
+		windowHeight,
 		DXGI_FORMAT_R8G8B8A8_UNORM,
 		0));
 
@@ -351,6 +351,9 @@ void DirectXGameCore::OnResize()
     // Update the active Camera
     Camera* active = CameraManager::Instance()->GetActiveCamera();
     active->SetAspectRatio( aspectRatio );
+
+	ResourceManager::Instance()->SetWindowHeight(windowHeight);
+	ResourceManager::Instance()->SetWindowWidth(windowWidth);
 }
 #pragma endregion
 

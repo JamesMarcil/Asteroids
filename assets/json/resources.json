@@ -84,10 +84,10 @@
     },
 
     {
-        "ID" : "StandardVertex",
-        "Type" : "Shader",
-        "Stage" : "Vertex",
-        "Filename" : "VertexShader.cso"
+      "ID": "StandardVertex",
+      "Type": "Shader",
+      "Stage": "Vertex",
+      "Filename": "VertexShader.cso"
     },
 
     {
@@ -95,6 +95,20 @@
         "Type" : "Shader",
         "Stage" : "Pixel",
         "Filename" : "PixelShader.cso"
+    },
+
+    {
+      "ID": "PPVS",
+      "Type": "Shader",
+      "Stage": "Vertex",
+      "Filename": "BlurVS.cso"
+    },
+
+    {
+      "ID": "PPPS",
+      "Type": "Shader",
+      "Stage": "Pixel",
+      "Filename": "BlurPS.cso"
     },
 
     {

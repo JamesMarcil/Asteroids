@@ -30,16 +30,18 @@ void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
     ID3D11DeviceContext* pDeviceContext = pResource->GetDeviceContext();
     Camera* pCamera = CameraManager::Instance()->GetActiveCamera();
     XMFLOAT3 camPos = pCamera->transform.GetTranslation();
-
 	ID3D11DepthStencilView* depthStencilView = pResource->GetDepthStencilView();
+
+	// try to grab the post processing Render Target
 	ID3D11RenderTargetView* pRTV = pResource->GetRenderTargetView("PostRTV");
 
+	// if the target doesn't exist fall back to the normal target
 	if (pRTV == nullptr)
 	{
 		pRTV = pResource->GetRenderTargetView("MainRTV");
 	}
 
-	pDeviceContext->OMGetRenderTargets(1, &pRTV, &depthStencilView);
+	pDeviceContext->OMSetRenderTargets(1, &pRTV, depthStencilView);
 
     // Declare a MAX_LIGHTS sized array for each type of LightComponent
     DirectionalLightComponent::Light dirLights[DirectionalLightComponent::MAX_LIGHTS];

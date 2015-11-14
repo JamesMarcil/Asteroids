@@ -37,6 +37,7 @@
 #include "RenderSystem.h"
 #include "SkyboxSystem.h"
 #include "SwapSystem.h"
+#include "PostEffectsSystem.h"
 
 // For the DirectX Math library
 using namespace DirectX;
@@ -95,14 +96,16 @@ void GameState::Enter( void )
             pManager->RegisterDepthStencilState("Skybox_DepthStencil", desc);
         }
 
+#pragma region post process set up
+
 		ID3D11RenderTargetView* ppRTV;
 		ID3D11ShaderResourceView* ppSRV;
 
 		// Create post-process resources
 		D3D11_TEXTURE2D_DESC textureDesc;
 		ZeroMemory(&textureDesc, sizeof(textureDesc));
-		textureDesc.Width = 800;
-		textureDesc.Height = 600;
+		textureDesc.Width = pManager->GetWindowWidth();
+		textureDesc.Height = pManager->GetWindowHeight();
 		textureDesc.ArraySize = 1;
 		textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 		textureDesc.CPUAccessFlags = 0;
@@ -113,6 +116,7 @@ void GameState::Enter( void )
 		textureDesc.SampleDesc.Quality = 0;
 		textureDesc.Usage = D3D11_USAGE_DEFAULT;
 
+		// create the texture that we will render into
 		ID3D11Texture2D* ppTexture;
 		pManager->GetDevice()->CreateTexture2D(&textureDesc, 0, &ppTexture);
 		
@@ -125,7 +129,7 @@ void GameState::Enter( void )
 
 		pManager->GetDevice()->CreateRenderTargetView(ppTexture, &rtvDesc, &ppRTV);
 
-		// Create the Shader Resource View
+		// Create the Shader Resource View for the scene
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 		ZeroMemory(&srvDesc, sizeof(srvDesc));
 		srvDesc.Format = textureDesc.Format;
@@ -135,12 +139,16 @@ void GameState::Enter( void )
 
 		pManager->GetDevice()->CreateShaderResourceView(ppTexture, &srvDesc, &ppSRV);
 
+		// register the scene texture as our postEffectTexture
 		pManager->RegisterTexture("PostEffectTexture", ppSRV);
 
-		// We don't need the texture reference no mo'
+		// We can release the texture because the RenderTarget and Shader Resource View now handle it
 		ppTexture->Release();
 
+		// Register the post processing Render Target
 		pManager->RegisterRenderTargetView("PostRTV", ppRTV);
+
+#pragma endregion
 
 		this->LoadCurrentLevel();
 		EventManager* pEventManager = EventManager::Instance();
@@ -154,6 +162,7 @@ void GameState::Enter( void )
         pEntity->AddSystem<ClearSystem>();
         pEntity->AddSystem<RenderSystem>();
         pEntity->AddSystem<SkyboxSystem>();
+		pEntity->AddSystem<PostEffectsSystem>();
 		pEntity->AddSystem<SwapSystem>();
 		pEntity->AddSystem<ScriptSystem>();
 

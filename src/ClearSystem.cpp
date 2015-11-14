@@ -25,7 +25,10 @@ void ClearSystem::Update(EntityManager* pManager, float dt, float tt)
 
     // Clear the screen to black.
     const float color[] = {0.0f, 0.0f, 0.0f, 0.0f };
-	pDeviceContext->ClearRenderTargetView(pEffectRenderTarget, color);
-    pDeviceContext->ClearRenderTargetView(pMainRenderTarget, color);
+	if (pEffectRenderTarget != nullptr)
+	{
+		pDeviceContext->ClearRenderTargetView(pEffectRenderTarget, color);
+	}
+	pDeviceContext->ClearRenderTargetView(pMainRenderTarget, color);
     pDeviceContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }

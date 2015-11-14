@@ -52,6 +52,7 @@ ResourceManager::~ResourceManager(void)
 		delete pair.second;
 	}
 
+	// Release RenderTargets
 	for (auto& pair : renderTargetViews)
 	{
 		ReleaseMacro(pair.second);
@@ -69,16 +70,21 @@ void ResourceManager::RegisterDeviceAndContext( ID3D11Device* const device, ID3D
     this->deviceContext = deviceContext;
 }
 
+/*
+* Register an ID3D11RenderTargetView with the ResourceManager.
+* @param   id				   The name/key for the Render Target View
+* @param   pRTV				   The ID3D11RenderTargetView to register.
+*/
 void ResourceManager::RegisterRenderTargetView(const std::string& id, ID3D11RenderTargetView* pRTV)
 {
 	renderTargetViews.emplace(id, pRTV);
 }
 
 /*
- * Register an ID3D11RenderView and ID3D11DepthStencilView with the ResourceManager.
- * @param   pRender             The ID3D11RenderTargetView to register.
- * @param   pDepthStencil       The ID3D11DepthStencilView to register.
- */
+* Register an ID3D11Device and ID3D11DeviceContext with the ResourceManager.
+* @param   device              The ID3D11Device to register.
+* @param   deviceContext       The ID3D11DeviceContext to register.
+*/
 void ResourceManager::RegisterDepthStencilView(ID3D11DepthStencilView* pDepthStencil)
 {
     this->depthStencilView = pDepthStencil;
@@ -220,6 +226,12 @@ bool ResourceManager::RegisterTexture( const std::string& id, const std::wstring
     return true;
 }
 
+/*
+* Register an ID3D11ShaderResourceView* with the ResourceManager.
+* @param       id          The id to store the ID3D11ShaderResourceView* at.
+* @param       srv		   The ID3D11ShaderResourceView to register.
+* @return  A bool indicating if the operation was successful.
+*/
 bool ResourceManager::RegisterTexture(const std::string & id, ID3D11ShaderResourceView * srv)
 {
 	// Bail if there is not a registered ID3D11Device or ID3D11DeviceContext
