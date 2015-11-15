@@ -174,9 +174,6 @@
     <ClInclude Include="..\include\AutoDestructScript.h">
       <Filter>Header Files\Components\Scripts</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Script.h">
-      <Filter>Header Files\Components\Scripts</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\ClearSystem.h">
       <Filter>Header Files\Systems</Filter>
     </ClInclude>

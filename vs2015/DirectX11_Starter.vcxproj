@@ -134,7 +134,6 @@
     <ClInclude Include="..\include\ScriptComponent.h" />
     <ClInclude Include="..\include\AutoDestructScript.h" />
     <ClInclude Include="..\include\ScriptSystem.h" />
-    <ClInclude Include="..\include\Script.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\AttackSystem.cpp" />
