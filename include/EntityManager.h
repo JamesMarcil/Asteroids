@@ -24,6 +24,7 @@ private:
     constexpr static std::uint32_t ENTITY_COUNT = 50;               // Increment in which GameEntities are allocated.
     std::uint32_t               m_highestID{1};                     // Current max GameEntity ID generated.
     std::vector<GameEntity>     m_entities;                         // Vector containing all GameEntities, indexed via GameEntity ID
+    std::vector<GameEntity>     m_markedForDestruction;             // Vector containing all GameEntities to destroy this frame.
     std::vector<std::uint32_t>  m_entityIDs;                        // Vector containing all available GameEntity IDs.
     std::vector<ComponentMask>  m_entityMasks;                      // Vector containing the ComponentMask for each GameEntity, indexed via GameEntity ID.
     std::vector<ComponentPool>  m_entityComponents;                 // Vector containing the ComponentPools for each Component<T>, indexed via Component ID.
@@ -153,6 +154,7 @@ public:
         // Reset all std containers.
         m_highestID = 1;
         m_entities.clear();
+        m_markedForDestruction.clear();
         m_entityIDs.clear();
         m_entityMasks.clear();
         m_entityComponents.clear();
@@ -199,21 +201,7 @@ public:
             return false;
         }
 
-        // Clear the mask
-        m_entityMasks[entity_id - 1].reset();
-
-        // Delete all Components belonging to this GameEntity
-        for(auto& pool : m_entityComponents)
-        {
-            if(pool[entity_id - 1])
-            {
-                delete pool[entity_id - 1];
-                pool[entity_id - 1] = nullptr;
-            }
-        }
-
-        // Re-add the ID to pool
-        m_entityIDs.push_back(entity_id);
+        m_markedForDestruction.emplace_back(entity_id);
 
         return true;
     }
@@ -603,6 +591,31 @@ public:
                 pSystem->Update(this, dt, tt);
             }
         }
+
+        // Destroy all GameEntities marked for destruction this frame.
+        for(auto& entity : m_markedForDestruction)
+        {
+            std::uint32_t entity_id = entity.id();
+
+            // Clear the mask
+            m_entityMasks[entity_id - 1].reset();
+
+            // Delete all Components belonging to this GameEntity
+            for(auto& pool : m_entityComponents)
+            {
+                if(pool[entity_id - 1])
+                {
+                    delete pool[entity_id - 1];
+                    pool[entity_id - 1] = nullptr;
+                }
+            }
+
+            // Re-add the ID to pool
+            m_entityIDs.push_back(entity_id);
+        }
+
+        // Reset the vector of GameEntities marked for destruction.
+        m_markedForDestruction.clear();
     }
 #pragma endregion
 
