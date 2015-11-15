@@ -170,7 +170,7 @@ void GameState::LoadCurrentLevel()
 		pEntity->AddComponent<RenderComponent>(e, defaultMat, pManager->GetMesh("Sphere"));
 		pEntity->AddComponent<PhysicsComponent>(e, XMVectorZero(), XMVectorSet(0.0f, 0.0f, -1.0f + currentLevel*-2.0f, 0.0f));
 		ScriptComponent* script = pEntity->AddComponent<ScriptComponent>(e);
-		script->AddScript(new AutoDestructScript(-5.0f));
+		script->AddScript<AutoDestructScript>(-5.0f);
 		pEntity->AddComponent<CollisionComponent>(e, *pManager->GetMesh("Sphere"), position, 1.3f);
 	}
 }
