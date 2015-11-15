@@ -1,39 +1,48 @@
-#include <AttackSystem.h>
+#include "AttackSystem.h"
 
-#include <EntityManager.h>
-#include <InputManager.h>
-#include <ResourceManager.h>
-#include <TransformComponent.h>
-#include <RenderComponent.h>
-#include <InputComponent.h>
-#include <PhysicsComponent.h>
-#include <AttackComponent.h>
-#include <CollisionComponent.h>
+// Managers
+#include "EntityManager.h"
+#include "InputManager.h"
+#include "ResourceManager.h"
 
-AttackSystem::~AttackSystem() {
-	delete projectileCollider; 
-	projectileCollider = 0;
+// Component
+#include "TransformComponent.h"
+#include "RenderComponent.h"
+#include "InputComponent.h"
+#include "PhysicsComponent.h"
+#include "AttackComponent.h"
+#include "CollisionComponent.h"
+
+// DirectX
+#include <DirectXMath.h>
+
+AttackSystem::AttackSystem(void)
+{
+    ResourceManager* pResource = ResourceManager::Instance();
+    projectileCollider = CollisionSphere(*pResource->GetMesh("Helix"), DirectX::XMFLOAT3(0,0,0), 0.1f);
 }
 
-void AttackSystem::Update(EntityManager* pManager, float dt, float tt) {
-	if (InputManager::Instance()->IsMousePressed(MouseButton::LMB)) {
+void AttackSystem::Update(EntityManager* pManager, float dt, float tt)
+{
+    InputManager* pInput = InputManager::Instance();
+	if (pInput->IsMousePressed(MouseButton::LMB))
+    {
 		FireProjectile(pManager);
 	}
 }
 
-void AttackSystem::FireProjectile(EntityManager* pManager) {
-	ResourceManager* rManager = ResourceManager::Instance();
-	GameEntity player = pManager->EntitiesWithComponents<InputComponent, AttackComponent>()[0];
+void AttackSystem::FireProjectile(EntityManager* pEntity)
+{
+	ResourceManager* pResource = ResourceManager::Instance();
 
-	if (projectileCollider == nullptr) {
-		projectileCollider = new CollisionSphere(*rManager->GetMesh("Helix"), DirectX::XMFLOAT3(0,0,0), 0.1f);
-	}
+	GameEntity player = pEntity->EntitiesWithComponents<InputComponent, AttackComponent>()[0];
+    TransformComponent* pPlayerTransform = pEntity->GetComponent<TransformComponent>(player);
 
-	GameEntity projectile = pManager->Create("Projectile");
-	pManager->AddComponent<RenderComponent>(projectile, rManager->GetMaterial("default"), rManager->GetMesh("Helix"));
-	pManager->AddComponent<TransformComponent>(projectile, pManager->GetComponent<TransformComponent>(player)->transform.GetTranslation());
-	pManager->GetComponent<TransformComponent>(projectile)->transform.SetScale(0.1f);
-	pManager->GetComponent<TransformComponent>(projectile)->transform.Rotate(3.14159f / 2, 0, 0);
-	pManager->AddComponent<CollisionComponent>(projectile, projectileCollider->GetRadius(), pManager->GetComponent<TransformComponent>(player)->transform.GetTranslation());
-	pManager->AddComponent<PhysicsComponent>(projectile, DirectX::XMFLOAT3(0, 0, 10), DirectX::XMFLOAT3(0, 0, 5));
+	GameEntity projectile = pEntity->Create("Projectile");
+	pEntity->AddComponent<RenderComponent>(projectile, pResource->GetMaterial("default"), pResource->GetMesh("Helix"));
+	pEntity->AddComponent<CollisionComponent>(projectile, projectileCollider.GetRadius(), pPlayerTransform->transform.GetTranslation());
+	pEntity->AddComponent<PhysicsComponent>(projectile, DirectX::XMFLOAT3(0, 0, 10), DirectX::XMFLOAT3(0, 0, 5));
+	TransformComponent* pTransform = pEntity->AddComponent<TransformComponent>(projectile, pPlayerTransform->transform.GetTranslation());
+	pTransform->transform.SetScale(0.1f);
+	pTransform->transform.Rotate(3.14159f / 2, 0, 0);
 }

@@ -6,9 +6,12 @@
 
 class AttackSystem : public System<AttackSystem>
 {
-	CollisionSphere* projectileCollider;
-	
-	virtual ~AttackSystem();
+private:
+	CollisionSphere projectileCollider;
+
+public:
+    AttackSystem(void);
+	virtual ~AttackSystem(void) {}
 	virtual void Update(EntityManager* pManager, float dt, float tt) override;
 
 	void FireProjectile(EntityManager* pManager);

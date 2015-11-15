@@ -142,11 +142,10 @@ void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
         pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         pDeviceContext->DrawIndexed(pMesh->GetIndexCount(), 0, 0);
     }
-
-	//RenderCollisionSpheres(pManager);
 }
 
-void RenderSystem::RenderCollisionSpheres(EntityManager* pManager) {
+void RenderSystem::RenderCollisionSpheres(EntityManager* pManager)
+{
 	std::vector<GameEntity> collisionEntities = pManager->EntitiesWithComponents<CollisionComponent>();
 
 	ResourceManager* rManager = ResourceManager::Instance();
@@ -172,14 +171,15 @@ void RenderSystem::RenderCollisionSpheres(EntityManager* pManager) {
 	colliderMat->GetVertexShader()->SetMatrix4x4("view", CameraManager::Instance()->GetActiveCamera()->GetViewMatrix());
 	colliderMat->GetVertexShader()->SetMatrix4x4("projection", CameraManager::Instance()->GetActiveCamera()->GetProjectionMatrix());
 
-	for (GameEntity ge : collisionEntities) {
+	for (GameEntity ge : collisionEntities)
+    {
 		collider = pManager->GetComponent<CollisionComponent>(ge)->collider;
 		translation = XMMatrixTranslation(collider.GetPosition().x, collider.GetPosition().y, collider.GetPosition().z);
 		scale = XMMatrixScaling(collider.GetRadius() * 2, collider.GetRadius() * 2, collider.GetRadius() * 2);
 		XMStoreFloat4x4(&transform, XMMatrixTranspose(scale * translation));
 
 		colliderMat->GetVertexShader()->SetMatrix4x4("world", transform);
-		(collider.IsColliding()) ? colliderMat->GetPixelShader()->SetFloat("isColliding", 1) : colliderMat->GetPixelShader()->SetFloat("isColliding", 0);
+		(collider.GetIsColliding()) ? colliderMat->GetPixelShader()->SetFloat("isColliding", 1) : colliderMat->GetPixelShader()->SetFloat("isColliding", 0);
 		SimplePixelShader* pShader = colliderMat->GetPixelShader();
 
 		colliderMat->GetVertexShader()->SetShader(true);

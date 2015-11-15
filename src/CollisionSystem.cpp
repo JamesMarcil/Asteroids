@@ -1,42 +1,63 @@
 #include "CollisionSystem.h"
-#include <EntityManager.h>
-#include <CollisionComponent.h>
-#include <TransformComponent.h>
 
-void CollisionSystem::Update(EntityManager* pManager, float dt, float tt) {
-	std::vector<GameEntity> collidibles = pManager->EntitiesWithComponents<CollisionComponent>();
-	std::vector<GameEntity> toDestroy = std::vector<GameEntity>();
+// Manager
+#include "EntityManager.h"
+#include "EventManager.h"
 
-	for (GameEntity ge : collidibles) {
-		pManager->GetComponent<CollisionComponent>(ge)->collider.SetPosition(pManager->GetComponent<TransformComponent>(ge)->transform.GetTranslation());
-		pManager->GetComponent<CollisionComponent>(ge)->collider.IsColliding(false);
+// Component
+#include "CollisionComponent.h"
+#include "TransformComponent.h"
+
+void CollisionSystem::Update(EntityManager* pManager, float dt, float tt)
+{
+	std::vector<GameEntity> collidables = pManager->EntitiesWithComponents<CollisionComponent>();
+	for (GameEntity ge : collidables)
+    {
+        CollisionComponent* pCollider = pManager->GetComponent<CollisionComponent>(ge);
+        TransformComponent* pTransform = pManager->GetComponent<TransformComponent>(ge);
+
+		pCollider->collider.SetPosition(pTransform->transform.GetTranslation());
+		pCollider->collider.IsColliding(false);
 	}
 
-	GameEntity e1;
-	GameEntity e2;
+	std::vector<GameEntity> toDestroy;
+	for (std::size_t i = 0; i < collidables.size(); i++)
+    {
+		for (std::size_t j = 0; j < collidables.size(); j++)
+        {
+            if(i == j)
+            {
+                continue;
+            }
 
-	for (std::size_t i = 0; i < collidibles.size(); i++) {
-		for (std::size_t j = 0; j < collidibles.size(); j++) {
-			if (i != j) {
-				e1 = collidibles[i];
-				e2 = collidibles[j];
+            GameEntity e1 = collidables[i];
+            GameEntity e2 = collidables[j];
+            CollisionComponent* pColliderOne = pManager->GetComponent<CollisionComponent>(e1);
+            CollisionComponent* pColliderTwo = pManager->GetComponent<CollisionComponent>(e2);
 
-				if (pManager->GetComponent<CollisionComponent>(e1)->collider.CollidesWith(pManager->GetComponent<CollisionComponent>(e2)->collider)) {
-					pManager->GetComponent<CollisionComponent>(e1)->collider.IsColliding(true);
-					pManager->GetComponent<CollisionComponent>(e1)->collider.IsColliding(true);
+            if (pColliderOne->collider.CollidesWith(pColliderTwo->collider))
+            {
+                pColliderOne->collider.IsColliding(true);
+                pColliderTwo->collider.IsColliding(true);
 
-					if ((e1.GetTag() == "Projectile" && e2.GetTag() == "Asteroid") ||
-						(e1.GetTag() == "Asteroid" && e2.GetTag() == "Projectile")) {
-
-						toDestroy.push_back(e1);
-						toDestroy.push_back(e2);
-					}
-				}
-			}
+                if ((e1.GetTag() == "Projectile" && e2.GetTag() == "Asteroid") || (e1.GetTag() == "Asteroid" && e2.GetTag() == "Projectile"))
+                {
+                    toDestroy.push_back(e1);
+                    toDestroy.push_back(e2);
+                }
+            }
 		}
 	}
 
-	for (std::size_t i = 0; i < toDestroy.size(); i++) {
-		pManager->Destroy(toDestroy[i]);
-	}
+    EventManager* pEvent = EventManager::Instance();
+    for(auto& entity : toDestroy)
+    {
+		pManager->Destroy(entity);
+
+        std::string tag = entity.GetTag();
+        if(tag == "Asteroid")
+        {
+            pEvent->Fire("AsteroidDestroyed", nullptr);
+        }
+    }
 }
