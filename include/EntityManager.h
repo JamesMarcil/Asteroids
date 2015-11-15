@@ -251,7 +251,7 @@ public:
         // Test if a component of type T is already attached.
         if(m_entityMasks[entity_id - 1].test(component_id))
         {
-            return static_cast<T*>(m_entityComponents[entity_id - 1][component_id]);
+            return static_cast<T*>(m_entityComponents[component_id][entity_id - 1]);
         }
 
         // Create the Component of type T.
