@@ -20,7 +20,7 @@ CollisionSphere::CollisionSphere(Mesh& m, DirectX::XMFLOAT3& p, float scale)
 		}
 	}
 
-	radius *= scale;
+	radius *= scale * 2;
 }
 
 CollisionSphere::CollisionSphere(float r, DirectX::XMFLOAT3& p)

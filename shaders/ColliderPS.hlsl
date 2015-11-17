@@ -25,10 +25,10 @@ float4 main(VertexToPixel input) : SV_TARGET
 
     // Sample the diffuse texture
 	if (isColliding == 1) {
-		diffuseColor = rockTexture.Sample(trilinear, input.uv);
+		diffuseColor = float4(1, 0, 0, 1);
 	}
 	else {
-		diffuseColor = loamTexture.Sample(trilinear, input.uv);
+		diffuseColor = float4(0, 0, 1, 1);
 	}
 
     // Combine lights

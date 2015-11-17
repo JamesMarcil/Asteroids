@@ -142,6 +142,8 @@ void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
         pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         pDeviceContext->DrawIndexed(pMesh->GetIndexCount(), 0, 0);
     }
+
+	RenderCollisionSpheres(pManager);
 }
 
 void RenderSystem::RenderCollisionSpheres(EntityManager* pManager)
@@ -151,6 +153,7 @@ void RenderSystem::RenderCollisionSpheres(EntityManager* pManager)
 	ResourceManager* rManager = ResourceManager::Instance();
 	ID3D11Device* device = rManager->GetDevice();
 	ID3D11DeviceContext* deviceContext = rManager->GetDeviceContext();
+	ID3D11RasterizerState* rState = rManager->GetRasterizerState("Wireframe_Rasterizer");
 
 	// Update the mesh
 	Mesh* sphere = rManager->GetMesh("Sphere");
@@ -170,12 +173,13 @@ void RenderSystem::RenderCollisionSpheres(EntityManager* pManager)
 
 	colliderMat->GetVertexShader()->SetMatrix4x4("view", CameraManager::Instance()->GetActiveCamera()->GetViewMatrix());
 	colliderMat->GetVertexShader()->SetMatrix4x4("projection", CameraManager::Instance()->GetActiveCamera()->GetProjectionMatrix());
+	deviceContext->RSSetState(rState);
 
 	for (GameEntity ge : collisionEntities)
     {
 		collider = pManager->GetComponent<CollisionComponent>(ge)->collider;
 		translation = XMMatrixTranslation(collider.GetPosition().x, collider.GetPosition().y, collider.GetPosition().z);
-		scale = XMMatrixScaling(collider.GetRadius() * 2, collider.GetRadius() * 2, collider.GetRadius() * 2);
+		scale = XMMatrixScaling(collider.GetRadius(), collider.GetRadius(), collider.GetRadius());
 		XMStoreFloat4x4(&transform, XMMatrixTranspose(scale * translation));
 
 		colliderMat->GetVertexShader()->SetMatrix4x4("world", transform);
@@ -187,4 +191,6 @@ void RenderSystem::RenderCollisionSpheres(EntityManager* pManager)
 
 		deviceContext->DrawIndexed(sphere->GetIndexCount(), 0, 0);
 	}
+
+	deviceContext->RSSetState(nullptr);
 }

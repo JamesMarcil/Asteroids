@@ -23,7 +23,7 @@ void CollisionSystem::Update(EntityManager* pManager, float dt, float tt)
 	std::vector<GameEntity> toDestroy;
 	for (std::size_t i = 0; i < collidables.size(); i++)
     {
-		for (std::size_t j = 0; j < collidables.size(); j++)
+		for (std::size_t j =  0; j < collidables.size(); j++)
         {
             if(i == j)
             {

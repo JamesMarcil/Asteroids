@@ -77,6 +77,17 @@ void GameState::Enter( void )
             pManager->RegisterSamplerState( "trilinear", desc);
         }
 
+		// Create the ID3D11RasterizerState for CollisionSpheres/OctTree Octants
+		{
+			D3D11_RASTERIZER_DESC desc;
+			ZeroMemory(&desc, sizeof(D3D11_RASTERIZER_DESC));
+			desc.FillMode = D3D11_FILL_WIREFRAME;
+			desc.CullMode = D3D11_CULL_FRONT;
+			desc.DepthClipEnable = true;
+
+			pManager->RegisterRasterizerState("Wireframe_Rasterizer", desc);
+		}
+
         // Create the ID3D11RasterizerState for the Skybox.
         {
             D3D11_RASTERIZER_DESC desc;
