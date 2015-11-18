@@ -1,11 +1,21 @@
 #ifndef RENDER_SYSTEM_H
 #define RENDER_SYSTEM_H
 
+// ECS
 #include "System.h"
+
+// Forward Declarations
+class CameraManager;
+class ResourceManager;
 
 class RenderSystem : public System<RenderSystem>
 {
-    virtual ~RenderSystem(void) {}
+private:
+	CameraManager* m_pCamera;
+	ResourceManager* m_pResource;
+public:
+	RenderSystem(void);
+	virtual ~RenderSystem(void);
 
     /* System interface. */
     virtual void Update(EntityManager* pManager, float dt, float tt ) override;

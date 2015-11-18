@@ -9,6 +9,11 @@
 
 using namespace DirectX;
 
+ClearSystem::ClearSystem(void)
+{
+	m_pResource = ResourceManager::Instance();
+}
+
 ClearSystem::~ClearSystem(void)
 {
     /* Nothing to do. */
@@ -16,11 +21,9 @@ ClearSystem::~ClearSystem(void)
 
 void ClearSystem::Update(EntityManager* pManager, float dt, float tt)
 {
-    ResourceManager* pResource = ResourceManager::Instance();
-
-    ID3D11DeviceContext* pDeviceContext = pResource->GetDeviceContext();
-    ID3D11RenderTargetView* pRenderTarget = pResource->GetRenderTargetView();
-    ID3D11DepthStencilView* pDepthStencilView = pResource->GetDepthStencilView();
+    ID3D11DeviceContext* pDeviceContext = m_pResource->GetDeviceContext();
+    ID3D11RenderTargetView* pRenderTarget = m_pResource->GetRenderTargetView();
+    ID3D11DepthStencilView* pDepthStencilView = m_pResource->GetDepthStencilView();
 
     // Clear the screen to black.
     const float color[] = {0.0f, 0.0f, 0.0f, 0.0f };

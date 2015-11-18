@@ -25,6 +25,30 @@ SkyboxSystem::SkyboxSystem()
 	warping = false;
 	timeElapsed = 0;
 	currentTexture = 0;
+
+	m_pResource = ResourceManager::Instance();
+
+	// Create the ID3D11RasterizerState for the Skybox.
+	{
+		D3D11_RASTERIZER_DESC desc;
+		ZeroMemory(&desc, sizeof(D3D11_RASTERIZER_DESC));
+		desc.FillMode = D3D11_FILL_SOLID;
+		desc.CullMode = D3D11_CULL_FRONT;
+		desc.DepthClipEnable = true;
+
+		m_pResource->RegisterRasterizerState("Skybox_Rasterizer", desc);
+	}
+
+	// Create the ID3D11DepthStencilState for the Skybox.
+	{
+		D3D11_DEPTH_STENCIL_DESC desc;
+		ZeroMemory(&desc, sizeof(D3D11_DEPTH_STENCIL_DESC));
+		desc.DepthEnable = true;
+		desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		desc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+
+		m_pResource->RegisterDepthStencilState("Skybox_DepthStencil", desc);
+	}
 }
 
 SkyboxSystem::~SkyboxSystem(void)
@@ -63,18 +87,17 @@ void SkyboxSystem::Update(EntityManager* pManager, float dt, float tt)
 		}
 	}
 
-    ResourceManager* pResource = ResourceManager::Instance();
-    ID3D11DeviceContext* pDeviceContext = pResource->GetDeviceContext();
-    ID3D11RasterizerState* pRasterizer = pResource->GetRasterizerState("Skybox_Rasterizer");
-    ID3D11DepthStencilState* pDepthStencil = pResource->GetDepthStencilState("Skybox_DepthStencil");
-	ID3D11ShaderResourceView* pToSkySRV = pResource->GetTexture(textureNames[currentTexture]);
-	ID3D11ShaderResourceView* pFromSkySRV = pResource->GetTexture(textureNames[lastTexture]);
-    ISimpleShader   *pSkyVertex = pResource->GetShader("SkyboxVertex"),
-                    *pSkyPixel = pResource->GetShader("SkyboxPixel");
+    ID3D11DeviceContext* pDeviceContext = m_pResource->GetDeviceContext();
+    ID3D11RasterizerState* pRasterizer = m_pResource->GetRasterizerState("Skybox_Rasterizer");
+    ID3D11DepthStencilState* pDepthStencil = m_pResource->GetDepthStencilState("Skybox_DepthStencil");
+	ID3D11ShaderResourceView* pToSkySRV = m_pResource->GetTexture(textureNames[currentTexture]);
+	ID3D11ShaderResourceView* pFromSkySRV = m_pResource->GetTexture(textureNames[lastTexture]);
+    ISimpleShader   *pSkyVertex = m_pResource->GetShader("SkyboxVertex"),
+                    *pSkyPixel = m_pResource->GetShader("SkyboxPixel");
     Camera* pCamera = CameraManager::Instance()->GetActiveCamera();
 
     // Update Mesh data.
-    Mesh* pCube = pResource->GetMesh("Cube");
+    Mesh* pCube = m_pResource->GetMesh("Cube");
     ID3D11Buffer* vb = pCube->GetVertexBuffer();
     ID3D11Buffer* ib = pCube->GetIndexBuffer();
     UINT stride = sizeof(Vertex);
@@ -91,7 +114,7 @@ void SkyboxSystem::Update(EntityManager* pManager, float dt, float tt)
 	pSkyPixel->SetShaderResourceView("skybox", pToSkySRV);
 	pSkyPixel->SetShaderResourceView("fromSkybox", pFromSkySRV);
 	pSkyPixel->SetFloat("t", lerpT);
-    pSkyPixel->SetSamplerState("trilinear", pResource->GetSamplerState("trilinear"));
+    pSkyPixel->SetSamplerState("trilinear", m_pResource->GetSamplerState("trilinear"));
 	pSkyPixel->CopyBufferData("PerFrame");
 
     // Set Shader without copying buffers.
