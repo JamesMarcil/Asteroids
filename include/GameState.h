@@ -17,8 +17,6 @@ class GameState : public IGameState, public IEventListener
 {
 private:
     bool     isInitialized;
-    bool	 prevSpaceBar;
-    unsigned currentEntity;
 	unsigned int currentLevel = 0;
 	unsigned int asteroids = 0;
 

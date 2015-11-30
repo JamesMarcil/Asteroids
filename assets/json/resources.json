@@ -133,6 +133,28 @@
     },
 
     {
+        "ID" : "UIVertex",
+        "Type" : "Shader",
+        "Stage" : "Vertex",
+        "Filename" : "UIVertex.cso"
+    },
+
+    {
+        "ID" : "UIPixel",
+        "Type" : "Shader",
+        "Stage" : "Pixel",
+        "Filename" : "UIPixel.cso"
+    },
+
+    {
+        "ID" : "UIMaterial",
+        "Type" : "Material",
+        "VertexShader" : "UIVertex",
+        "PixelShader" : "UIPixel",
+        "Textures" : [ { "Key" : "buttonTexture", "TextureName" : "Diffuse" } ]
+    },
+
+    {
         "ID" : "default",
         "Type" : "Material",
         "VertexShader" : "StandardVertex",
@@ -153,5 +175,11 @@
             { "Key" : "shipTexture", "TextureName" : "Ship" },
             { "Key" : "shipSpecMap", "TextureName" : "Ship_Spec" }
         ]
+    },
+
+    {
+        "ID" : "TimesNewRoman",
+        "Type" : "SpriteFont",
+        "Filename" : "fonts/test.fnt"
     }
 ]

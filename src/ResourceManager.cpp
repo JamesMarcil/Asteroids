@@ -51,6 +51,12 @@ ResourceManager::~ResourceManager(void)
 	{
 		delete pair.second;
 	}
+
+    // Release DirectXTK SpriteFont
+    for(auto& pair : spritefonts)
+    {
+        delete pair.second;
+    }
 }
 
 /*
@@ -159,6 +165,16 @@ Material* ResourceManager::GetMaterial(const std::string& id)
 	}
 
 	return iter->second;
+}
+
+DirectX::SpriteFont* ResourceManager::GetSpriteFont(const std::string& id)
+{
+    auto& iter = spritefonts.find(id);
+    if(iter == spritefonts.cend())
+    {
+        return nullptr;
+    }
+    return iter->second;
 }
 
 #pragma endregion
@@ -287,6 +303,30 @@ bool ResourceManager::RegisterDepthStencilState(const std::string& id, D3D11_DEP
     return true;
 }
 
+/*
+ * TODO
+ */
+bool ResourceManager::RegisterSpriteFont(const std::string& id, const std::wstring& filename)
+{
+    // Bail if there is not a registered ID3D11Device or ID3D11DeviceContext
+    if(!device || !deviceContext)
+    {
+        return false;
+    }
+
+    // Bail is there is already a SpriteFont* stored at that id.
+    if(spritefonts.find(id) != spritefonts.cend())
+    {
+        return false;
+    }
+
+    // Create and insert the SpriteFont.
+    DirectX::SpriteFont* pSpriteFnt = new DirectX::SpriteFont(device, filename.c_str());
+    spritefonts.emplace(id, pSpriteFnt);
+
+    return true;
+}
+
 #pragma region JSON Methods
 
 /*
@@ -396,6 +436,14 @@ void ResourceManager::ParseMaterial(json obj, json parent)
     RegisterMaterial(id, pMaterial);
 }
 
+void ResourceManager::ParseSpriteFont(nlohmann::json obj, nlohmann::json parent)
+{
+    std::string id = obj["ID"];
+    std::string filename = obj["Filename"];
+
+    RegisterSpriteFont(id, std::wstring(filename.begin(), filename.end()).c_str());
+}
+
 /*
  * Attempts to parse the provided JSON file for resources.
  * @param   filename    The string indicating the JSON file to be parsed.
@@ -442,6 +490,10 @@ bool ResourceManager::ParseJSONFile(const std::string& filename)
                 else if(type == "Material")
                 {
                     ParseMaterial(member, jsonObj);
+                }
+                else if(type == "SpriteFont")
+                {
+                    ParseSpriteFont(member, jsonObj);
                 }
             }
             // JSON library will throw std::domain_error on missing values.

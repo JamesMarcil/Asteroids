@@ -25,6 +25,9 @@
 #include "InputComponent.h"
 #include "LightComponent.h"
 #include "ScriptComponent.h"
+#include "AABBComponent.h"
+#include "ButtonComponent.h"
+#include "UIRenderComponent.h"
 
 // Scripts
 #include "AutoDestructScript.h"
@@ -37,6 +40,10 @@
 #include "RenderSystem.h"
 #include "SkyboxSystem.h"
 #include "SwapSystem.h"
+#include "UIRenderSystem.h"
+#include "UIUpdateSystem.h"
+
+#include "UITextComponent.h"
 
 // For the DirectX Math library
 using namespace DirectX;
@@ -69,9 +76,11 @@ void GameState::Enter( void )
         EntityManager* pEntity = EntityManager::Instance();
         pEntity->AddSystem<PhysicsSystem>();
 		pEntity->AddSystem<InputControllerSystem>();
+        pEntity->AddSystem<UIUpdateSystem>();
         pEntity->AddSystem<ClearSystem>();
         pEntity->AddSystem<RenderSystem>();
         pEntity->AddSystem<SkyboxSystem>();
+        pEntity->AddSystem<UIRenderSystem>();
 		pEntity->AddSystem<SwapSystem>();
 		pEntity->AddSystem<ScriptSystem>();
 
@@ -99,10 +108,18 @@ void GameState::Enter( void )
 		pPhysics->drag = 0.95f;
 		pPhysics->rotationalDrag = 0.85f;
 
+        // Make Button.
+        GameEntity button = pEntity->Create();
+        pEntity->AddComponent<ButtonComponent>(button, true, "PlayClicked");
+        pEntity->AddComponent<AABBComponent>(button, XMFLOAT2(400.0f, 300.0f), 25.0f, 25.0f);
+        pEntity->AddComponent<UIRenderComponent>(button, XMFLOAT2(400.0f, 300.0f), 25.0f, 25.0f, pManager->GetMaterial("UIMaterial"));
+
+        // Make Text.
+        GameEntity text = pEntity->Create();
+        pEntity->AddComponent<UITextComponent>(text, L"Test", "TimesNewRoman", XMFLOAT2{400.0f, 300.0f}, XMFLOAT4{0.0f, 0.0f, 0.0f, 1.0f});
+
         isInitialized = true;
     }
-
-	currentEntity = 1;
 }
 
 #pragma endregion
