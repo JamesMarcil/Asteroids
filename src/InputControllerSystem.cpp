@@ -1,31 +1,39 @@
 #include "InputControllerSystem.h"
 
+// Managers
 #include "EntityManager.h" // Need to to include this to access EntityManager::* functions.
 #include "InputManager.h"
+#include "CameraManager.h"
 
-// Components
+// ECS
 #include "TransformComponent.h"
 #include "PhysicsComponent.h"
 #include "InputComponent.h"
 
-#include "CameraManager.h"
-
-#include "SimpleMath.h"
 // DirectX
 #include <DirectXMath.h>
+#include <SimpleMath.h>
+
+InputControllerSystem::InputControllerSystem(void)
+{
+	m_pCamera = CameraManager::Instance();
+	m_pInput = InputManager::Instance();
+}
+
+InputControllerSystem::~InputControllerSystem(void)
+{
+	/* Nothing to do. */
+}
+
 void InputControllerSystem::Update(EntityManager* pManager, float dt, float tt)
 {
 	using namespace DirectX;
 	using namespace SimpleMath;
 
-	if (CameraManager::Instance()->IsDebugActive()) return; //Don't overlap controls
+	if (m_pCamera->IsDebugActive()) return; //Don't overlap controls
 
-	InputManager* pInput = InputManager::Instance();
-
-	float horiz = (pInput->IsKeyDown('A') ? -1 : 0) + (pInput->IsKeyDown('D') ? 1 : 0);
-	float vert = (pInput->IsKeyDown('S') ? -1 : 0) + (pInput->IsKeyDown('W') ? 1 : 0);
-
-
+	float horiz = (m_pInput->IsKeyDown('A') ? -1 : 0) + (m_pInput->IsKeyDown('D') ? 1 : 0);
+	float vert = (m_pInput->IsKeyDown('S') ? -1 : 0) + (m_pInput->IsKeyDown('W') ? 1 : 0);
 
 	for (auto& entity : pManager->EntitiesWithComponents<InputComponent, PhysicsComponent, TransformComponent>())
 	{
@@ -36,8 +44,6 @@ void InputControllerSystem::Update(EntityManager* pManager, float dt, float tt)
 		PhysicsComponent* pPhysics = pManager->GetComponent<PhysicsComponent>(entity);
 
 		Vector3 rot = Vector3(t.GetRotationEuler().x, t.GetRotationEuler().y, t.GetRotationEuler().z);
-		//Vector3 horizAdd = Vector3(cos(rot.z) * horiz, sin(rot.z) * horiz, 0);
-		//Vector3 vertAdd  = Vector3(-sin(rot.z) * vert, cos(rot.z) * vert, 0);
 		Vector3 accel = Vector3(horiz, vert, 0);// horizAdd + vertAdd;
 		accel.Normalize();
 		accel *= inputCom->movementSpeed;
@@ -67,6 +73,5 @@ void InputControllerSystem::Update(EntityManager* pManager, float dt, float tt)
 		}
 
 		t.SetRotation(rot.x, 0, rot.z); //Cleaning issues caused by euler rotation
-		
 	}
 }

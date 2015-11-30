@@ -108,7 +108,7 @@
       "ID": "PPPS",
       "Type": "Shader",
       "Stage": "Pixel",
-      "Filename": "BlurPS.cso"
+      "Filename": "RadialBlur.cso"
     },
 
     {

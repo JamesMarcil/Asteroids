@@ -9,6 +9,11 @@
 
 using namespace DirectX;
 
+ClearSystem::ClearSystem(void)
+{
+	m_pResource = ResourceManager::Instance();
+}
+
 ClearSystem::~ClearSystem(void)
 {
     /* Nothing to do. */

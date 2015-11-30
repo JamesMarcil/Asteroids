@@ -3,11 +3,18 @@
 // Managers
 #include "EntityManager.h"
 #include "ResourceManager.h"
+#include "CameraManager.h"
+#include "EventManager.h"
 
 // DirectX
 #include <d3d11.h>
 
 using namespace DirectX;
+
+PostEffectsSystem::PostEffectsSystem()
+{
+	EventManager::Instance()->Register("WarpBegin", this);
+}
 
 PostEffectsSystem::~PostEffectsSystem(void)
 {
@@ -37,9 +44,9 @@ void PostEffectsSystem::Update(EntityManager * pManager, float dt, float tt)
 	ppVS->SetShader();
 
 	// set the effect shader values
-	ppPS->SetInt("blurAmount", 10);
+	/*ppPS->SetInt("blurAmount", 10);
 	ppPS->SetFloat("pixelWidth", 1.0f / pResource->GetWindowWidth());
-	ppPS->SetFloat("pixelHeight", 1.0f / pResource->GetWindowHeight());
+	ppPS->SetFloat("pixelHeight", 1.0f / pResource->GetWindowHeight());*/
 	ppPS->SetShaderResourceView("pixels", ppSRV);
 	ppPS->SetSamplerState("trilinear", sampler);
 	ppPS->SetShader();
@@ -57,4 +64,15 @@ void PostEffectsSystem::Update(EntityManager * pManager, float dt, float tt)
 	// Unbind shader resource view so we can render into the
 	// texture at the beginning of next frame
 	ppPS->SetShaderResourceView("pixels", 0);
+}
+
+float warpTime = 2;
+float timeElapsed = 0;
+bool warping = false;
+void PostEffectsSystem::EventRouter(const std::string & name, void * data)
+{
+	if (name == "WarpBegin")
+	{
+		CameraManager::Instance()->GetActiveCamera()->SetFOV(0.35f * XM_PI);
+	}
 }

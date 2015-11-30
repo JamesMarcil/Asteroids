@@ -9,44 +9,41 @@
 
 // STD
 #include <vector>
+#include <type_traits>
+#include <utility>
 
 class ScriptComponent : public Component<ScriptComponent>
 {
 private:
 	std::vector<IScript*> scripts;
-	bool deleted = false;
 
 public:
-    ScriptComponent(void) = default;
-
 	virtual ~ScriptComponent(void)
     {
 		for (auto& script : scripts)
         {
-			delete script;
+            if(script)
+            {
+                delete script;
+            }
 		}
-		scripts.clear();
-
-		deleted = true;
 	}
 
 	void Update(GameEntity& entity, float dt, float tt)
     {
-        // An update may cause this to be destroyed.
-		if (deleted)
+        for(auto& script : scripts)
         {
-            return;
-        }
-
-        for(std::size_t i = 0; !deleted && i < scripts.size(); ++i)
-        {
-            scripts[i]->Update(entity, dt, tt);
+            script->Update(entity, dt, tt);
         }
 	}
 
-	void AddScript(IScript* script)
+    template <typename T, typename... Args>
+    void AddScript(Args&&... args)
     {
-		scripts.push_back(script);
+        static_assert(std::is_base_of<IScript, T>::value, "Must be an instance of IScript!");
+
+        IScript* pScript = new T(std::forward<Args>(args)...);
+        scripts.push_back(pScript);
 	}
 
 	void RemoveScript(IScript* script)
