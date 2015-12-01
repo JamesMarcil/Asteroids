@@ -1,11 +1,17 @@
 #ifndef AUTO_DESTRUCT_SCRIPT_H
 #define AUTO_DESTRUCT_SCRIPT_H
 
+// Manager
+#include "EventManager.h"
+
+// ECS
 #include "EntityManager.h"
-#include "ScriptComponent.h"
-#include "Transform.h"
-#include "TransformComponent.h"
 #include "GameEntity.h"
+#include "TransformComponent.h"
+#include "ScriptComponent.h"
+
+// Transform
+#include "Transform.h"
 
 class AutoDestructScript : public IScript
 {
