@@ -210,6 +210,9 @@
     <ClInclude Include="..\include\UIRenderComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\EntityFactory.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ExitState.cpp">
@@ -298,6 +301,9 @@
     </ClCompile>
     <ClCompile Include="..\src\UIUpdateSystem.cpp">
       <Filter>Source Files\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\EntityFactory.cpp">
+      <Filter>Source Files\Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

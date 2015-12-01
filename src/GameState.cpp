@@ -5,6 +5,7 @@
 #include <cstdlib>
 
 // Managers
+#include "EntityFactory.h"
 #include "EntityManager.h"
 #include "InputManager.h"
 #include "ResourceManager.h"
@@ -17,20 +18,6 @@
 // State
 #include "StateMachine.h"
 #include "GameStates.h"
-
-// Components
-#include "TransformComponent.h"
-#include "RenderComponent.h"
-#include "PhysicsComponent.h"
-#include "InputComponent.h"
-#include "LightComponent.h"
-#include "ScriptComponent.h"
-#include "AABBComponent.h"
-#include "ButtonComponent.h"
-#include "UIRenderComponent.h"
-
-// Scripts
-#include "AutoDestructScript.h"
 
 // Systems
 #include "PhysicsSystem.h"
@@ -85,34 +72,20 @@ void GameState::Enter( void )
 		pEntity->AddSystem<ScriptSystem>();
 
         // Make a SpotLight
-        {
-            GameEntity e = pEntity->Create();
-            pEntity->AddComponent<SpotLightComponent>
-            (
-                e,                                          // Entity
-                XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),           // Color
-                XMFLOAT3(0.0f, 0.0f, -1.0f),                // Position
-                XMFLOAT3(0.0f, 0.0f, 1.0f),                 // Direction
-                30.0f,                                      // Specular Exponent
-                1.0f                                        // SpotLight Power
-            );
-        }
+        GameEntity spotlight = EntityFactory::CreateSpotlight
+        (
+            XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), // Color
+            XMFLOAT3(0.0f, 0.0f, -1.0f),      // Position
+            XMFLOAT3(0.0f, 0.0f, 1.0f),       // Direction
+            30.0f,                            // Specular Exponent
+            1.0f                              // SpotLight Power
+        );
 
 		//Make Player
-		GameEntity player = pEntity->Create();
-		pEntity->AddComponent<RenderComponent>(player, pManager->GetMaterial("ship"), pManager->GetMesh("Ship"));
-        pEntity->AddComponent<InputComponent>(player, 50.0f);
-		TransformComponent* pTrans = pEntity->AddComponent<TransformComponent>(player, XMFLOAT3(0, 0, 0));
-		pTrans->transform.SetScale(.001f);
-		PhysicsComponent* pPhysics = pEntity->AddComponent<PhysicsComponent>(player, XMVectorZero(), XMVectorSet(0, 0, 0, 0));
-		pPhysics->drag = 0.95f;
-		pPhysics->rotationalDrag = 0.85f;
+		GameEntity player = EntityFactory::CreatePlayer(XMFLOAT3(0.0f, 0.0f, 0.0f));
 
         // Make Button.
-        GameEntity button = pEntity->Create();
-        pEntity->AddComponent<ButtonComponent>(button, true, "PlayClicked");
-        pEntity->AddComponent<AABBComponent>(button, XMFLOAT2(400.0f, 300.0f), 25.0f, 25.0f);
-        pEntity->AddComponent<UIRenderComponent>(button, XMFLOAT2(400.0f, 300.0f), 25.0f, 25.0f, pManager->GetMaterial("UIMaterial"));
+        GameEntity button = EntityFactory::CreateButton(XMFLOAT2(0.0f, 0.0f), 100.0f, 100.0f, "UIMaterial");
 
         // Make Text.
         GameEntity text = pEntity->Create();
@@ -127,24 +100,17 @@ void GameState::Enter( void )
 void GameState::LoadCurrentLevel()
 {
 	this->currentLevel++;
-	EntityManager* pEntity = EntityManager::Instance();
-	ResourceManager* pManager = ResourceManager::Instance();
-
-	Material* defaultMat = pManager->GetMaterial("default");
-
 	srand(time(0));
 	int span = 2;
 	int toAdd = 30 + currentLevel * 5;
 	this->asteroids = toAdd;
 	for (int i = 0; i < toAdd; ++i)
 	{
-		GameEntity e = pEntity->Create();
 		XMFLOAT3 position = XMFLOAT3(rand() % (span * 2) - span, rand() % (span * 2) - span, i * 5 + 15);
-		pEntity->AddComponent<TransformComponent>(e, position);
-		pEntity->AddComponent<RenderComponent>(e, defaultMat, pManager->GetMesh("Sphere"));
-		pEntity->AddComponent<PhysicsComponent>(e, XMVectorZero(), XMVectorSet(0.0f, 0.0f, -1.0f + currentLevel*-2.0f, 0.0f));
-		ScriptComponent* script = pEntity->AddComponent<ScriptComponent>(e);
-		script->AddScript<AutoDestructScript>(-5.0f);
+        XMFLOAT3 velocity{0.0f, 0.0f, 0.0f};
+        XMFLOAT3 acceleration{0.0f, 0.0f, -1.0f + currentLevel * -2.0f};
+
+        EntityFactory::CreateAsteroid(position, velocity, acceleration);
 	}
 }
 
