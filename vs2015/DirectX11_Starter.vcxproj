@@ -105,6 +105,7 @@
     <ClInclude Include="..\include\GameStates.h" />
     <ClInclude Include="..\include\IEventListener.h" />
     <ClInclude Include="..\include\IGameState.h" />
+    <ClInclude Include="..\include\ImageEffect.h" />
     <ClInclude Include="..\include\InputComponent.h" />
     <ClInclude Include="..\include\InputManager.h" />
     <ClInclude Include="..\include\json.h" />
@@ -112,6 +113,7 @@
     <ClInclude Include="..\include\Material.h" />
     <ClInclude Include="..\include\MenuState.h" />
     <ClInclude Include="..\include\Mesh.h" />
+    <ClInclude Include="..\include\NoEffect.h" />
     <ClInclude Include="..\include\PhysicsComponent.h" />
     <ClInclude Include="..\include\PhysicsSystem.h" />
     <ClInclude Include="..\include\PostEffectsSystem.h" />
@@ -132,6 +134,7 @@
     <ClInclude Include="..\include\AutoDestructScript.h" />
     <ClInclude Include="..\include\ScriptSystem.h" />
     <ClInclude Include="..\include\Script.h" />
+    <ClInclude Include="..\include\Warp.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Camera.cpp" />
@@ -150,6 +153,7 @@
     <ClCompile Include="..\src\Material.cpp" />
     <ClCompile Include="..\src\MenuState.cpp" />
     <ClCompile Include="..\src\Mesh.cpp" />
+    <ClCompile Include="..\src\NoEffect.cpp" />
     <ClCompile Include="..\src\PhysicsSystem.cpp" />
     <ClCompile Include="..\src\PostEffectsSystem.cpp" />
     <ClCompile Include="..\src\RenderSystem.cpp" />
@@ -161,6 +165,7 @@
     <ClCompile Include="..\src\Transform.cpp" />
     <ClCompile Include="..\src\InputControllerSystem.cpp" />
     <ClCompile Include="..\src\ScriptSystem.cpp" />
+    <ClCompile Include="..\src\Warp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\shaders\BlurPS.hlsl">
@@ -181,13 +186,19 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
     </FxCompile>
+    <FxCompile Include="..\shaders\NoEffect.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="..\shaders\PixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="..\shaders\RadialBlur.hlsl">
+    <FxCompile Include="..\shaders\WarpBlur.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>

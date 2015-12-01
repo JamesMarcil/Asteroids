@@ -61,60 +61,6 @@ void GameState::Enter( void )
         ResourceManager* pManager = ResourceManager::Instance();
 		pManager->ParseJSONFile("json/resources.json");
 
-#pragma region post process set up
-
-		ID3D11RenderTargetView* ppRTV;
-		ID3D11ShaderResourceView* ppSRV;
-
-		// Create post-process resources
-		D3D11_TEXTURE2D_DESC textureDesc;
-		ZeroMemory(&textureDesc, sizeof(textureDesc));
-		textureDesc.Width = pManager->GetWindowWidth();
-		textureDesc.Height = pManager->GetWindowHeight();
-		textureDesc.ArraySize = 1;
-		textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-		textureDesc.CPUAccessFlags = 0;
-		textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		textureDesc.MipLevels = 1;
-		textureDesc.MiscFlags = 0;
-		textureDesc.SampleDesc.Count = 1;
-		textureDesc.SampleDesc.Quality = 0;
-		textureDesc.Usage = D3D11_USAGE_DEFAULT;
-
-		// create the texture that we will render into
-		ID3D11Texture2D* ppTexture;
-		pManager->GetDevice()->CreateTexture2D(&textureDesc, 0, &ppTexture);
-		
-		// Create the Render Target View
-		D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
-		ZeroMemory(&rtvDesc, sizeof(rtvDesc));
-		rtvDesc.Format = textureDesc.Format;
-		rtvDesc.Texture2D.MipSlice = 0;
-		rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-
-		pManager->GetDevice()->CreateRenderTargetView(ppTexture, &rtvDesc, &ppRTV);
-
-		// Create the Shader Resource View for the scene
-		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-		ZeroMemory(&srvDesc, sizeof(srvDesc));
-		srvDesc.Format = textureDesc.Format;
-		srvDesc.Texture2D.MipLevels = 1;
-		srvDesc.Texture2D.MostDetailedMip = 0;
-		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-
-		pManager->GetDevice()->CreateShaderResourceView(ppTexture, &srvDesc, &ppSRV);
-
-		// register the scene texture as our postEffectTexture
-		pManager->RegisterTexture("PostEffectTexture", ppSRV);
-
-		// We can release the texture because the RenderTarget and Shader Resource View now handle it
-		ppTexture->Release();
-
-		// Register the post processing Render Target
-		pManager->RegisterRenderTargetView("PostRTV", ppRTV);
-
-#pragma endregion
-
 		this->LoadCurrentLevel();
 		EventManager* pEventManager = EventManager::Instance();
 		pEventManager->Register("WarpEnd", this);

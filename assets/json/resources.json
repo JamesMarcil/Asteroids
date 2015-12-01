@@ -105,10 +105,17 @@
     },
 
     {
-      "ID": "PPPS",
+      "ID": "PPWarpBlur",
       "Type": "Shader",
       "Stage": "Pixel",
-      "Filename": "RadialBlur.cso"
+      "Filename": "WarpBlur.cso"
+    },
+
+    {
+      "ID": "PPNoEffect",
+      "Type": "Shader",
+      "Stage": "Pixel",
+      "Filename": "NoEffect.cso"
     },
 
     {
