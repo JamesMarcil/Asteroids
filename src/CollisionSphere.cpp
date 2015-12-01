@@ -20,7 +20,7 @@ CollisionSphere::CollisionSphere(Mesh& m, DirectX::XMFLOAT3& p, float scale)
 		}
 	}
 
-	radius *= scale * 2;
+	radius *= scale;
 }
 
 CollisionSphere::CollisionSphere(float r, DirectX::XMFLOAT3& p)
@@ -65,7 +65,7 @@ bool CollisionSphere::CollidesWith(CollisionSphere& other)
 	float xDiff = position.x - otherPos.x;
 	float yDiff = position.y - otherPos.y;
 	float zDiff = position.z - otherPos.z;
-	float distance = xDiff * xDiff + yDiff * yDiff + zDiff * zDiff;
+	float distance = sqrtf(xDiff * xDiff + yDiff * yDiff + zDiff * zDiff);
 
-    return (distance < radius * other.GetRadius());
+    return (distance < radius + other.GetRadius());
 }

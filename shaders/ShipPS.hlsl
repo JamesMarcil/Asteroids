@@ -20,7 +20,7 @@ cbuffer Lights : register(b1)
 	SpotLight spotLights[MAX_LIGHTS];
 };
 
-Texture2D shipTexture    : register(t0);
+Texture2D shipTexture		: register(t0);
 Texture2D shipSpecMap       : register(t1);
 SamplerState trilinear      : register(s0);
 
@@ -61,5 +61,5 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float4 diffuseColor = shipTexture.Sample(trilinear, input.uv);
 
 	// Calculate the final color.
-	return diffuseColor * (dirColor + pointColor + spotColor);
+	return diffuseColor;// *(dirColor + pointColor + spotColor);
 }

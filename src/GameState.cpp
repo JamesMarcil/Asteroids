@@ -118,13 +118,13 @@ void GameState::Enter( void )
         // Register Systems.
         EntityManager* pEntity = EntityManager::Instance();
         pEntity->AddSystem<PhysicsSystem>();
+		pEntity->AddSystem<CollisionSystem>();
 		pEntity->AddSystem<InputControllerSystem>();
         pEntity->AddSystem<ClearSystem>();
         pEntity->AddSystem<RenderSystem>();
         pEntity->AddSystem<SkyboxSystem>();
 		pEntity->AddSystem<SwapSystem>();
 		pEntity->AddSystem<ScriptSystem>();
-		pEntity->AddSystem<CollisionSystem>();
 		pEntity->AddSystem<AttackSystem>();
 
         // Make a SpotLight
@@ -145,9 +145,9 @@ void GameState::Enter( void )
 		GameEntity player = pEntity->Create("Player");
 		pEntity->AddComponent<RenderComponent>(player, pManager->GetMaterial("ship"), pManager->GetMesh("Ship"));
         pEntity->AddComponent<InputComponent>(player, 50.0f);
-		pEntity->AddComponent<CollisionComponent>(player, *pManager->GetMesh("Ship"), XMFLOAT3(0, 0, 0), 0.001f);
+		pEntity->AddComponent<CollisionComponent>(player, *pManager->GetMesh("Ship"), XMFLOAT3(0, 0, 0), 0.0007f);
 		pEntity->AddComponent<AttackComponent>(player, 5.0f);
-		TransformComponent* pTrans = pEntity->AddComponent<TransformComponent>(player, XMFLOAT3(0, 0, 0));
+		TransformComponent* pTrans = pEntity->AddComponent<TransformComponent>(player, XMFLOAT3(0, 0, 1));
 		pTrans->transform.SetScale(.001f);
 		PhysicsComponent* pPhysics = pEntity->AddComponent<PhysicsComponent>(player, XMVectorZero(), XMVectorSet(0, 0, 0, 0));
 		pPhysics->drag = 0.95f;
@@ -182,7 +182,7 @@ void GameState::LoadCurrentLevel()
 		pEntity->AddComponent<PhysicsComponent>(e, XMVectorZero(), XMVectorSet(0.0f, 0.0f, -1.0f + currentLevel*-2.0f, 0.0f));
 		ScriptComponent* script = pEntity->AddComponent<ScriptComponent>(e);
 		script->AddScript<AutoDestructScript>(-5.0f);
-		pEntity->AddComponent<CollisionComponent>(e, *pManager->GetMesh("Sphere"), position, 1.3f);
+		pEntity->AddComponent<CollisionComponent>(e, 0.55f, position);
 	}
 }
 

@@ -2,19 +2,11 @@
 #define OCT_TREE
 
 #include "GameEntity.h"
+#include "EntityManager.h"
 #include <DirectXMath.h>
+#include "CollisionSphere.h"
 #include <vector>
-
-struct Octant {
-	DirectX::XMFLOAT3 position;
-	float width;
-	float height;
-	float depth;
-
-	Octant(DirectX::XMFLOAT3 p, float w, float h, float d, int mE)
-		: position(p), width(w), height(h), depth(d)
-	{}
-};
+#include <Octant.h>
 
 class OctTree
 {
@@ -26,14 +18,20 @@ public:
 	OctTree();
 	OctTree(int mE);
 
-	void Update(std::vector<GameEntity> entities, Octant initial);
+	void Update(EntityManager* eManager, std::vector<GameEntity> collidables);
 
 	/* Getters */
 	int GetMaxEntities();
 	std::vector<std::vector<GameEntity>> GetPartitionedEntities();
 
 private:
-	void PartitionSpace(std::vector<GameEntity> entities, Octant o);
+	/*
+	* Remove a Component of type T from the provided GameEntity.
+	* @param   pManager			GameEntity Manager
+	* @param   entities			List containing entities within partition
+	* @param   o				Octant to partition
+	*/
+	void PartitionSpace(EntityManager* pManager, std::vector<GameEntity> entities, Octant o);
 };
 
 #endif

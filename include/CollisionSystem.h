@@ -7,9 +7,9 @@
 
 class CollisionSystem : public System<CollisionSystem>
 {
-	OctTree octTree;
+	OctTree* octTree;
 
-	virtual ~CollisionSystem() {}
+	virtual ~CollisionSystem() { delete octTree; }
 	virtual void Update(EntityManager* pManager, float dt, float tt) override;
 };
 

@@ -3,15 +3,12 @@
 struct VertexToPixel
 {
     float4 position		: SV_POSITION;
+	float3 worldPos     : TEXCOORD0;
     float3 normal       : NORMAL;
-    float3 worldPos     : TEXCOORD0;
     float2 uv           : TEXCOORD1;
 };
 
 float isColliding;
-
-Texture2D loamTexture		: register(t0);
-Texture2D rockTexture		: register(t1);
 
 SamplerState trilinear      : register(s0);
 

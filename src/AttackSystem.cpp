@@ -12,6 +12,8 @@
 #include "PhysicsComponent.h"
 #include "AttackComponent.h"
 #include "CollisionComponent.h"
+#include <ScriptComponent.h>
+#include <AutoDestructScript.h>
 
 // DirectX
 #include <DirectXMath.h>
@@ -39,10 +41,12 @@ void AttackSystem::FireProjectile(EntityManager* pEntity)
     TransformComponent* pPlayerTransform = pEntity->GetComponent<TransformComponent>(player);
 
 	GameEntity projectile = pEntity->Create("Projectile");
-	pEntity->AddComponent<RenderComponent>(projectile, pResource->GetMaterial("default"), pResource->GetMesh("Helix"));
+	pEntity->AddComponent<RenderComponent>(projectile, pResource->GetMaterial("default"), pResource->GetMesh("Sphere"));
 	pEntity->AddComponent<CollisionComponent>(projectile, projectileCollider.GetRadius(), pPlayerTransform->transform.GetTranslation());
 	pEntity->AddComponent<PhysicsComponent>(projectile, DirectX::XMFLOAT3(0, 0, 10), DirectX::XMFLOAT3(0, 0, 5));
 	TransformComponent* pTransform = pEntity->AddComponent<TransformComponent>(projectile, pPlayerTransform->transform.GetTranslation());
 	pTransform->transform.SetScale(0.1f);
-	pTransform->transform.Rotate(3.14159f / 2, 0, 0);
+	pTransform->transform.Translate(0, 0, 1);
+	ScriptComponent* script = pEntity->AddComponent<ScriptComponent>(projectile);
+	script->AddScript<AutoDestructScript>(30.0f);
 }

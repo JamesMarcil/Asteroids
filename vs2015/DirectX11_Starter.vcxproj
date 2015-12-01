@@ -116,6 +116,7 @@
     <ClInclude Include="..\include\Material.h" />
     <ClInclude Include="..\include\MenuState.h" />
     <ClInclude Include="..\include\Mesh.h" />
+    <ClInclude Include="..\include\Octant.h" />
     <ClInclude Include="..\include\OctTree.h" />
     <ClInclude Include="..\include\PhysicsComponent.h" />
     <ClInclude Include="..\include\PhysicsSystem.h" />
