@@ -1,6 +1,9 @@
 #ifndef GAME_ENTITY_H
 #define GAME_ENTITY_H
 
+// STD
+#include <cstdint>
+
 struct GameEntity
 {
 private:
