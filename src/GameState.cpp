@@ -62,53 +62,7 @@ void GameState::Enter( void )
 
         // Parse "resources.json" for any resources.
         ResourceManager* pManager = ResourceManager::Instance();
-        pManager->ParseJSONFile("json/resources.json");
-
-        /* Sampler Creation */
-        {
-            D3D11_SAMPLER_DESC desc;
-            ZeroMemory(&desc, sizeof(desc));
-            desc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-            desc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-            desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-            desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-            desc.MaxLOD = D3D11_FLOAT32_MAX;
-
-            pManager->RegisterSamplerState( "trilinear", desc);
-        }
-
-		// Create the ID3D11RasterizerState for CollisionSpheres/OctTree Octants
-		{
-			D3D11_RASTERIZER_DESC desc;
-			ZeroMemory(&desc, sizeof(D3D11_RASTERIZER_DESC));
-			desc.FillMode = D3D11_FILL_WIREFRAME;
-			desc.CullMode = D3D11_CULL_FRONT;
-			desc.DepthClipEnable = true;
-
-			pManager->RegisterRasterizerState("Wireframe_Rasterizer", desc);
-		}
-
-        // Create the ID3D11RasterizerState for the Skybox.
-        {
-            D3D11_RASTERIZER_DESC desc;
-            ZeroMemory(&desc, sizeof(D3D11_RASTERIZER_DESC));
-            desc.FillMode = D3D11_FILL_SOLID;
-            desc.CullMode = D3D11_CULL_FRONT;
-            desc.DepthClipEnable = true;
-
-            pManager->RegisterRasterizerState("Skybox_Rasterizer", desc);
-        }
-
-        // Create the ID3D11DepthStencilState for the Skybox.
-        {
-            D3D11_DEPTH_STENCIL_DESC desc;
-            ZeroMemory(&desc, sizeof(D3D11_DEPTH_STENCIL_DESC));
-            desc.DepthEnable = true;
-            desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-            desc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
-
-            pManager->RegisterDepthStencilState("Skybox_DepthStencil", desc);
-        }
+		pManager->ParseJSONFile("json/resources.json");
 
 		this->LoadCurrentLevel();
 		EventManager* pEventManager = EventManager::Instance();

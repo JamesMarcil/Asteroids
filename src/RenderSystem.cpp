@@ -27,12 +27,35 @@
 
 using namespace DirectX;
 
+RenderSystem::RenderSystem(void)
+{
+	m_pCamera = CameraManager::Instance();
+	m_pResource = ResourceManager::Instance();
+
+	/* Sampler Creation */
+	{
+		D3D11_SAMPLER_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+		desc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+		desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		desc.MaxLOD = D3D11_FLOAT32_MAX;
+
+		m_pResource->RegisterSamplerState("trilinear", desc);
+	}
+}
+
+RenderSystem::~RenderSystem(void)
+{
+	/* Nothing to do. */
+}
+
 void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
 {
-    ResourceManager* pResource = ResourceManager::Instance();
-    ID3D11Device* pDevice = pResource->GetDevice();
-    ID3D11DeviceContext* pDeviceContext = pResource->GetDeviceContext();
-    Camera* pCamera = CameraManager::Instance()->GetActiveCamera();
+    ID3D11Device* pDevice = m_pResource->GetDevice();
+    ID3D11DeviceContext* pDeviceContext = m_pResource->GetDeviceContext();
+    Camera* pCamera = m_pCamera->GetActiveCamera();
     XMFLOAT3 camPos = pCamera->transform.GetTranslation();
 
     // Declare a MAX_LIGHTS sized array for each type of LightComponent
@@ -129,7 +152,7 @@ void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
 			pPixelShader->SetFloat3("cameraPosition", XMFLOAT3(camPos.x, camPos.y, camPos.z));
 			pPixelShader->CopyBufferData("PerFrame");
 
-			pPixelShader->SetSamplerState("trilinear", pResource->GetSamplerState("trilinear"));
+			pPixelShader->SetSamplerState("trilinear", m_pResource->GetSamplerState("trilinear"));
 		}
 
         // Update "PerObject" Constant Buffer.
@@ -145,9 +168,6 @@ void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
         pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         pDeviceContext->DrawIndexed(pMesh->GetIndexCount(), 0, 0);
     }
-
-	RenderCollisionSpheres(pManager);
-	RenderOctants(pManager);
 }
 
 void RenderSystem::RenderCollisionSpheres(EntityManager* pManager)
