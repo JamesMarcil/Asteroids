@@ -192,6 +192,9 @@
     <ClInclude Include="..\include\json.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\AsteroidRenderComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ExitState.cpp">
@@ -293,6 +296,9 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="..\shaders\ColliderPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\shaders\AsteroidVertexShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

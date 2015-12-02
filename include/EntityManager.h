@@ -321,7 +321,7 @@ public:
             return false;
         }
 
-        return m_entityMasks[component_id][entity_id - 1];
+        return m_entityMasks[entity_id - 1][component_id];
     }
 
     /*
