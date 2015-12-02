@@ -84,6 +84,12 @@
     },
 
     {
+        "ID" : "RandomNoise",
+        "Type" : "Texture",
+        "Filename" : "textures/noise.png"
+    },
+
+    {
         "ID" : "StandardVertex",
         "Type" : "Shader",
         "Stage" : "Vertex",
@@ -140,6 +146,13 @@
     },
 
     {
+        "ID" : "AsteroidPixel",
+        "Type" : "Shader",
+        "Stage" : "Pixel",
+        "Filename" : "AsteroidPixelShader.cso"
+    },
+
+    {
         "ID" : "default",
         "Type" : "Material",
         "VertexShader" : "StandardVertex",
@@ -174,12 +187,13 @@
     {
         "ID" : "asteroid",
         "Type" : "Material",
-        "VertexShader" : "AsteroidVertex",
-        "PixelShader" : "StandardPixel",
+        "VertexShader" : "StandardVertex",
+        "PixelShader" : "AsteroidPixel",
         "Textures" : [ 
-            { "Key" : "diffuseTexture", "TextureName" : "Rust_Spec" },
-            { "Key" : "rustTexture", "TextureName" : "Rust_Spec" },
-            { "Key" : "specMapTexture", "TextureName" : "Rust" }
+            { "Key" : "diffuseTexture", "TextureName" : "Diffuse" },
+            { "Key" : "rustTexture", "TextureName" : "Rust" },
+            { "Key" : "specMapTexture", "TextureName" : "Rust_Spec" },
+            { "Key" : "noiseTexture", "TextureName" : "RandomNoise" }
         ]
     }
 ]

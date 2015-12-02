@@ -131,7 +131,7 @@ void GameState::LoadCurrentLevel()
 	for (int i = 0; i < toAdd; ++i)
 	{
 		GameEntity e = pEntity->Create("Asteroid");
-		XMFLOAT3 position = XMFLOAT3(rand() % (span * 2) - span, rand() % (span * 2) - span, i * 5 + 15);
+		XMFLOAT3 position = XMFLOAT3(rand() % (span * 2) - span, rand() % (span * 2) - span, i * 5 + 95);
 		pEntity->AddComponent<TransformComponent>(e, position);
 		pEntity->AddComponent<RenderComponent>(e, asteroidMat, pManager->GetMesh("Sphere"));
 		pEntity->AddComponent<AsteroidRenderComponent>(e, i+1);
