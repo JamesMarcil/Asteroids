@@ -156,9 +156,6 @@
     <ClInclude Include="..\include\InputControllerSystem.h">
       <Filter>Header Files\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\CollisionComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\CollisionSphere.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -177,9 +174,6 @@
     <ClInclude Include="..\include\AutoDestructScript.h">
       <Filter>Header Files\Components\Scripts</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Script.h">
-      <Filter>Header Files\Components\Scripts</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\ClearSystem.h">
       <Filter>Header Files\Systems</Filter>
     </ClInclude>
@@ -190,6 +184,27 @@
       <Filter>Header Files\Systems</Filter>
     </ClInclude>
     <ClInclude Include="..\include\json.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\IScript.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\AttackComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\CollisionComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\AttackSystem.h">
+      <Filter>Header Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\CollisionSystem.h">
+      <Filter>Header Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\OctTree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Octant.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -271,6 +286,15 @@
     </ClCompile>
     <ClCompile Include="..\src\SwapSystem.cpp">
       <Filter>Source Files\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\AttackSystem.cpp">
+      <Filter>Source Files\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\CollisionSystem.cpp">
+      <Filter>Source Files\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\OctTree.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,8 +1,11 @@
 #ifndef COLLISION_SPHERE
 #define COLLISION_SPHERE
 
-#include <DirectXMath.h>
+// Mesh
 #include "Mesh.h"
+
+// DirectX
+#include <DirectXMath.h>
 
 class CollisionSphere
 {
@@ -12,15 +15,18 @@ private:
 	bool isColliding;
 
 public:
-	CollisionSphere();
+	CollisionSphere(void) = default;
 	CollisionSphere(Mesh& m, DirectX::XMFLOAT3& p, float scale);
 	CollisionSphere(float r, DirectX::XMFLOAT3& p);
 
-	DirectX::XMFLOAT3 GetPosition();
-	float GetRadius();
-	bool IsColliding();
-	void IsColliding(bool val);
-	void SetPosition(DirectX::XMFLOAT3& pos);
+    // Getters
+	DirectX::XMFLOAT3   GetPosition(void) const;
+	float               GetRadius(void) const;
+	bool                GetIsColliding(void) const;
+
+    // Setters
+	bool IsColliding(bool value);
+    DirectX::XMFLOAT3 SetPosition(DirectX::XMFLOAT3& value);
 
 	bool CollidesWith(CollisionSphere& other);
 };

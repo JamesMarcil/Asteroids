@@ -87,11 +87,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\AttackComponent.h" />
+    <ClInclude Include="..\include\AttackSystem.h" />
     <ClInclude Include="..\include\Camera.h" />
     <ClInclude Include="..\include\CameraManager.h" />
     <ClInclude Include="..\include\ClearSystem.h" />
     <ClInclude Include="..\include\CollisionComponent.h" />
     <ClInclude Include="..\include\CollisionSphere.h" />
+    <ClInclude Include="..\include\CollisionSystem.h" />
     <ClInclude Include="..\include\Component.h" />
     <ClInclude Include="..\include\DebugCamera.h" />
     <ClInclude Include="..\include\DirectXGameCore.h" />
@@ -107,11 +110,14 @@
     <ClInclude Include="..\include\IGameState.h" />
     <ClInclude Include="..\include\InputComponent.h" />
     <ClInclude Include="..\include\InputManager.h" />
+    <ClInclude Include="..\include\IScript.h" />
     <ClInclude Include="..\include\json.h" />
     <ClInclude Include="..\include\LightComponent.h" />
     <ClInclude Include="..\include\Material.h" />
     <ClInclude Include="..\include\MenuState.h" />
     <ClInclude Include="..\include\Mesh.h" />
+    <ClInclude Include="..\include\Octant.h" />
+    <ClInclude Include="..\include\OctTree.h" />
     <ClInclude Include="..\include\PhysicsComponent.h" />
     <ClInclude Include="..\include\PhysicsSystem.h" />
     <ClInclude Include="..\include\RenderComponent.h" />
@@ -130,13 +136,14 @@
     <ClInclude Include="..\include\ScriptComponent.h" />
     <ClInclude Include="..\include\AutoDestructScript.h" />
     <ClInclude Include="..\include\ScriptSystem.h" />
-    <ClInclude Include="..\include\Script.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\AttackSystem.cpp" />
     <ClCompile Include="..\src\Camera.cpp" />
     <ClCompile Include="..\src\CameraManager.cpp" />
     <ClCompile Include="..\src\ClearSystem.cpp" />
     <ClCompile Include="..\src\CollisionSphere.cpp" />
+    <ClCompile Include="..\src\CollisionSystem.cpp" />
     <ClCompile Include="..\src\Component.cpp" />
     <ClCompile Include="..\src\DebugCamera.cpp" />
     <ClCompile Include="..\src\DirectXGameCore.cpp" />
@@ -149,6 +156,7 @@
     <ClCompile Include="..\src\Material.cpp" />
     <ClCompile Include="..\src\MenuState.cpp" />
     <ClCompile Include="..\src\Mesh.cpp" />
+    <ClCompile Include="..\src\OctTree.cpp" />
     <ClCompile Include="..\src\PhysicsSystem.cpp" />
     <ClCompile Include="..\src\RenderSystem.cpp" />
     <ClCompile Include="..\src\ResourceManager.cpp" />
