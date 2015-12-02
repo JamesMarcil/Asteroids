@@ -21,6 +21,7 @@
 // Components
 #include "TransformComponent.h"
 #include "RenderComponent.h"
+#include "AsteroidRenderComponent.h"
 #include "PhysicsComponent.h"
 #include "InputComponent.h"
 #include "LightComponent.h"
@@ -121,7 +122,7 @@ void GameState::LoadCurrentLevel()
 	EntityManager* pEntity = EntityManager::Instance();
 	ResourceManager* pManager = ResourceManager::Instance();
 
-	Material* defaultMat = pManager->GetMaterial("default");
+	Material* asteroidMat = pManager->GetMaterial("asteroid");
 
 	srand(time(0));
 	int span = 2;
@@ -132,7 +133,8 @@ void GameState::LoadCurrentLevel()
 		GameEntity e = pEntity->Create("Asteroid");
 		XMFLOAT3 position = XMFLOAT3(rand() % (span * 2) - span, rand() % (span * 2) - span, i * 5 + 15);
 		pEntity->AddComponent<TransformComponent>(e, position);
-		pEntity->AddComponent<RenderComponent>(e, defaultMat, pManager->GetMesh("Sphere"));
+		pEntity->AddComponent<RenderComponent>(e, asteroidMat, pManager->GetMesh("Sphere"));
+		pEntity->AddComponent<AsteroidRenderComponent>(e, i+1);
 		pEntity->AddComponent<PhysicsComponent>(e, XMVectorZero(), XMVectorSet(0.0f, 0.0f, -1.0f + currentLevel*-2.0f, 0.0f));
 		ScriptComponent* script = pEntity->AddComponent<ScriptComponent>(e);
 		script->AddScript<AutoDestructScript>(-5.0f);

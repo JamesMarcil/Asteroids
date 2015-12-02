@@ -133,6 +133,13 @@
     },
 
     {
+        "ID" : "AsteroidVertex",
+        "Type" : "Shader",
+        "Stage" : "Vertex",
+        "Filename" : "AsteroidVertexShader.cso"
+    },
+
+    {
         "ID" : "default",
         "Type" : "Material",
         "VertexShader" : "StandardVertex",
@@ -154,8 +161,7 @@
             { "Key" : "shipSpecMap", "TextureName" : "Ship_Spec" }
         ]
     },
-	
-	{
+    {
         "ID" : "collider",
         "Type" : "Material",
         "VertexShader" : "StandardVertex",
@@ -163,6 +169,17 @@
         "Textures" : [ 
             { "Key" : "loamTexture", "TextureName" : "Loam" },
             { "Key" : "rockTexture", "TextureName" : "Rock" }
+        ]
+    },
+    {
+        "ID" : "asteroid",
+        "Type" : "Material",
+        "VertexShader" : "AsteroidVertex",
+        "PixelShader" : "StandardPixel",
+        "Textures" : [ 
+            { "Key" : "diffuseTexture", "TextureName" : "Rust_Spec" },
+            { "Key" : "rustTexture", "TextureName" : "Rust_Spec" },
+            { "Key" : "specMapTexture", "TextureName" : "Rust" }
         ]
     }
 ]

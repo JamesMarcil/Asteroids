@@ -136,6 +136,8 @@
     <ClInclude Include="..\include\ScriptComponent.h" />
     <ClInclude Include="..\include\AutoDestructScript.h" />
     <ClInclude Include="..\include\ScriptSystem.h" />
+    <ClInclude Include="..\include\Script.h" />
+    <ClInclude Include="..\include\AsteroidRenderComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\AttackSystem.cpp" />
@@ -206,6 +208,12 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="..\shaders\VertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="..\shaders\AsteroidVertexShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
