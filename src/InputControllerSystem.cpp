@@ -35,6 +35,9 @@ void InputControllerSystem::Update(EntityManager* pManager, float dt, float tt)
 	float horiz = (m_pInput->IsKeyDown('A') ? -1 : 0) + (m_pInput->IsKeyDown('D') ? 1 : 0);
 	float vert = (m_pInput->IsKeyDown('S') ? -1 : 0) + (m_pInput->IsKeyDown('W') ? 1 : 0);
 
+	float playableWidth = 5;
+	float playableHeight = 4;
+
 	for (auto& entity : pManager->EntitiesWithComponents<InputComponent, PhysicsComponent, TransformComponent>())
 	{
 		TransformComponent* pTransform = pManager->GetComponent<TransformComponent>(entity);
@@ -42,6 +45,18 @@ void InputControllerSystem::Update(EntityManager* pManager, float dt, float tt)
 
 		InputComponent* inputCom = pManager->GetComponent<InputComponent>(entity);
 		PhysicsComponent* pPhysics = pManager->GetComponent<PhysicsComponent>(entity);
+
+		DirectX::XMFLOAT3 pos = t.GetTranslation();
+		if ((pos.x < -playableWidth / 2 && horiz < 0) ||
+			(pos.x > playableWidth / 2 && horiz > 0)) {
+			horiz = 0;
+			pPhysics->velocity.x = 0;
+		}
+		if ((pos.y < -playableHeight / 2 && vert < 0) ||
+			(pos.y > playableHeight / 2 && vert > 0)) {
+			vert = 0;
+			pPhysics->velocity.y = 0;
+		}
 
 		Vector3 rot = Vector3(t.GetRotationEuler().x, t.GetRotationEuler().y, t.GetRotationEuler().z);
 		Vector3 accel = Vector3(horiz, vert, 0);// horizAdd + vertAdd;
