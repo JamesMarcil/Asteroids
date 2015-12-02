@@ -153,7 +153,7 @@ void GameState::EventRouter(const std::string& name, void* data)
     {
 		asteroids--;
 		if (asteroids <= 0) {
-			EventManager::Instance()->Fire("WarpEnd", nullptr); //TODO change to WarpStart
+			EventManager::Instance()->Fire("WarpBegin", nullptr); //TODO change to WarpStart
 		}
 	}
 }
