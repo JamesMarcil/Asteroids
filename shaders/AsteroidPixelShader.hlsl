@@ -5,7 +5,8 @@ struct VertexToPixel
     float4 position		: SV_POSITION;
     float3 worldPos     : POSITION;
     float3 normal       : NORMAL;
-    float2 uv           : TEXCOORD1;
+	float2 uv           : TEXCOORD1;
+	float2 noise        : TEXCOORD2;
 };
 
 cbuffer PerFrame : register(b0)
@@ -25,6 +26,10 @@ Texture2D rustTexture       : register(t1);
 Texture2D specMapTexture    : register(t2);
 Texture2D noiseTexture      : register(t3);
 SamplerState trilinear      : register(s0);
+
+float rand(float2 co) {
+	return 0.5 + (frac(sin(dot(co.xy, float2(12.9898, 78.233))) * 43758.5453))*0.5;
+}
 
 float4 main(VertexToPixel input) : SV_TARGET
 {
@@ -60,7 +65,7 @@ float4 main(VertexToPixel input) : SV_TARGET
     // Sample the diffuse texture.
     float4 diffuseColor = rustTexture.Sample(trilinear, input.uv);
 
-	if (input.worldPos.z > noiseTexture.Sample(trilinear, input.uv).r*150.0f) discard; //Fade in
+	if (input.worldPos.z > noiseTexture.Sample(trilinear, input.uv).r*150.0f + 50.f) discard; //Fade in
 
     // Calculate the final color.
 	return diffuseColor * (dirColor + pointColor + spotColor);

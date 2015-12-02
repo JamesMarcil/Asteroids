@@ -90,6 +90,12 @@
     },
 
     {
+        "ID" : "Perlin",
+        "Type" : "Texture",
+        "Filename" : "textures/perlin_noise_seamless.png"
+    },
+
+    {
         "ID" : "StandardVertex",
         "Type" : "Shader",
         "Stage" : "Vertex",
@@ -187,13 +193,14 @@
     {
         "ID" : "asteroid",
         "Type" : "Material",
-        "VertexShader" : "StandardVertex",
+        "VertexShader" : "AsteroidVertex",
         "PixelShader" : "AsteroidPixel",
         "Textures" : [ 
             { "Key" : "diffuseTexture", "TextureName" : "Diffuse" },
             { "Key" : "rustTexture", "TextureName" : "Rust" },
             { "Key" : "specMapTexture", "TextureName" : "Rust_Spec" },
-            { "Key" : "noiseTexture", "TextureName" : "RandomNoise" }
+            { "Key" : "noiseTexture", "TextureName" : "RandomNoise" },
+            { "Key" : "perlinTexture", "TextureName" : "Perlin" }
         ]
     }
 ]
