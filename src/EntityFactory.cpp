@@ -32,15 +32,15 @@ GameEntity EntityFactory::CreateTextField(std::wstring text, std::string spritef
     return textfield;
 }
 
-GameEntity EntityFactory::CreateButton(DirectX::XMFLOAT2 center, float width, float height, std::string material_id)
+GameEntity EntityFactory::CreateButton(DirectX::XMFLOAT2 center, float width, float height, std::string event, std::wstring text, std::string spritefont_id, DirectX::XMFLOAT2 position, DirectX::XMFLOAT4 color)
 {
     EntityManager* pEntity = EntityManager::Instance();
     ResourceManager* pResource = ResourceManager::Instance();
 
     GameEntity button = pEntity->Create();
-    pEntity->AddComponent<ButtonComponent>(button, true, "PlayClicked");
+    pEntity->AddComponent<ButtonComponent>(button, true, event);
     pEntity->AddComponent<AABBComponent>(button, XMFLOAT2{center.x + 400.0f, center.y + 300.0f}, width / 2.0f, height / 2.0f); // TODO: Replace with half window width and half window height
-    pEntity->AddComponent<UIRenderComponent>(button, center, width, height, pResource->GetMaterial(material_id));
+    pEntity->AddComponent<UITextComponent>(button, text, spritefont_id, position, color);
 
     return button;
 }

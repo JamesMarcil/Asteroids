@@ -30,8 +30,6 @@
 #include "UIRenderSystem.h"
 #include "UIUpdateSystem.h"
 
-#include "UITextComponent.h"
-
 // For the DirectX Math library
 using namespace DirectX;
 
@@ -41,7 +39,7 @@ using namespace DirectX;
 // Initializes the base class (including the window and D3D),
 // sets up our geometry and loads the shaders (among other things)
 // --------------------------------------------------------
-void GameState::Enter( void )
+void GameState::Enter(void)
 {
     // Register resources with the ResourceManager
     if(!isInitialized)
@@ -61,15 +59,15 @@ void GameState::Enter( void )
 
         // Register Systems.
         EntityManager* pEntity = EntityManager::Instance();
-        pEntity->AddSystem<PhysicsSystem>();
-		pEntity->AddSystem<InputControllerSystem>();
-        pEntity->AddSystem<UIUpdateSystem>();
-        pEntity->AddSystem<ClearSystem>();
-        pEntity->AddSystem<RenderSystem>();
-        pEntity->AddSystem<SkyboxSystem>();
-        pEntity->AddSystem<UIRenderSystem>();
-		pEntity->AddSystem<SwapSystem>();
-		pEntity->AddSystem<ScriptSystem>();
+        pEntity->AddSystemWithPriority<PhysicsSystem, 0>();
+		pEntity->AddSystemWithPriority<InputControllerSystem, 1>();
+        pEntity->AddSystemWithPriority<UIUpdateSystem, 2>();
+        pEntity->AddSystemWithPriority<ClearSystem, 3>();
+        pEntity->AddSystemWithPriority<RenderSystem, 4>();
+        pEntity->AddSystemWithPriority<SkyboxSystem, 5>();
+        pEntity->AddSystemWithPriority<UIRenderSystem, 6>();
+		pEntity->AddSystemWithPriority<SwapSystem, 7>();
+		pEntity->AddSystemWithPriority<ScriptSystem, 8>();
 
         // Make a SpotLight
         GameEntity spotlight = EntityFactory::CreateSpotlight
@@ -79,17 +77,10 @@ void GameState::Enter( void )
             XMFLOAT3(0.0f, 0.0f, 1.0f),       // Direction
             30.0f,                            // Specular Exponent
             1.0f                              // SpotLight Power
-        );
+       );
 
 		//Make Player
 		GameEntity player = EntityFactory::CreatePlayer(XMFLOAT3(0.0f, 0.0f, 0.0f));
-
-        // Make Button.
-        GameEntity button = EntityFactory::CreateButton(XMFLOAT2(0.0f, 0.0f), 100.0f, 100.0f, "UIMaterial");
-
-        // Make Text.
-        GameEntity text = pEntity->Create();
-        pEntity->AddComponent<UITextComponent>(text, L"Test", "TimesNewRoman", XMFLOAT2{400.0f, 300.0f}, XMFLOAT4{0.0f, 0.0f, 0.0f, 1.0f});
 
         isInitialized = true;
     }
@@ -132,27 +123,15 @@ void GameState::EventRouter(const std::string& name, void* data)
 	}
 }
 
-
-
-#pragma region Game Loop
 // --------------------------------------------------------
 // Update your game here - take input, move objects, etc.
 // --------------------------------------------------------
-void GameState::Update( float deltaTime, float totalTime )
+void GameState::Update(float deltaTime, float totalTime)
 {
-	// Handle Input
-    InputManager* pInput = InputManager::Instance();
-    StateMachine<GameStates>* pState = StateMachine<GameStates>::Instance();
-
-    if( pInput->IsKeyDown( '1' ) )
-    {
-        pState->GoToState( GameStates::MENU );
-    }
-	else if (pInput->IsKeyDown('3'))
-	{
-		pState->GoToState(GameStates::EXIT);
-	}
+    /* Nothing to do. */
 }
 
-void GameState::Exit( void ) { /* Nothing to do. */ }
-#pragma endregion
+void GameState::Exit(void) 
+{ 
+    /* Nothing to do. */ 
+}

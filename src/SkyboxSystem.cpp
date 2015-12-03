@@ -18,7 +18,8 @@ using namespace DirectX;
 
 SkyboxSystem::SkyboxSystem()
 {
-	EventManager::Instance()->Register("WarpBegin", this);
+    m_pEvent = EventManager::Instance();
+	m_pEvent->Register("WarpBegin", this);
 	textureNames[0] = "GreenSpace";
 	textureNames[1] = "PurpleSpace";
 	textureNames[2] = "Space";
@@ -80,6 +81,7 @@ void SkyboxSystem::Update(EntityManager* pManager, float dt, float tt)
 		{
 			warping = false;
 			lerpT = 1;
+            m_pEvent->Fire("WarpEnd", nullptr);
 		}
 		else
 		{
