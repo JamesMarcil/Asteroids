@@ -20,6 +20,11 @@
 #include "RenderComponent.h"
 #include "TransformComponent.h"
 #include "LightComponent.h"
+#include <CollisionComponent.h>
+
+// Collisions
+#include <Octant.h>
+#include "AsteroidRenderComponent.h"
 
 using namespace DirectX;
 
@@ -154,6 +159,11 @@ void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
         // Update "PerObject" Constant Buffer.
         Transform& t = pTransform->transform;
         pVertexShader->SetMatrix4x4("world", t.GetWorldMatrix());
+		if (pManager->HasComponent<AsteroidRenderComponent>(entity)) {
+			AsteroidRenderComponent* asteroid = pManager->GetComponent<AsteroidRenderComponent>(entity);
+			pVertexShader->SetInt("id", asteroid->randomID);
+		}
+
         pVertexShader->CopyBufferData("PerObject");
 
         // Set the Shaders but do not copy buffers, this has been done already.
@@ -164,4 +174,92 @@ void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
         pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         pDeviceContext->DrawIndexed(pMesh->GetIndexCount(), 0, 0);
     }
+}
+
+void RenderSystem::RenderCollisionSpheres(EntityManager* pManager)
+{
+	std::vector<GameEntity> collisionEntities = pManager->EntitiesWithComponents<CollisionComponent>();
+
+	ResourceManager* rManager = ResourceManager::Instance();
+	ID3D11Device* device = rManager->GetDevice();
+	ID3D11DeviceContext* deviceContext = rManager->GetDeviceContext();
+	ID3D11RasterizerState* rState = rManager->GetRasterizerState("Wireframe_Rasterizer");
+
+	// Update the mesh
+	Mesh* sphere = rManager->GetMesh("Sphere");
+	ID3D11Buffer* vb = sphere->GetVertexBuffer();
+	ID3D11Buffer* ib = sphere->GetIndexBuffer();
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+	deviceContext->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
+	deviceContext->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
+
+	Material* colliderMat = rManager->GetMaterial("collider");
+	colliderMat->WriteShaderInfo();
+	CollisionSphere collider;
+	XMMATRIX translation;
+	XMMATRIX scale;
+	XMFLOAT4X4 transform;
+
+	colliderMat->GetVertexShader()->SetMatrix4x4("view", CameraManager::Instance()->GetActiveCamera()->GetViewMatrix());
+	colliderMat->GetVertexShader()->SetMatrix4x4("projection", CameraManager::Instance()->GetActiveCamera()->GetProjectionMatrix());
+	deviceContext->RSSetState(rState);
+
+	for (GameEntity ge : collisionEntities)
+    {
+		collider = pManager->GetComponent<CollisionComponent>(ge)->collider;
+		translation = XMMatrixTranslation(collider.GetPosition().x, collider.GetPosition().y, collider.GetPosition().z);
+		scale = XMMatrixScaling(collider.GetRadius() * 2, collider.GetRadius() * 2, collider.GetRadius() * 2);
+		XMStoreFloat4x4(&transform, XMMatrixTranspose(scale * translation));
+
+		colliderMat->GetVertexShader()->SetMatrix4x4("world", transform);
+		(collider.GetIsColliding()) ? colliderMat->GetPixelShader()->SetFloat("isColliding", 1) : colliderMat->GetPixelShader()->SetFloat("isColliding", 0);
+		SimplePixelShader* pShader = colliderMat->GetPixelShader();
+
+		colliderMat->GetVertexShader()->SetShader(true);
+		colliderMat->GetPixelShader()->SetShader(true);
+
+		deviceContext->DrawIndexed(sphere->GetIndexCount(), 0, 0);
+	}
+
+	deviceContext->RSSetState(nullptr);
+}
+
+void RenderSystem::RenderOctants(EntityManager* pManager) {
+	ResourceManager* rManager = ResourceManager::Instance();
+	ID3D11Device* device = rManager->GetDevice();
+	ID3D11DeviceContext* deviceContext = rManager->GetDeviceContext();
+	ID3D11RasterizerState* rState = rManager->GetRasterizerState("Wireframe_Rasterizer");
+
+	// Update the mesh
+	Mesh* cube = rManager->GetMesh("Cube");
+	ID3D11Buffer* vb = cube->GetVertexBuffer();
+	ID3D11Buffer* ib = cube->GetIndexBuffer();
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+	deviceContext->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
+	deviceContext->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
+
+	Material* colliderMat = rManager->GetMaterial("collider");
+	colliderMat->WriteShaderInfo();
+	XMMATRIX translation;
+	XMMATRIX scale;
+	XMFLOAT4X4 transform;
+
+	colliderMat->GetVertexShader()->SetMatrix4x4("view", CameraManager::Instance()->GetActiveCamera()->GetViewMatrix());
+	colliderMat->GetVertexShader()->SetMatrix4x4("projection", CameraManager::Instance()->GetActiveCamera()->GetProjectionMatrix());
+	deviceContext->RSSetState(rState);
+
+	for (auto& o : pManager->Octants()) {
+		translation = XMMatrixTranslation(o.position.x, o.position.y, o.position.z);
+		scale = XMMatrixScaling(o.halfW * 2, o.halfH * 2, o.halfD * 2);
+		XMStoreFloat4x4(&transform, XMMatrixTranspose(scale * translation));
+
+		colliderMat->GetVertexShader()->SetMatrix4x4("world", transform);
+
+		colliderMat->GetVertexShader()->SetShader(true);
+		colliderMat->GetPixelShader()->SetShader(true);
+
+		deviceContext->DrawIndexed(cube->GetIndexCount(), 0, 0);
+	}
 }

@@ -15,6 +15,9 @@
 #include "ButtonComponent.h"
 #include "UIRenderComponent.h"
 #include "UITextComponent.h"
+#include "CollisionComponent.h"
+#include "AttackComponent.h"
+#include "AsteroidRenderComponent.h"
 
 // Scripts
 #include "AutoDestructScript.h"
@@ -26,7 +29,7 @@ GameEntity EntityFactory::CreateTextField(std::wstring text, std::string spritef
     EntityManager* pEntity = EntityManager::Instance();
     ResourceManager* pResource = ResourceManager::Instance();
 
-    GameEntity textfield = pEntity->Create();
+    GameEntity textfield = pEntity->Create("Text");
     pEntity->AddComponent<UITextComponent>(textfield, text, spritefont_id, position, color);
 
     return textfield;
@@ -37,7 +40,7 @@ GameEntity EntityFactory::CreateButton(DirectX::XMFLOAT2 center, float width, fl
     EntityManager* pEntity = EntityManager::Instance();
     ResourceManager* pResource = ResourceManager::Instance();
 
-    GameEntity button = pEntity->Create();
+    GameEntity button = pEntity->Create("Button");
     pEntity->AddComponent<ButtonComponent>(button, true, event);
     pEntity->AddComponent<AABBComponent>(button, XMFLOAT2{center.x + 400.0f, center.y + 300.0f}, width / 2.0f, height / 2.0f); // TODO: Replace with half window width and half window height
     pEntity->AddComponent<UITextComponent>(button, text, spritefont_id, position, color);
@@ -45,15 +48,19 @@ GameEntity EntityFactory::CreateButton(DirectX::XMFLOAT2 center, float width, fl
     return button;
 }
 
-GameEntity EntityFactory::CreateAsteroid(DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 velocity, DirectX::XMFLOAT3 acceleration)
+GameEntity EntityFactory::CreateAsteroid(DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 velocity, DirectX::XMFLOAT3 acceleration, DirectX::XMFLOAT3 rotation, float scale, int id)
 {
     EntityManager* pEntity = EntityManager::Instance();
     ResourceManager* pResource = ResourceManager::Instance();
 
-    GameEntity asteroid = pEntity->Create();
-    pEntity->AddComponent<TransformComponent>(asteroid, position);
-    pEntity->AddComponent<RenderComponent>(asteroid, pResource->GetMaterial("default"), pResource->GetMesh("Sphere"));
+    GameEntity asteroid = pEntity->Create("Asteroid");
+    pEntity->AddComponent<CollisionComponent>(asteroid, 0.55f*scale, position);
+    pEntity->AddComponent<AsteroidRenderComponent>(asteroid, id);
+    pEntity->AddComponent<RenderComponent>(asteroid, pResource->GetMaterial("asteroid"), pResource->GetMesh("Sphere"));
     pEntity->AddComponent<PhysicsComponent>(asteroid, velocity, acceleration);
+    TransformComponent* pTransform = pEntity->AddComponent<TransformComponent>(asteroid, position);
+    pTransform->transform.SetRotation(rotation);
+    pTransform->transform.SetScale(scale);
     ScriptComponent* script = pEntity->AddComponent<ScriptComponent>(asteroid);
     script->AddScript<AutoDestructScript>(-5.0f);
 
@@ -65,9 +72,11 @@ GameEntity EntityFactory::CreatePlayer(DirectX::XMFLOAT3 position)
     EntityManager* pEntity = EntityManager::Instance();
     ResourceManager* pResource = ResourceManager::Instance();
 
-    GameEntity player = pEntity->Create();
+    GameEntity player = pEntity->Create("Player");
     pEntity->AddComponent<RenderComponent>(player, pResource->GetMaterial("ship"), pResource->GetMesh("Ship"));
     pEntity->AddComponent<InputComponent>(player, 50.0f);
+    pEntity->AddComponent<CollisionComponent>(player, *pResource->GetMesh("Ship"), XMFLOAT3(0, 0, 0), 0.0007f);
+    pEntity->AddComponent<AttackComponent>(player, 5.0f);
     TransformComponent* pTrans = pEntity->AddComponent<TransformComponent>(player, position);
     pTrans->transform.SetScale(.001f);
     PhysicsComponent* pPhysics = pEntity->AddComponent<PhysicsComponent>(player, XMVectorZero(), XMVectorZero());
@@ -81,7 +90,7 @@ GameEntity EntityFactory::CreateDirectionalLight(DirectX::XMFLOAT4 color, Direct
 {
     EntityManager* pEntity = EntityManager::Instance();
 
-    GameEntity dirLight = pEntity->Create();
+    GameEntity dirLight = pEntity->Create("DirectionalLight");
     pEntity->AddComponent<DirectionalLightComponent>
     (
         dirLight,
@@ -97,7 +106,7 @@ GameEntity EntityFactory::CreatePointLight(DirectX::XMFLOAT4 color, DirectX::XMF
 {
     EntityManager* pEntity = EntityManager::Instance();
 
-    GameEntity pointLight = pEntity->Create();
+    GameEntity pointLight = pEntity->Create("PointLight");
     pEntity->AddComponent<PointLightComponent>
     (
         pointLight,
@@ -113,7 +122,7 @@ GameEntity EntityFactory::CreateSpotlight(DirectX::XMFLOAT4 color, DirectX::XMFL
 {
     EntityManager* pEntity = EntityManager::Instance();
 
-    GameEntity spotlight = pEntity->Create();
+    GameEntity spotlight = pEntity->Create("SpotLight");
     pEntity->AddComponent<SpotLightComponent>
     (
         spotlight,

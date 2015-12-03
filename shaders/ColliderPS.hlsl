@@ -3,15 +3,12 @@
 struct VertexToPixel
 {
     float4 position		: SV_POSITION;
+	float3 worldPos     : TEXCOORD0;
     float3 normal       : NORMAL;
-    float3 worldPos     : TEXCOORD0;
     float2 uv           : TEXCOORD1;
 };
 
-int isColliding;
-
-Texture2D loamTexture		: register(t0);
-Texture2D rockTexture		: register(t1);
+float isColliding;
 
 SamplerState trilinear      : register(s0);
 
@@ -25,10 +22,10 @@ float4 main(VertexToPixel input) : SV_TARGET
 
     // Sample the diffuse texture
 	if (isColliding == 1) {
-		diffuseColor = rockTexture.Sample(trilinear, input.uv);
+		diffuseColor = float4(1, 0, 0, 1);
 	}
 	else {
-		diffuseColor = loamTexture.Sample(trilinear, input.uv);
+		diffuseColor = float4(0, 0, 1, 1);
 	}
 
     // Combine lights

@@ -29,6 +29,8 @@
 #include "SwapSystem.h"
 #include "UIRenderSystem.h"
 #include "UIUpdateSystem.h"
+#include "CollisionSystem.h"
+#include "AttackSystem.h"
 
 // For the DirectX Math library
 using namespace DirectX;
@@ -60,14 +62,16 @@ void GameState::Enter(void)
         // Register Systems.
         EntityManager* pEntity = EntityManager::Instance();
         pEntity->AddSystemWithPriority<PhysicsSystem, 0>();
-		pEntity->AddSystemWithPriority<InputControllerSystem, 1>();
-        pEntity->AddSystemWithPriority<UIUpdateSystem, 2>();
-        pEntity->AddSystemWithPriority<ClearSystem, 3>();
-        pEntity->AddSystemWithPriority<RenderSystem, 4>();
-        pEntity->AddSystemWithPriority<SkyboxSystem, 5>();
-        pEntity->AddSystemWithPriority<UIRenderSystem, 6>();
-		pEntity->AddSystemWithPriority<SwapSystem, 7>();
-		pEntity->AddSystemWithPriority<ScriptSystem, 8>();
+		pEntity->AddSystemWithPriority<CollisionSystem, 1>();
+		pEntity->AddSystemWithPriority<InputControllerSystem, 2>();
+        pEntity->AddSystemWithPriority<UIUpdateSystem, 3>();
+        pEntity->AddSystemWithPriority<ClearSystem, 4>();
+        pEntity->AddSystemWithPriority<RenderSystem, 5>();
+        pEntity->AddSystemWithPriority<SkyboxSystem, 6>();
+        pEntity->AddSystemWithPriority<UIRenderSystem, 7>();
+		pEntity->AddSystemWithPriority<SwapSystem, 8>();
+		pEntity->AddSystemWithPriority<ScriptSystem, 9>();
+		pEntity->AddSystemWithPriority<AttackSystem, 10>();
 
         // Make a SpotLight
         GameEntity spotlight = EntityFactory::CreateSpotlight
@@ -90,18 +94,20 @@ void GameState::Enter(void)
 
 void GameState::LoadCurrentLevel()
 {
+	srand(static_cast<std::time_t>(0));
 	this->currentLevel++;
-	srand(time(0));
-	int span = 2;
+	int span = 10;
 	int toAdd = 30 + currentLevel * 5;
 	this->asteroids = toAdd;
 	for (int i = 0; i < toAdd; ++i)
 	{
-		XMFLOAT3 position = XMFLOAT3(rand() % (span * 2) - span, rand() % (span * 2) - span, i * 5 + 15);
-        XMFLOAT3 velocity{0.0f, 0.0f, 0.0f};
+		XMFLOAT3 position = XMFLOAT3(static_cast<float>(rand()*rand() % (span * 2) - span), static_cast<float>(rand()*rand() % (span * 2) - span), i * 5.0f + 155.0f);
+        XMFLOAT3 velocity{0.0f, 0.0f, -15.0f - (rand() % 15)};
         XMFLOAT3 acceleration{0.0f, 0.0f, -1.0f + currentLevel * -2.0f};
+        XMFLOAT3 rotation{rand() * 3.0f, rand() * 3.0f, rand() * 3.0f};
+		float scale = 1.0f + rand() * 0.0001f;
 
-        EntityFactory::CreateAsteroid(position, velocity, acceleration);
+        EntityFactory::CreateAsteroid(position, velocity, acceleration, rotation, scale, i+1);
 	}
 }
 
@@ -118,7 +124,7 @@ void GameState::EventRouter(const std::string& name, void* data)
     {
 		asteroids--;
 		if (asteroids <= 0) {
-			EventManager::Instance()->Fire("WarpEnd", nullptr); //TODO change to WarpStart
+			EventManager::Instance()->Fire("WarpBegin", nullptr); //TODO change to WarpStart
 		}
 	}
 }
