@@ -20,4 +20,8 @@ void Material::WriteShaderInfo()
 	{
 		pixelShader->SetShaderResourceView(pair.first, pManager->GetTexture(pair.second));
 	}
+	for (auto pair : textures)
+	{
+		vertexShader->SetShaderResourceView(pair.first, pManager->GetTexture(pair.second));
+	}
 }

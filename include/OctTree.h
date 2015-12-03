@@ -5,23 +5,26 @@
 #include "EntityManager.h"
 #include <DirectXMath.h>
 #include "CollisionSphere.h"
-#include <vector>
 #include <Octant.h>
+
+// STD
+#include <vector>
+#include <cstdint>
 
 class OctTree
 {
 private:
-	int maxEntities;										  // Max number of entities per partition
-	std::vector<std::vector<GameEntity>> partitionedEntities; // List holding sub-lists of entities in their respective partitions
+    std::uint32_t maxEntities;								    // Max number of entities per partition
+	std::vector<std::vector<GameEntity>> partitionedEntities;   // List holding sub-lists of entities in their respective partitions
 
 public:
 	OctTree();
-	OctTree(int mE);
+	OctTree(std::uint32_t mE);
 
 	void Update(EntityManager* eManager, std::vector<GameEntity> collidables);
 
 	/* Getters */
-	int GetMaxEntities();
+    std::uint32_t GetMaxEntities() const;
 	std::vector<std::vector<GameEntity>> GetPartitionedEntities();
 
 private:

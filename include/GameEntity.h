@@ -2,6 +2,7 @@
 #define GAME_ENTITY_H
 
 // STD
+#include <cstdint>
 #include <string>
 
 struct GameEntity
@@ -15,13 +16,21 @@ public:
     /*
      * Construct an invalid GameEntity with an ID of 0.
      */
-    GameEntity(void) : m_id(0), m_tag("Invalid") { /* Nothing to do */ }
+    GameEntity(void) 
+        : m_id(0), m_tag("Invalid") 
+    { 
+        /* Nothing to do */ 
+    }
 
     /*
      * Construct a GameEntity with the provided ID.
      * @param   id      The id for this GameEntity.
      */
-    GameEntity(std::uint32_t id, const std::string& t) : m_id(id), m_tag(t) { /* Nothing to do */ }
+    GameEntity(std::uint32_t id, const std::string& t) 
+        : m_id(id), m_tag(t) 
+    { 
+        /* Nothing to do */ 
+    }
 
     /* Getters */
     const std::uint32_t id(void) const { return m_id; }

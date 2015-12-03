@@ -1,6 +1,7 @@
 #include "PhysicsSystem.h"
 
 #include "EntityManager.h" // Need to to include this to access EntityManager::* functions.
+#include "InputManager.h"
 
 // Components
 #include "TransformComponent.h"
@@ -12,6 +13,12 @@
 void PhysicsSystem::Update(EntityManager* pManager, float dt, float tt )
 {
     using namespace DirectX;
+
+	if (InputManager::Instance()->IsKeyDown('M'))
+	{
+		this->paused = true;
+	}
+	if (this->paused) return;
 
     for(auto& entity : pManager->EntitiesWithComponents<PhysicsComponent, TransformComponent>())
     {

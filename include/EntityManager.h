@@ -162,10 +162,30 @@ public:
         m_markedForDestruction.clear();
         m_entityIDs.clear();
         m_entityMasks.clear();
+
         m_entityComponents.clear();
+        m_entityComponents.resize(ComponentBase::MAX_COMPONENTS);
 
         // Reset to ENTITY_COUNT GameEntities.
         Resize();
+    }
+
+    /*
+     * Destroy all currently attached systems.
+     */
+    void ClearSystems(void)
+    {
+        for(auto& system : m_systemPool)
+        {
+            if(system)
+            {
+                delete system;
+            }
+        }
+        m_systemPool.clear();
+        m_systemPool.resize(SystemBase::MAX_SYSTEMS);
+        m_systemPriorities.clear();
+        m_attachedSystems.reset();
     }
 
     /*

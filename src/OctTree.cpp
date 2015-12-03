@@ -10,7 +10,7 @@ OctTree::OctTree() {
 	partitionedEntities = std::vector<std::vector<GameEntity>>();
 }
 
-OctTree::OctTree(int mE)
+OctTree::OctTree(std::uint32_t mE)
 	: maxEntities(mE)
 {
 	partitionedEntities = std::vector<std::vector<GameEntity>>();
@@ -26,7 +26,7 @@ void OctTree::Update(EntityManager* eManager, std::vector<GameEntity> collidable
 	PartitionSpace(eManager, collidables, initial);
 }
 
-int OctTree::GetMaxEntities() {
+std::uint32_t OctTree::GetMaxEntities() const {
 	return maxEntities;
 }
 

@@ -84,6 +84,18 @@
     },
 
     {
+        "ID" : "RandomNoise",
+        "Type" : "Texture",
+        "Filename" : "textures/noise.png"
+    },
+
+    {
+        "ID" : "Perlin",
+        "Type" : "Texture",
+        "Filename" : "textures/perlin_noise_seamless.png"
+    },
+
+    {
         "ID" : "StandardVertex",
         "Type" : "Shader",
         "Stage" : "Vertex",
@@ -133,6 +145,42 @@
     },
 
     {
+        "ID" : "UIVertex",
+        "Type" : "Shader",
+        "Stage" : "Vertex",
+        "Filename" : "UIVertex.cso"
+    },
+
+    {
+        "ID" : "UIPixel",
+        "Type" : "Shader",
+        "Stage" : "Pixel",
+        "Filename" : "UIPixel.cso"
+    },
+
+    {
+        "ID" : "UIMaterial",
+        "Type" : "Material",
+        "VertexShader" : "UIVertex",
+        "PixelShader" : "UIPixel",
+        "Textures" : [ { "Key" : "buttonTexture", "TextureName" : "Diffuse" } ]
+    },
+
+    {
+        "ID" : "AsteroidVertex",
+        "Type" : "Shader",
+        "Stage" : "Vertex",
+        "Filename" : "AsteroidVertexShader.cso"
+    },
+
+    {
+        "ID" : "AsteroidPixel",
+        "Type" : "Shader",
+        "Stage" : "Pixel",
+        "Filename" : "AsteroidPixelShader.cso"
+    },
+
+    {
         "ID" : "default",
         "Type" : "Material",
         "VertexShader" : "StandardVertex",
@@ -154,15 +202,30 @@
             { "Key" : "shipSpecMap", "TextureName" : "Ship_Spec" }
         ]
     },
-	
-	{
-        "ID" : "collider",
+
+    {
+        "ID" : "SpaceAge48",
+        "Type" : "SpriteFont",
+        "Filename" : "fonts/space_48.fnt"
+    },
+
+    {
+        "ID" : "SpaceAge54",
+        "Type" : "SpriteFont",
+        "Filename" : "fonts/space_54.fnt"
+    },
+
+    {
+        "ID" : "asteroid",
         "Type" : "Material",
-        "VertexShader" : "StandardVertex",
-        "PixelShader" : "ColliderPixel",
+        "VertexShader" : "AsteroidVertex",
+        "PixelShader" : "AsteroidPixel",
         "Textures" : [ 
-            { "Key" : "loamTexture", "TextureName" : "Loam" },
-            { "Key" : "rockTexture", "TextureName" : "Rock" }
+            { "Key" : "diffuseTexture", "TextureName" : "Diffuse" },
+            { "Key" : "rustTexture", "TextureName" : "Rust" },
+            { "Key" : "specMapTexture", "TextureName" : "Rust_Spec" },
+            { "Key" : "noiseTexture", "TextureName" : "RandomNoise" },
+            { "Key" : "perlinTexture", "TextureName" : "Perlin" }
         ]
     }
 ]
