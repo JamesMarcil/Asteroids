@@ -54,7 +54,7 @@ SkyboxSystem::SkyboxSystem()
 
 SkyboxSystem::~SkyboxSystem(void)
 {
-    /* Nothing to do. */
+	m_pEvent->UnRegister("WarpBegin", this);
 }
 
 void SkyboxSystem::EventRouter(const std::string& name, void* data)
