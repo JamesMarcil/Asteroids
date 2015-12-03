@@ -50,10 +50,6 @@ void GameState::Enter(void)
 		camMan->RegisterCamera<Camera>("Main Camera", 0.0f, 0.0f, -5.0f);
 		camMan->SetActiveCamera("Main Camera");
 
-        // Parse "resources.json" for any resources.
-        ResourceManager* pManager = ResourceManager::Instance();
-		pManager->ParseJSONFile("json/resources.json");
-
 		this->LoadCurrentLevel();
 		EventManager* pEventManager = EventManager::Instance();
 		pEventManager->Register("WarpEnd", this);
