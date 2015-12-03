@@ -213,6 +213,9 @@
     <ClInclude Include="..\include\EntityFactory.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\StaticCamera.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ExitState.cpp">
@@ -303,6 +306,9 @@
       <Filter>Source Files\Systems</Filter>
     </ClCompile>
     <ClCompile Include="..\src\EntityFactory.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\StaticCamera.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
   </ItemGroup>

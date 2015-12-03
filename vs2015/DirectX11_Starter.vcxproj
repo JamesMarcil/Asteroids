@@ -125,6 +125,7 @@
     <ClInclude Include="..\include\Singleton.h" />
     <ClInclude Include="..\include\SkyboxSystem.h" />
     <ClInclude Include="..\include\StateMachine.h" />
+    <ClInclude Include="..\include\StaticCamera.h" />
     <ClInclude Include="..\include\SwapSystem.h" />
     <ClInclude Include="..\include\System.h" />
     <ClInclude Include="..\include\Transform.h" />
@@ -163,6 +164,7 @@
     <ClCompile Include="..\src\ResourceManager.cpp" />
     <ClCompile Include="..\src\SimpleShader.cpp" />
     <ClCompile Include="..\src\SkyboxSystem.cpp" />
+    <ClCompile Include="..\src\StaticCamera.cpp" />
     <ClCompile Include="..\src\SwapSystem.cpp" />
     <ClCompile Include="..\src\System.cpp" />
     <ClCompile Include="..\src\Transform.cpp" />
