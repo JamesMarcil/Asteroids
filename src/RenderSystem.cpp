@@ -24,6 +24,7 @@
 
 // Collisions
 #include <Octant.h>
+#include "AsteroidRenderComponent.h"
 
 using namespace DirectX;
 
@@ -158,6 +159,11 @@ void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
         // Update "PerObject" Constant Buffer.
         Transform& t = pTransform->transform;
         pVertexShader->SetMatrix4x4("world", t.GetWorldMatrix());
+		if (pManager->HasComponent<AsteroidRenderComponent>(entity)) {
+			AsteroidRenderComponent* asteroid = pManager->GetComponent<AsteroidRenderComponent>(entity);
+			pVertexShader->SetInt("id", asteroid->randomID);
+		}
+
         pVertexShader->CopyBufferData("PerObject");
 
         // Set the Shaders but do not copy buffers, this has been done already.

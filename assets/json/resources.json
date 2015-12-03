@@ -84,6 +84,18 @@
     },
 
     {
+        "ID" : "RandomNoise",
+        "Type" : "Texture",
+        "Filename" : "textures/noise.png"
+    },
+
+    {
+        "ID" : "Perlin",
+        "Type" : "Texture",
+        "Filename" : "textures/perlin_noise_seamless.png"
+    },
+
+    {
         "ID" : "StandardVertex",
         "Type" : "Shader",
         "Stage" : "Vertex",
@@ -133,6 +145,20 @@
     },
 
     {
+        "ID" : "AsteroidVertex",
+        "Type" : "Shader",
+        "Stage" : "Vertex",
+        "Filename" : "AsteroidVertexShader.cso"
+    },
+
+    {
+        "ID" : "AsteroidPixel",
+        "Type" : "Shader",
+        "Stage" : "Pixel",
+        "Filename" : "AsteroidPixelShader.cso"
+    },
+
+    {
         "ID" : "default",
         "Type" : "Material",
         "VertexShader" : "StandardVertex",
@@ -154,8 +180,7 @@
             { "Key" : "shipSpecMap", "TextureName" : "Ship_Spec" }
         ]
     },
-	
-	{
+    {
         "ID" : "collider",
         "Type" : "Material",
         "VertexShader" : "StandardVertex",
@@ -163,6 +188,19 @@
         "Textures" : [ 
             { "Key" : "loamTexture", "TextureName" : "Loam" },
             { "Key" : "rockTexture", "TextureName" : "Rock" }
+        ]
+    },
+    {
+        "ID" : "asteroid",
+        "Type" : "Material",
+        "VertexShader" : "AsteroidVertex",
+        "PixelShader" : "AsteroidPixel",
+        "Textures" : [ 
+            { "Key" : "diffuseTexture", "TextureName" : "Diffuse" },
+            { "Key" : "rustTexture", "TextureName" : "Rust" },
+            { "Key" : "specMapTexture", "TextureName" : "Rust_Spec" },
+            { "Key" : "noiseTexture", "TextureName" : "RandomNoise" },
+            { "Key" : "perlinTexture", "TextureName" : "Perlin" }
         ]
     }
 ]

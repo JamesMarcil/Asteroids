@@ -21,6 +21,7 @@
 // Components
 #include "TransformComponent.h"
 #include "RenderComponent.h"
+#include "AsteroidRenderComponent.h"
 #include "PhysicsComponent.h"
 #include "InputComponent.h"
 #include "LightComponent.h"
@@ -101,7 +102,7 @@ void GameState::Enter( void )
         pEntity->AddComponent<InputComponent>(player, 50.0f);
 		pEntity->AddComponent<CollisionComponent>(player, *pManager->GetMesh("Ship"), XMFLOAT3(0, 0, 0), 0.0007f);
 		pEntity->AddComponent<AttackComponent>(player, 5.0f);
-		TransformComponent* pTrans = pEntity->AddComponent<TransformComponent>(player, XMFLOAT3(0, 0, 1));
+		TransformComponent* pTrans = pEntity->AddComponent<TransformComponent>(player, XMFLOAT3(0, 0, 0));
 		pTrans->transform.SetScale(.001f);
 		PhysicsComponent* pPhysics = pEntity->AddComponent<PhysicsComponent>(player, XMVectorZero(), XMVectorSet(0, 0, 0, 0));
 		pPhysics->drag = 0.95f;
@@ -121,22 +122,29 @@ void GameState::LoadCurrentLevel()
 	EntityManager* pEntity = EntityManager::Instance();
 	ResourceManager* pManager = ResourceManager::Instance();
 
-	Material* defaultMat = pManager->GetMaterial("default");
+	Material* asteroidMat = pManager->GetMaterial("asteroid");
 
-	srand(time(0));
-	int span = 2;
+	srand(static_cast<std::time_t>(0));
+	int span = 10;
 	int toAdd = 30 + currentLevel * 5;
 	this->asteroids = toAdd;
 	for (int i = 0; i < toAdd; ++i)
 	{
 		GameEntity e = pEntity->Create("Asteroid");
-		XMFLOAT3 position = XMFLOAT3(rand() % (span * 2) - span, rand() % (span * 2) - span, i * 5 + 15);
-		pEntity->AddComponent<TransformComponent>(e, position);
-		pEntity->AddComponent<RenderComponent>(e, defaultMat, pManager->GetMesh("Sphere"));
-		pEntity->AddComponent<PhysicsComponent>(e, XMVectorZero(), XMVectorSet(0.0f, 0.0f, -1.0f + currentLevel*-2.0f, 0.0f));
+
+		float scale = 1 + rand()*0.0001f;
+
+		XMFLOAT3 position = XMFLOAT3(static_cast<float>(rand()*rand() % (span * 2) - span), static_cast<float>(rand()*rand() % (span * 2) - span), i * 5.0f + 155.0f);
+		TransformComponent* transform = pEntity->AddComponent<TransformComponent>(e, position);
+		transform->transform.SetRotation(XMFLOAT3(rand() * 3.0f, rand() * 3.0f, rand() * 3.0f));
+		transform->transform.SetScale(scale);
+		pEntity->AddComponent<RenderComponent>(e, asteroidMat, pManager->GetMesh("Sphere"));
+		pEntity->AddComponent<AsteroidRenderComponent>(e, i+1);
+		PhysicsComponent* phys = pEntity->AddComponent<PhysicsComponent>(e, XMVectorZero(), XMVectorSet(0.0f, 0.0f, -1.0f + currentLevel*-2.0f, 0.0f));
+		phys->velocity.z = -15.0f - (rand() % 15);
 		ScriptComponent* script = pEntity->AddComponent<ScriptComponent>(e);
 		script->AddScript<AutoDestructScript>(-5.0f);
-		pEntity->AddComponent<CollisionComponent>(e, 0.55f, position);
+		pEntity->AddComponent<CollisionComponent>(e, 0.55f*scale, position);
 	}
 }
 
@@ -153,7 +161,7 @@ void GameState::EventRouter(const std::string& name, void* data)
     {
 		asteroids--;
 		if (asteroids <= 0) {
-			EventManager::Instance()->Fire("WarpEnd", nullptr); //TODO change to WarpStart
+			EventManager::Instance()->Fire("WarpBegin", nullptr); //TODO change to WarpStart
 		}
 	}
 }
