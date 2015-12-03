@@ -45,12 +45,12 @@ VertexToPixel main(VertexShaderInput input)
 
 	uint2 samplePos;
 	float randnum = rand(id);
-	samplePos.x = (int)((input.uv.x / 2.0f + 1.0f + randnum) * 512) % 512;
-	samplePos.y = (int)((input.uv.y / 2.0f + 1.0f + randnum) * 512) % 512;
+	samplePos.x = (uint)((input.uv.x / 2.0f + 1.0f + randnum) * 512) % 512;
+	samplePos.y = (uint)((input.uv.y / 2.0f + 1.0f + randnum) * 512) % 512;
 	//float smallNoiseChange = perlinSmallTexture[input.uv + tempWorldPos.xy].r;
 	float noiseChange = perlinTexture[samplePos].r;
 	input.position += input.normal * (noiseChange * 0.5f);
-	output.noise = mul(float2((float)samplePos.x/512, (float)samplePos.y/512), (float3x3)world);
+	output.noise = mul(float3((float)samplePos.x/512, (float)samplePos.y/512, 0.0f), (float3x3)world).xy;
 
     // Calculate output position
     matrix worldViewProj = mul(mul(world, view), projection);
