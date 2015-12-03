@@ -166,7 +166,9 @@ public:
     }
 
     /*
-     * TODO
+     * Register a DirectX::Spritefont with the ResourceManager.
+     * @param   id          The id to store the DirectX::SpriteFont at.
+     * @param   filename    The name of the file containing the SpriteFont.
      */
     bool RegisterSpriteFont(const std::string& id, const std::wstring& filename);
 

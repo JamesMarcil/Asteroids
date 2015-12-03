@@ -35,12 +35,12 @@ private:
     DirectX::SpriteBatch* spriteBatch;
 public:
     /*
-     * TODO
+     * Construct an instance of the UIRenderSystem.
      */
 	UIRenderSystem(void);
 
     /*
-     * TODO
+     * Destruct the UIRenderSystem instance.
      */
 	virtual ~UIRenderSystem(void) override;
 

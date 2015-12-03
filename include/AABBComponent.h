@@ -14,7 +14,9 @@ struct AABBComponent : public Component<AABBComponent>
     AABB boundingBox;
 
     /*
-     * TODO
+     * Construct an instance of the AABB component.
+     * @param   min     The upper-left point of the AABB.
+     * @param   max     The lower-right point of the AABB.
      */
     AABBComponent(DirectX::XMFLOAT2 min, DirectX::XMFLOAT2 max)
         : boundingBox(min, max)
@@ -23,7 +25,10 @@ struct AABBComponent : public Component<AABBComponent>
     }
 
     /*
-     * TODO
+     * Construct an instance of the AABB component.
+     * @param   center      THe center point of the AABB.
+     * @param   halfWidth   Half the width of the AABB.
+     * @param   halfHeight  Half the height of the AABB.
      */
     AABBComponent(DirectX::XMFLOAT2 center, float halfWidth, float halfHeight)
         : boundingBox(center, halfWidth, halfHeight)

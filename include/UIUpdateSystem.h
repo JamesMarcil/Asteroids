@@ -15,12 +15,12 @@ private:
 
 public:
     /*
-     * TODO
+     * Construct an instance of the UIUpdateSystem.
      */
     UIUpdateSystem(void);
 
     /*
-     * TODO
+     * Destruct the UIUpdateSystem instance.
      */
     virtual ~UIUpdateSystem(void) override;
 

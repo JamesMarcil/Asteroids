@@ -3,7 +3,9 @@
 using namespace DirectX;
 
 /*
- * TODO
+ * Construct an instance of an Axis-Aligned Bounding Box.
+ * @param   min     The upper-left point.
+ * @param   max     The lower-right point.
  */
 AABB::AABB(DirectX::XMFLOAT2 min, DirectX::XMFLOAT2 max)
     : min(min), max(max)
@@ -12,7 +14,10 @@ AABB::AABB(DirectX::XMFLOAT2 min, DirectX::XMFLOAT2 max)
 }
 
 /*
- * TODO
+ * Construct an instance of an Axis-Aligned Bounding Box.
+ * @param   center      The center point.
+ * @param   halfWidth   Half the width of the AABB.
+ * @param   halfHeight  Half the height of the AABB.
  */
 AABB::AABB(DirectX::XMFLOAT2 center, float halfWidth, float halfHeight)
 {
@@ -21,7 +26,9 @@ AABB::AABB(DirectX::XMFLOAT2 center, float halfWidth, float halfHeight)
 }
 
 /*
- * TODO
+ * Performs a test to see if two AABB's are intersecting.
+ * @param   rhs     The AABB to test against.
+ * @returns A boolean indicating if the two AABB's intersect.
  */
 bool AABB::IntersectsWith(const AABB& rhs)
 {
@@ -34,7 +41,9 @@ bool AABB::IntersectsWith(const AABB& rhs)
 }
 
 /*
- * TODO
+ * Performs a test to see if a point is contained within an AABB.
+ * @param   point   The point to test against.
+ * @returns A boolean indicating if the point is within the AABB.
  */
 bool AABB::ContainsPoint(const DirectX::XMFLOAT2& point)
 {

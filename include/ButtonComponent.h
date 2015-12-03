@@ -13,7 +13,9 @@ struct ButtonComponent : public Component<ButtonComponent>
     std::string event;
 
     /*
-     * TODO
+     * Construct an instance of the ButtonComponent.
+     * @param   isEnabled   Boolean indicating if the button is enabled.
+     * @param   event       The event to fire when clicked.
      */
     ButtonComponent(bool isEnabled, std::string event)
         : isEnabled(isEnabled), event(event)
