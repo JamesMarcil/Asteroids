@@ -32,8 +32,8 @@ void InputControllerSystem::Update(EntityManager* pManager, float dt, float tt)
 
 	if (m_pCamera->IsDebugActive()) return; //Don't overlap controls
 
-	float horiz = (m_pInput->IsKeyDown('A') ? -1 : 0) + (m_pInput->IsKeyDown('D') ? 1 : 0);
-	float vert = (m_pInput->IsKeyDown('S') ? -1 : 0) + (m_pInput->IsKeyDown('W') ? 1 : 0);
+	float horiz = static_cast<float>((m_pInput->IsKeyDown('A') ? -1 : 0) + (m_pInput->IsKeyDown('D') ? 1 : 0));
+	float vert = static_cast<float>((m_pInput->IsKeyDown('S') ? -1 : 0) + (m_pInput->IsKeyDown('W') ? 1 : 0));
 
 	float playableWidth = 5;
 	float playableHeight = 4;
