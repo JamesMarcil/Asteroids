@@ -21,6 +21,7 @@ private:
     EntityFactory& operator=(EntityFactory&& rhs) = delete;
 
 public:
+    static GameEntity CreateTextField(std::wstring text, std::string spritefont_id, DirectX::XMFLOAT2 position, DirectX::XMFLOAT4 color);
     static GameEntity CreateButton(DirectX::XMFLOAT2 center, float width, float height, std::string material_id);
     static GameEntity CreateAsteroid(DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 velocity, DirectX::XMFLOAT3 acceleration);
     static GameEntity CreatePlayer(DirectX::XMFLOAT3 position);
