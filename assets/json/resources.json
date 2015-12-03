@@ -178,8 +178,14 @@
     },
 
     {
-        "ID" : "TimesNewRoman",
+        "ID" : "SpaceAge48",
         "Type" : "SpriteFont",
-        "Filename" : "fonts/test.fnt"
+        "Filename" : "fonts/space_48.fnt"
+    },
+
+    {
+        "ID" : "SpaceAge54",
+        "Type" : "SpriteFont",
+        "Filename" : "fonts/space_54.fnt"
     }
 ]
