@@ -6,7 +6,8 @@
 class PhysicsSystem : public System<PhysicsSystem>
 {
 private:
-	bool paused = false;
+	bool paused{false};
+
 public:
     virtual ~PhysicsSystem(void){}
 
