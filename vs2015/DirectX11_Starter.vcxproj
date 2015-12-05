@@ -87,16 +87,23 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\AABB.h" />
+    <ClInclude Include="..\include\AABBComponent.h" />
+    <ClInclude Include="..\include\ButtonComponent.h" />
+    <ClInclude Include="..\include\AttackComponent.h" />
+    <ClInclude Include="..\include\AttackSystem.h" />
     <ClInclude Include="..\include\Camera.h" />
     <ClInclude Include="..\include\CameraManager.h" />
     <ClInclude Include="..\include\ClearSystem.h" />
     <ClInclude Include="..\include\CollisionComponent.h" />
     <ClInclude Include="..\include\CollisionSphere.h" />
+    <ClInclude Include="..\include\CollisionSystem.h" />
     <ClInclude Include="..\include\Component.h" />
     <ClInclude Include="..\include\DebugCamera.h" />
     <ClInclude Include="..\include\DirectXGameCore.h" />
     <ClInclude Include="..\include\dxerr.h" />
     <ClInclude Include="..\include\DXMacros.h" />
+    <ClInclude Include="..\include\EntityFactory.h" />
     <ClInclude Include="..\include\EntityManager.h" />
     <ClInclude Include="..\include\EventManager.h" />
     <ClInclude Include="..\include\ExitState.h" />
@@ -108,12 +115,15 @@
     <ClInclude Include="..\include\ImageEffect.h" />
     <ClInclude Include="..\include\InputComponent.h" />
     <ClInclude Include="..\include\InputManager.h" />
+    <ClInclude Include="..\include\IScript.h" />
     <ClInclude Include="..\include\json.h" />
     <ClInclude Include="..\include\LightComponent.h" />
     <ClInclude Include="..\include\Material.h" />
     <ClInclude Include="..\include\MenuState.h" />
     <ClInclude Include="..\include\Mesh.h" />
     <ClInclude Include="..\include\NoEffect.h" />
+    <ClInclude Include="..\include\Octant.h" />
+    <ClInclude Include="..\include\OctTree.h" />
     <ClInclude Include="..\include\PhysicsComponent.h" />
     <ClInclude Include="..\include\PhysicsSystem.h" />
     <ClInclude Include="..\include\PostEffectsSystem.h" />
@@ -124,11 +134,15 @@
     <ClInclude Include="..\include\Singleton.h" />
     <ClInclude Include="..\include\SkyboxSystem.h" />
     <ClInclude Include="..\include\StateMachine.h" />
+    <ClInclude Include="..\include\StaticCamera.h" />
     <ClInclude Include="..\include\SwapSystem.h" />
     <ClInclude Include="..\include\System.h" />
     <ClInclude Include="..\include\Transform.h" />
     <ClInclude Include="..\include\TransformComponent.h" />
     <ClInclude Include="..\include\Tweens.h" />
+    <ClInclude Include="..\include\UIRenderComponent.h" />
+    <ClInclude Include="..\include\UIRenderSystem.h" />
+    <ClInclude Include="..\include\UIUpdateSystem.h" />
     <ClInclude Include="..\include\Vertex.h" />
     <ClInclude Include="..\include\InputControllerSystem.h" />
     <ClInclude Include="..\include\ScriptComponent.h" />
@@ -136,16 +150,21 @@
     <ClInclude Include="..\include\ScriptSystem.h" />
     <ClInclude Include="..\include\Script.h" />
     <ClInclude Include="..\include\Warp.h" />
+    <ClInclude Include="..\include\AsteroidRenderComponent.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\AABB.cpp" />
+    <ClCompile Include="..\src\AttackSystem.cpp" />
     <ClCompile Include="..\src\Camera.cpp" />
     <ClCompile Include="..\src\CameraManager.cpp" />
     <ClCompile Include="..\src\ClearSystem.cpp" />
     <ClCompile Include="..\src\CollisionSphere.cpp" />
+    <ClCompile Include="..\src\CollisionSystem.cpp" />
     <ClCompile Include="..\src\Component.cpp" />
     <ClCompile Include="..\src\DebugCamera.cpp" />
     <ClCompile Include="..\src\DirectXGameCore.cpp" />
     <ClCompile Include="..\src\dxerr.cpp" />
+    <ClCompile Include="..\src\EntityFactory.cpp" />
     <ClCompile Include="..\src\EventManager.cpp" />
     <ClCompile Include="..\src\ExitState.cpp" />
     <ClCompile Include="..\src\GameState.cpp" />
@@ -155,18 +174,22 @@
     <ClCompile Include="..\src\MenuState.cpp" />
     <ClCompile Include="..\src\Mesh.cpp" />
     <ClCompile Include="..\src\NoEffect.cpp" />
+    <ClCompile Include="..\src\OctTree.cpp" />
     <ClCompile Include="..\src\PhysicsSystem.cpp" />
     <ClCompile Include="..\src\PostEffectsSystem.cpp" />
     <ClCompile Include="..\src\RenderSystem.cpp" />
     <ClCompile Include="..\src\ResourceManager.cpp" />
     <ClCompile Include="..\src\SimpleShader.cpp" />
     <ClCompile Include="..\src\SkyboxSystem.cpp" />
+    <ClCompile Include="..\src\StaticCamera.cpp" />
     <ClCompile Include="..\src\SwapSystem.cpp" />
     <ClCompile Include="..\src\System.cpp" />
     <ClCompile Include="..\src\Transform.cpp" />
     <ClCompile Include="..\src\InputControllerSystem.cpp" />
     <ClCompile Include="..\src\ScriptSystem.cpp" />
     <ClCompile Include="..\src\Warp.cpp" />
+    <ClCompile Include="..\src\UIRenderSystem.cpp" />
+    <ClCompile Include="..\src\UIUpdateSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\shaders\BlurPS.hlsl">
@@ -229,10 +252,35 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
     </FxCompile>
+    <FxCompile Include="..\shaders\UIPixel.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="..\shaders\UIVertex.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <DisableOptimizations Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DisableOptimizations>
+    </FxCompile>
     <FxCompile Include="..\shaders\VertexShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="..\shaders\AsteroidVertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="..\shaders\AsteroidPixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
     </FxCompile>
   </ItemGroup>

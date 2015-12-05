@@ -12,6 +12,7 @@
 
 // Forward Declarations
 class ResourceManager;
+class EventManager;
 
 class SkyboxSystem : public System<SkyboxSystem>, public IEventListener
 {
@@ -22,6 +23,7 @@ public:
 	virtual void EventRouter(const std::string& name, void* data) override;
 private:
 	ResourceManager* m_pResource;
+    EventManager* m_pEvent;
 	std::string textureNames[3];
 	int currentTexture;
 	bool warping;

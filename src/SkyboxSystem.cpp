@@ -18,7 +18,8 @@ using namespace DirectX;
 
 SkyboxSystem::SkyboxSystem()
 {
-	EventManager::Instance()->Register("WarpBegin", this);
+    m_pEvent = EventManager::Instance();
+	m_pEvent->Register("WarpBegin", this);
 	textureNames[0] = "GreenSpace";
 	textureNames[1] = "PurpleSpace";
 	textureNames[2] = "Space";
@@ -53,7 +54,7 @@ SkyboxSystem::SkyboxSystem()
 
 SkyboxSystem::~SkyboxSystem(void)
 {
-    /* Nothing to do. */
+	m_pEvent->UnRegister("WarpBegin", this);
 }
 
 void SkyboxSystem::EventRouter(const std::string& name, void* data)
@@ -70,7 +71,7 @@ void SkyboxSystem::EventRouter(const std::string& name, void* data)
 
 void SkyboxSystem::Update(EntityManager* pManager, float dt, float tt)
 {
-	if (InputManager::Instance()->IsKeyDown('L') && !warping) EventManager::Instance()->Fire("WarpBegin", nullptr);
+	//if (InputManager::Instance()->IsKeyDown('L') && !warping) EventManager::Instance()->Fire("WarpBegin", nullptr);
 
 	int lastTexture = currentTexture - 1 < 0 ? 2 : currentTexture - 1;
 
@@ -90,6 +91,7 @@ void SkyboxSystem::Update(EntityManager* pManager, float dt, float tt)
 		{
 			warping = false;
 			lerpT = 1;
+            m_pEvent->Fire("WarpEnd", nullptr);
 		}
 		else
 		{

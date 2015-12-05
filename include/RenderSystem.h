@@ -19,6 +19,9 @@ public:
 
     /* System interface. */
     virtual void Update(EntityManager* pManager, float dt, float tt ) override;
+
+	void RenderCollisionSpheres(EntityManager* pManager);
+	void RenderOctants(EntityManager* pManager);
 };
 
 #endif

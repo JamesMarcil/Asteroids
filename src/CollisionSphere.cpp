@@ -1,66 +1,71 @@
 #include "CollisionSphere.h"
 
-CollisionSphere::CollisionSphere() {
-}
-
-CollisionSphere::CollisionSphere(Mesh& m, DirectX::XMFLOAT3& p, float scale) {
-	position = p;
-	radius = 0;
-	isColliding = false;
-
-	float distance;
+CollisionSphere::CollisionSphere(Mesh& m, DirectX::XMFLOAT3& p, float scale)
+    : position(p), radius(0), isColliding(false)
+{
+	// Loop through vertices to find farthest from centroid
 	DirectX::XMFLOAT3 current;
 	DirectX::XMVECTOR container;
-
-	// Loop through vertices to find farthest from centroid
-	for (int i = 0; i < m.GetVertexCount(); i += 100) {
+	for (int i = 0; i < m.GetVertexCount(); i += 100)
+    {
 		current = m.GetVertices()[i].Position;
 		container = DirectX::XMLoadFloat3(&current);
 		DirectX::XMVectorScale(container, scale);
 		container = DirectX::XMVector3Length(container);
 		XMStoreFloat3(&current, container); // Stores magnitude in each index
 
-		if (current.x > radius) {
+		if (current.x > radius)
+        {
 			radius = current.x;
 		}
 	}
+
+	radius *= scale;
 }
 
-CollisionSphere::CollisionSphere(float r, DirectX::XMFLOAT3& p) {
-	position = p;
-	radius = r;
-	isColliding = false;
+CollisionSphere::CollisionSphere(float r, DirectX::XMFLOAT3& p)
+    : position(p), radius(r), isColliding(false)
+{
 }
 
-DirectX::XMFLOAT3 CollisionSphere::GetPosition() {
+#pragma region Getters
+
+DirectX::XMFLOAT3 CollisionSphere::GetPosition(void) const
+{
 	return position;
 }
 
-float CollisionSphere::GetRadius() {
+float CollisionSphere::GetRadius(void) const
+{
 	return radius;
 }
 
-bool CollisionSphere::IsColliding() {
+bool CollisionSphere::GetIsColliding(void) const
+{
 	return isColliding;
 }
 
-void CollisionSphere::IsColliding(bool val) {
-	isColliding = val;
+#pragma endregion
+
+#pragma region Setters
+bool CollisionSphere::IsColliding(bool val)
+{
+	return isColliding = val;
 }
 
-void CollisionSphere::SetPosition(DirectX::XMFLOAT3& p) {
-	position = p;
+DirectX::XMFLOAT3 CollisionSphere::SetPosition(DirectX::XMFLOAT3& p)
+{
+	return position = p;
 }
+#pragma endregion
 
-bool CollisionSphere::CollidesWith(CollisionSphere& other) {
-	float xDiff = position.x - other.GetPosition().x;
-	float yDiff = position.y - other.GetPosition().y;
-	float zDiff = position.z - other.GetPosition().z;
+bool CollisionSphere::CollidesWith(CollisionSphere& other)
+{
+    DirectX::XMFLOAT3 otherPos = other.GetPosition();
+	float xDiff = position.x - otherPos.x;
+	float yDiff = position.y - otherPos.y;
+	float zDiff = position.z - otherPos.z;
 	float distance = sqrtf(xDiff * xDiff + yDiff * yDiff + zDiff * zDiff);
 
-	if (distance < radius + other.GetRadius())
-	{
-		return true;
-	}
-	return false;
+    return (distance < radius + other.GetRadius());
 }

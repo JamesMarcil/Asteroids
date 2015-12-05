@@ -10,10 +10,14 @@
 #include <cstdint>
 #include <vector>
 #include <bitset>
+#include <iostream>
 #include <algorithm>
 #include <utility>
 #include <iterator>
 #include <type_traits>
+
+// Collisions
+#include <Octant.h>
 
 using ComponentMask = std::bitset<ComponentBase::MAX_COMPONENTS>;   // Bitset used to determine which Components are attached to a GameEntity, indexed via Component ID.
 using ComponentPool = std::vector<ComponentBase*>;                  // Pool of Component<T> for a particular T, indexed via GameEntity ID.
@@ -28,6 +32,7 @@ private:
     std::vector<std::uint32_t>  m_entityIDs;                        // Vector containing all available GameEntity IDs.
     std::vector<ComponentMask>  m_entityMasks;                      // Vector containing the ComponentMask for each GameEntity, indexed via GameEntity ID.
     std::vector<ComponentPool>  m_entityComponents;                 // Vector containing the ComponentPools for each Component<T>, indexed via Component ID.
+	std::vector<Octant>			m_octants;							// Vector containing all of the Octants present in the current frames partitioned space
 
     // Simple object used to sort Systems by their priority.
     struct SystemPriority
@@ -157,17 +162,37 @@ public:
         m_markedForDestruction.clear();
         m_entityIDs.clear();
         m_entityMasks.clear();
+
         m_entityComponents.clear();
+        m_entityComponents.resize(ComponentBase::MAX_COMPONENTS);
 
         // Reset to ENTITY_COUNT GameEntities.
         Resize();
     }
 
     /*
+     * Destroy all currently attached systems.
+     */
+    void ClearSystems(void)
+    {
+        for(auto& system : m_systemPool)
+        {
+            if(system)
+            {
+                delete system;
+            }
+        }
+        m_systemPool.clear();
+        m_systemPool.resize(SystemBase::MAX_SYSTEMS);
+        m_systemPriorities.clear();
+        m_attachedSystems.reset();
+    }
+
+    /*
      * This method allocates a new GameEntity.
      * @return A reference to the newly allocated GameEntity.
      */
-    GameEntity Create(void)
+    GameEntity Create(char* t)
     {
         // If there are no unused IDs, create more
         if(m_entityIDs.empty())
@@ -182,9 +207,9 @@ public:
         m_entityIDs.pop_back();
 
         // Construct a GameEntity at the indicated ID.
-        m_entities[entity_id - 1] = GameEntity(entity_id);
+        m_entities[entity_id - 1] = GameEntity(entity_id, t);
 
-        return GameEntity(entity_id);
+        return GameEntity(entity_id, t);
     }
 
     /*
@@ -201,7 +226,7 @@ public:
             return false;
         }
 
-        m_markedForDestruction.emplace_back(entity_id);
+        m_markedForDestruction.push_back(e);
 
         return true;
     }
@@ -573,6 +598,9 @@ public:
      */
     void Update(float dt, float tt)
     {
+		// Clear old Octants
+		m_octants.clear();
+
         // Sort based on System priority.
         std::stable_sort
         (
@@ -619,5 +647,13 @@ public:
     }
 #pragma endregion
 
+
+	std::vector<Octant> Octants() {
+		return m_octants;
+	}
+
+	void AddOctant(Octant o) {
+		m_octants.push_back(o);
+	}
 };
 #endif

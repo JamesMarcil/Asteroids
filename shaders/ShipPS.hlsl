@@ -20,7 +20,7 @@ cbuffer Lights : register(b1)
 	SpotLight spotLights[MAX_LIGHTS];
 };
 
-Texture2D shipTexture    : register(t0);
+Texture2D shipTexture		: register(t0);
 Texture2D shipSpecMap       : register(t1);
 SamplerState trilinear      : register(s0);
 

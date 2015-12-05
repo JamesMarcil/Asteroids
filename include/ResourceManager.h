@@ -12,6 +12,9 @@
 #include "SimpleShader.h"
 #include "Material.h"
 
+// DirectXTK
+#include <SpriteFont.h>
+
 // Singleton
 #include "Singleton.h"
 
@@ -29,7 +32,7 @@ private:
 	std::unordered_map<std::string, ID3D11DepthStencilState*> depthStencils;
 	std::unordered_map<std::string, Material*> materials;
 	std::unordered_map<std::string, ID3D11RenderTargetView*> renderTargetViews;
-
+	std::unordered_map<std::string, DirectX::SpriteFont*> spritefonts;
 
     ID3D11Device*           device;
     ID3D11DeviceContext*    deviceContext;
@@ -53,6 +56,7 @@ private:
     void ParseMesh(nlohmann::json obj, nlohmann::json parent);
     void ParseMaterial(nlohmann::json obj, nlohmann::json parent);
     void ParseShader(nlohmann::json obj, nlohmann::json parent);
+    void ParseSpriteFont(nlohmann::json obj, nlohmann::json parent);
 public:
     ResourceManager(void);
     virtual ~ResourceManager(void);
@@ -72,6 +76,7 @@ public:
 	ID3D11SamplerState*             GetSamplerState(const std::string& id);
     ID3D11RasterizerState*          GetRasterizerState(const std::string& id);
     ID3D11DepthStencilState*        GetDepthStencilState(const std::string& id);
+    DirectX::SpriteFont*            GetSpriteFont(const std::string& id);
     ID3D11Device*                   GetDevice() { return this->device; }
 	ID3D11DeviceContext*            GetDeviceContext() { return this->deviceContext; }
     //ID3D11RenderTargetView*         GetRenderTargetView() { return this->renderTargetView; }
@@ -177,6 +182,13 @@ public:
 
         return true;
     }
+
+    /*
+     * Register a DirectX::Spritefont with the ResourceManager.
+     * @param   id          The id to store the DirectX::SpriteFont at.
+     * @param   filename    The name of the file containing the SpriteFont.
+     */
+    bool RegisterSpriteFont(const std::string& id, const std::wstring& filename);
 
     /*
      * Register an ID3D11ShaderResourceView* with the ResourceManager.
