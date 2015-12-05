@@ -9,7 +9,7 @@ class ImageEffect
 public:
 	virtual ~ImageEffect(void) {}
 
-	virtual void RenderEffect(ID3D11ShaderResourceView* srv, ID3D11DeviceContext* pDeviceContext) = 0;
+	virtual void RenderEffect(ID3D11ShaderResourceView* srv, ID3D11DeviceContext* pDeviceContext, float dt, float tt) = 0;
 	virtual bool Enabled() { return enabled; }
 	virtual void Enabled(bool value) { enabled = value; }
 protected:

@@ -128,6 +128,7 @@
     <ClInclude Include="..\include\System.h" />
     <ClInclude Include="..\include\Transform.h" />
     <ClInclude Include="..\include\TransformComponent.h" />
+    <ClInclude Include="..\include\Tweens.h" />
     <ClInclude Include="..\include\Vertex.h" />
     <ClInclude Include="..\include\InputControllerSystem.h" />
     <ClInclude Include="..\include\ScriptComponent.h" />

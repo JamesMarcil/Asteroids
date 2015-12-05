@@ -1,7 +1,7 @@
-//cbuffer PerFrame : register(b0)
-//{
-//	float BlurWidth;
-//}
+cbuffer PerFrame : register(b0)
+{
+	float BlurWidth;
+}
 
 // Defines the input to this pixel shader
 // - Should match the output of our corresponding vertex shader
@@ -15,21 +15,16 @@ struct VertexToPixel
 Texture2D pixels		: register(t0);
 SamplerState trilinear	: register(s0);
 
-
-
 // Entry point for this pixel shader
 float4 main(VertexToPixel input) : SV_TARGET
 {
 
-	float2 Center = { 0.5, 0.5 }; ///center of the screen (could be any place)
+	float2 Center = { 0.5, 0.5 }; ///center of the screen
 	float BlurStart = 1.0f; /// blur offset
-	float BlurWidth = -0.3f;
 	int nsamples = 5;
 
-
-	//float2 dir = input.uv - Center;
 	input.uv -= Center;
-	//dir = normalize(dir);
+
 
 	float4 color = float4(0,0,0,0);
 
@@ -43,5 +38,4 @@ float4 main(VertexToPixel input) : SV_TARGET
 	color = saturate(color);
 
 	return color;
-	//return pixels.Sample(trilinear, input.uv + Center);
 }

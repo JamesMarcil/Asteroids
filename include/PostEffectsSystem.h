@@ -3,6 +3,8 @@
 
 #include "System.h"
 #include <vector>
+#include <unordered_map>
+#include <string>
 
 #include "IEventListener.h"
 
@@ -24,8 +26,12 @@ public:
 	void EnableEffect(Effect effect);
 	void SetEffectPriority(Effect effect, UINT priority);
 private:
-	std::vector<ImageEffect*> effects;
+	std::vector<ImageEffect*> effectsOrdered;
+	std::unordered_map<std::string, ImageEffect*> effectsMap;
 	NoEffect* noEffect;
+	float warpTime = 2;
+	float timeElapsed = 0;
+	bool warping = false;
 };
 
 

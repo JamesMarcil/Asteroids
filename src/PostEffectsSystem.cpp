@@ -85,7 +85,10 @@ PostEffectsSystem::PostEffectsSystem()
 
 #pragma endregion
 
-	effects.emplace_back(new Warp());
+	Warp* w = new Warp();
+	effectsOrdered.emplace_back(w);
+	effectsMap.emplace("Warp", w);
+
 	noEffect = new NoEffect();
 
 	EventManager::Instance()->Register("WarpBegin", this);
@@ -95,14 +98,20 @@ PostEffectsSystem::~PostEffectsSystem(void)
 {
 	delete noEffect;
 
-	for (std::vector<ImageEffect*>::iterator it = effects.begin(); it != effects.end(); ++it)
+	for (std::vector<ImageEffect*>::iterator it = effectsOrdered.begin(); it != effectsOrdered.end(); ++it)
 	{
 		delete (*it);
 	}
-	effects.clear();
+	effectsOrdered.clear();
+	effectsMap.clear();
 }
 
-// TODO: break this up so that we can apply multiple effects at will
+/*
+* Update Loop for the the effects system
+* @param   pManager           The Game's Resource Manager
+* @param   dt                 The time since last frame
+* @param   tt                 Total Time Elapsed
+*/
 void PostEffectsSystem::Update(EntityManager * pManager, float dt, float tt)
 {
 	ResourceManager* pResource = ResourceManager::Instance();
@@ -126,47 +135,46 @@ void PostEffectsSystem::Update(EntityManager * pManager, float dt, float tt)
 	pDeviceContext->IASetVertexBuffers(0, 1, &nothing, &stride, &offset);
 	pDeviceContext->IASetIndexBuffer(0, DXGI_FORMAT_R32_UINT, 0);
 
-	UINT alt = -1;
-	for (auto& effect : effects)
+	bool alt = false;
+	for (auto& effect : effectsOrdered)
 	{
-
-		alt++;
-		if (alt % 2 == 0)
+		if (effect->Enabled())
 		{
-			//use the next render target
-			pDeviceContext->OMSetRenderTargets(1, &swapRTV, dsv);
+			alt = !alt;
+			if (alt)
+			{
+				//use the next render target
+				pDeviceContext->OMSetRenderTargets(1, &swapRTV, 0);
 
-			//sample the last texture
-			effect->RenderEffect(ppSRV, pDeviceContext);
-		}
-		else
-		{
-			pDeviceContext->OMSetRenderTargets(1, &postRTV, dsv);
-			effect->RenderEffect(swapSRV, pDeviceContext);
+				//sample the last texture
+				effect->RenderEffect(ppSRV, pDeviceContext, dt, tt);
+			}
+			else
+			{
+				pDeviceContext->OMSetRenderTargets(1, &postRTV, 0);
+				effect->RenderEffect(swapSRV, pDeviceContext, dt, tt);
+			}
 		}
 	}
 
 	// switch back to rendering to the back buffer
-	pDeviceContext->OMSetRenderTargets(1, &mainRTV, dsv);
+	pDeviceContext->OMSetRenderTargets(1, &mainRTV, 0);
 
-	if (alt % 2 == 0)
+	if (alt)
 	{
-		noEffect->RenderEffect(swapSRV, pDeviceContext);
+		noEffect->RenderEffect(swapSRV, pDeviceContext, dt, tt);
 	}
 	else
 	{
-		noEffect->RenderEffect(ppSRV, pDeviceContext);
+		noEffect->RenderEffect(ppSRV, pDeviceContext, dt, tt);
 	}
 }
 
-float warpTime = 2;
-float timeElapsed = 0;
-bool warping = false;
 void PostEffectsSystem::EventRouter(const std::string & name, void * data)
 {
 	if (name == "WarpBegin")
 	{
-		CameraManager::Instance()->GetActiveCamera()->SetFOV(0.35f * XM_PI);
-		//warp->Enabled(true);
+		
+		effectsMap["Warp"]->Enabled(true);
 	}
 }

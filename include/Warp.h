@@ -8,8 +8,13 @@ class Warp : public ImageEffect
 public:
 	Warp();
 	virtual ~Warp(void);
-	virtual void RenderEffect(ID3D11ShaderResourceView* srv, ID3D11DeviceContext* pDeviceContext) override;
+	virtual void RenderEffect(ID3D11ShaderResourceView* srv, ID3D11DeviceContext* pDeviceContext, float dt, float tt) override;
+	virtual void Enabled(bool value) override;
 private:
-
+	float warpTime;
+	float timeElapsed;
+	float blurWidth;
+	float startFOV;
+	float endFOV;
 };
 #endif

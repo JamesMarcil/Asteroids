@@ -27,7 +27,8 @@ private:
 	bool warping;
 	float lerpT = 1;
 	float timeElapsed;
-	float warpTime = 2;
+	float warpTime = 6;
+	float delayedTimer;
 };
 
 #endif
