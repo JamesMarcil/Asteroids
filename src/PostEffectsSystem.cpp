@@ -24,6 +24,9 @@ PostEffectsSystem::PostEffectsSystem()
 	ID3D11RenderTargetView* ppRTV;
 	ID3D11ShaderResourceView* ppSRV;
 
+	ID3D11RenderTargetView* maskRTV;
+	ID3D11ShaderResourceView* maskSRV;
+
 	ID3D11RenderTargetView* swapRTV;
 	ID3D11ShaderResourceView* swapSRV;
 
@@ -50,6 +53,9 @@ PostEffectsSystem::PostEffectsSystem()
 	ID3D11Texture2D* swapTexture;
 	pManager->GetDevice()->CreateTexture2D(&textureDesc, 0, &swapTexture);
 
+	ID3D11Texture2D* maskTexture;
+	pManager->GetDevice()->CreateTexture2D(&textureDesc, 0, &maskTexture);
+
 	// Create the Render Target View
 	D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
 	ZeroMemory(&rtvDesc, sizeof(rtvDesc));
@@ -59,6 +65,7 @@ PostEffectsSystem::PostEffectsSystem()
 
 	pManager->GetDevice()->CreateRenderTargetView(ppTexture, &rtvDesc, &ppRTV);
 	pManager->GetDevice()->CreateRenderTargetView(swapTexture, &rtvDesc, &swapRTV);
+	pManager->GetDevice()->CreateRenderTargetView(maskTexture, &rtvDesc, &maskRTV);
 
 	// Create the Shader Resource View for the scene
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
@@ -70,18 +77,22 @@ PostEffectsSystem::PostEffectsSystem()
 
 	pManager->GetDevice()->CreateShaderResourceView(ppTexture, &srvDesc, &ppSRV);
 	pManager->GetDevice()->CreateShaderResourceView(swapTexture, &srvDesc, &swapSRV);
+	pManager->GetDevice()->CreateShaderResourceView(maskTexture, &srvDesc, &maskSRV);
 
 	// register the scene texture as our postEffectTexture
 	pManager->RegisterTexture("PostEffectTexture", ppSRV);
 	pManager->RegisterTexture("PostEffectSwapTexture", swapSRV);
+	pManager->RegisterTexture("MaskTexture", maskSRV);
 
 	// We can release the texture because the RenderTarget and Shader Resource View now handle it
 	ppTexture->Release();
 	swapTexture->Release();
+	maskTexture->Release();
 
 	// Register the post processing Render Targets
 	pManager->RegisterRenderTargetView("PostRTV", ppRTV);
 	pManager->RegisterRenderTargetView("PostSwapRTV", swapRTV);
+	pManager->RegisterRenderTargetView("MaskRTV", maskRTV);
 
 #pragma endregion
 
@@ -121,12 +132,14 @@ void PostEffectsSystem::Update(EntityManager * pManager, float dt, float tt)
 	ID3D11RenderTargetView* mainRTV = pResource->GetRenderTargetView("MainRTV");
 	ID3D11RenderTargetView* postRTV = pResource->GetRenderTargetView("PostRTV");
 	ID3D11RenderTargetView* swapRTV = pResource->GetRenderTargetView("PostSwapRTV");
+	ID3D11RenderTargetView* maskRTV = pResource->GetRenderTargetView("MaskRTV");
 
 	ID3D11DepthStencilView* dsv = pResource->GetDepthStencilView();
 
 	// Grab the Texture we rendered into
 	ID3D11ShaderResourceView* ppSRV = pResource->GetTexture("PostEffectTexture");
 	ID3D11ShaderResourceView* swapSRV = pResource->GetTexture("PostEffectSwapTexture");
+	ID3D11ShaderResourceView* maskSRV = pResource->GetTexture("MaskTexture");
 
 	// unbind the buffers and set up the "triangle" to draw onto
 	ID3D11Buffer* nothing = 0;

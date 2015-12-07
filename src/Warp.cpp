@@ -52,6 +52,8 @@ void Warp::RenderEffect(ID3D11ShaderResourceView * srv, ID3D11DeviceContext* pDe
 	// don't do anything if the effect isn't on
 	if (enabled)
 	{
+		ID3D11ShaderResourceView* maskSRV = ResourceManager::Instance()->GetTexture("MaskTexture");
+
 		float time0to1;
 		float blur, fov;
 
@@ -98,6 +100,7 @@ void Warp::RenderEffect(ID3D11ShaderResourceView * srv, ID3D11DeviceContext* pDe
 		ppVS->SetShader();
 
 		ppPS->SetShaderResourceView("pixels", srv);
+		ppPS->SetShaderResourceView("mask", maskSRV);
 		ppPS->SetSamplerState("trilinear", sampler);
 		ppPS->SetFloat("BlurWidth", blur);
 		ppPS->SetShader();

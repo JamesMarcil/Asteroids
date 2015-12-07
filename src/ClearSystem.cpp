@@ -26,6 +26,7 @@ void ClearSystem::Update(EntityManager* pManager, float dt, float tt)
     ID3D11DeviceContext* pDeviceContext = pResource->GetDeviceContext();
 	ID3D11RenderTargetView* pEffectRenderTarget = pResource->GetRenderTargetView("PostRTV");
 	ID3D11RenderTargetView* pEffectSwapRenderTarget = pResource->GetRenderTargetView("PostSwapRTV");
+	ID3D11RenderTargetView* pMaskRenderTarget = pResource->GetRenderTargetView("MaskRTV");
     ID3D11RenderTargetView* pMainRenderTarget = pResource->GetRenderTargetView("MainRTV");
     ID3D11DepthStencilView* pDepthStencilView = pResource->GetDepthStencilView();
 
@@ -38,6 +39,10 @@ void ClearSystem::Update(EntityManager* pManager, float dt, float tt)
 	if (pEffectSwapRenderTarget != nullptr)
 	{
 		pDeviceContext->ClearRenderTargetView(pEffectSwapRenderTarget, color);
+	}
+	if (pMaskRenderTarget != nullptr)
+	{
+		pDeviceContext->ClearRenderTargetView(pMaskRenderTarget, color);
 	}
 	pDeviceContext->ClearRenderTargetView(pMainRenderTarget, color);
     pDeviceContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);

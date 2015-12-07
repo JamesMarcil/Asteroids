@@ -24,8 +24,16 @@ Texture2D shipTexture		: register(t0);
 Texture2D shipSpecMap       : register(t1);
 SamplerState trilinear      : register(s0);
 
-float4 main(VertexToPixel input) : SV_TARGET
+struct PS_OUTPUT
 {
+	float4 color: SV_Target0;
+	float4 mask: SV_Target1;
+};
+
+PS_OUTPUT main(VertexToPixel input)
+{
+	PS_OUTPUT output;
+
 	input.uv = float2(input.uv.x, -input.uv.y);
 
 	// Re-normalize interpolated normal
@@ -59,7 +67,10 @@ float4 main(VertexToPixel input) : SV_TARGET
 
 	// Sample the diffuse texture.
 	float4 diffuseColor = shipTexture.Sample(trilinear, input.uv);
-
+	
 	// Calculate the final color.
-	return diffuseColor * (dirColor + pointColor + spotColor);
+	output.color = diffuseColor * (dirColor + pointColor + spotColor);
+	output.mask = float4(1, 0, 0, 0);
+
+	return output;
 }
