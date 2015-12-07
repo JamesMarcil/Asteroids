@@ -8,7 +8,7 @@
 
 #include "IEventListener.h"
 
-#include "ImageEffect.h"
+#include "IEffect.h"
 #include "NoEffect.h"
 
 enum Effect
@@ -26,8 +26,8 @@ public:
 	void EnableEffect(Effect effect);
 	void SetEffectPriority(Effect effect, UINT priority);
 private:
-	std::vector<ImageEffect*> effectsOrdered;
-	std::unordered_map<std::string, ImageEffect*> effectsMap;
+	std::vector<IEffect*> effectsOrdered;
+	std::unordered_map<std::string, IEffect*> effectsMap;
 	NoEffect* noEffect;
 	float warpTime = 2;
 	float timeElapsed = 0;

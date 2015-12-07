@@ -1,9 +1,9 @@
 #ifndef WARP_EFFECT_H
 #define WARP_EFFECT_H
 
-#include "ImageEffect.h"
+#include "IEffect.h"
 
-class Warp : public ImageEffect
+class Warp : public IEffect
 {
 public:
 	Warp();
