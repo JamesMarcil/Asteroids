@@ -52,6 +52,12 @@ ResourceManager::~ResourceManager(void)
 		delete pair.second;
 	}
 
+	// Release RenderTargets
+	for (auto& pair : renderTargetViews)
+	{
+		ReleaseMacro(pair.second);
+	}
+
     // Release DirectXTK SpriteFont
     for(auto& pair : spritefonts)
     {
@@ -71,13 +77,22 @@ void ResourceManager::RegisterDeviceAndContext( ID3D11Device* const device, ID3D
 }
 
 /*
- * Register an ID3D11RenderView and ID3D11DepthStencilView with the ResourceManager.
- * @param   pRender             The ID3D11RenderTargetView to register.
- * @param   pDepthStencil       The ID3D11DepthStencilView to register.
- */
-void ResourceManager::RegisterRenderTargetAndDepthStencilView(ID3D11RenderTargetView* pRender, ID3D11DepthStencilView* pDepthStencil)
+* Register an ID3D11RenderTargetView with the ResourceManager.
+* @param   id				   The name/key for the Render Target View
+* @param   pRTV				   The ID3D11RenderTargetView to register.
+*/
+void ResourceManager::RegisterRenderTargetView(const std::string& id, ID3D11RenderTargetView* pRTV)
 {
-    this->renderTargetView = pRender;
+	renderTargetViews.emplace(id, pRTV);
+}
+
+/*
+* Register an ID3D11Device and ID3D11DeviceContext with the ResourceManager.
+* @param   device              The ID3D11Device to register.
+* @param   deviceContext       The ID3D11DeviceContext to register.
+*/
+void ResourceManager::RegisterDepthStencilView(ID3D11DepthStencilView* pDepthStencil)
+{
     this->depthStencilView = pDepthStencil;
 }
 
@@ -91,6 +106,17 @@ void ResourceManager::RegisterSwapChain(IDXGISwapChain* pSwapChain)
 }
 
 #pragma region Getters
+
+ID3D11RenderTargetView* ResourceManager::GetRenderTargetView(const std::string& id)
+{
+	auto& iter = renderTargetViews.find(id);
+	if (iter == renderTargetViews.cend())
+	{
+		return nullptr;
+	}
+
+	return iter->second;
+}
 
 Mesh* ResourceManager::GetMesh( const std::string& id )
 {
@@ -214,6 +240,31 @@ bool ResourceManager::RegisterTexture( const std::string& id, const std::wstring
     textures.emplace( id, pTexture );
 
     return true;
+}
+
+/*
+* Register an ID3D11ShaderResourceView* with the ResourceManager.
+* @param       id          The id to store the ID3D11ShaderResourceView* at.
+* @param       srv		   The ID3D11ShaderResourceView to register.
+* @return  A bool indicating if the operation was successful.
+*/
+bool ResourceManager::RegisterTexture(const std::string & id, ID3D11ShaderResourceView * srv)
+{
+	// Bail if there is not a registered ID3D11Device or ID3D11DeviceContext
+	if (!device || !deviceContext)
+	{
+		return false;
+	}
+
+	// Bail if there is already an ID3D11ShaderResourceView* stored at that id
+	if (textures.find(id) != textures.cend())
+	{
+		return false;
+	}
+
+	textures.emplace(id, srv);
+
+	return true;
 }
 
 

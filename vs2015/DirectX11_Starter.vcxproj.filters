@@ -55,6 +55,12 @@
     <Filter Include="Header Files\Components\Scripts">
       <UniqueIdentifier>{de7863a6-7971-4a51-b32c-54c4a69cefd1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Effects">
+      <UniqueIdentifier>{9984f9f7-9526-410b-9259-acd68ecee4f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Effects">
+      <UniqueIdentifier>{b2477910-a6bb-4513-af86-e6abd78306c3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -186,6 +192,21 @@
     <ClInclude Include="..\include\json.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\PostEffectsSystem.h">
+      <Filter>Header Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Warp.h">
+      <Filter>Header Files\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\ImageEffect.h">
+      <Filter>Header Files\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\NoEffect.h">
+      <Filter>Header Files\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Tweens.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\AABB.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
@@ -314,6 +335,15 @@
     <ClCompile Include="..\src\SwapSystem.cpp">
       <Filter>Source Files\Systems</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\PostEffectsSystem.cpp">
+      <Filter>Source Files\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Warp.cpp">
+      <Filter>Source Files\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NoEffect.cpp">
+      <Filter>Source Files\Effects</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\AABB.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
@@ -359,6 +389,18 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="..\shaders\ColliderPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\shaders\BlurPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\shaders\BlurVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\shaders\WarpBlur.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\shaders\NoEffect.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="..\shaders\UIPixel.hlsl">

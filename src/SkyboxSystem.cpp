@@ -65,6 +65,7 @@ void SkyboxSystem::EventRouter(const std::string& name, void* data)
 		currentTexture = currentTexture > 2 ? 0 : currentTexture;
 		warping = true;
 		timeElapsed = 0;
+		delayedTimer = 0;
 	}
 }
 
@@ -77,6 +78,15 @@ void SkyboxSystem::Update(EntityManager* pManager, float dt, float tt)
 	if (warping)
 	{
 		timeElapsed += dt;
+
+		// offset the skybox tween so it happens during the overall effect
+		// but starts late and finishes early
+		// TODO: Make this suck less and not use magic numbers
+		if (timeElapsed >= 1 && timeElapsed <= 4)
+		{
+			delayedTimer += dt;
+		}
+
 		if (timeElapsed > warpTime)
 		{
 			warping = false;
@@ -85,7 +95,7 @@ void SkyboxSystem::Update(EntityManager* pManager, float dt, float tt)
 		}
 		else
 		{
-			lerpT = timeElapsed / warpTime;
+			lerpT = delayedTimer / 3;
 		}
 	}
 

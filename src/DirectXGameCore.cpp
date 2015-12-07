@@ -104,7 +104,7 @@ DirectXGameCore::DirectXGameCore(HINSTANCE hInstance)
 DirectXGameCore::~DirectXGameCore(void)
 {
 	// Release the core DirectX "stuff" we set up
-	ReleaseMacro(renderTargetView);
+	//ReleaseMacro(renderTargetView);
 	ReleaseMacro(depthStencilView);
 	ReleaseMacro(swapChain);
 	ReleaseMacro(depthStencilBuffer);
@@ -296,9 +296,9 @@ void DirectXGameCore::OnResize()
 
 	// Resize the swap chain to match the new window dimensions
 	HR(swapChain->ResizeBuffers(
-		1, 
-		windowWidth, 
-		windowHeight, 
+		1,
+		windowWidth,
+		windowHeight,
 		DXGI_FORMAT_R8G8B8A8_UNORM,
 		0));
 
@@ -331,7 +331,10 @@ void DirectXGameCore::OnResize()
 	deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
 
     // Update the ResourceManager with the new RenderTarget and DepthStencil Views
-    ResourceManager::Instance()->RegisterRenderTargetAndDepthStencilView(renderTargetView, depthStencilView);
+    //ResourceManager::Instance()->RegisterRenderTargetAndDepthStencilView(renderTargetView, depthStencilView);
+	ResourceManager::Instance()->RegisterDepthStencilView(depthStencilView);
+	ResourceManager::Instance()->RegisterRenderTargetView("MainRTV", renderTargetView);
+
 
 	// Update the viewport to match the new window size and set it on the device
 	viewport.TopLeftX	= 0;
@@ -348,6 +351,9 @@ void DirectXGameCore::OnResize()
     // Update the active Camera
     Camera* active = CameraManager::Instance()->GetActiveCamera();
     active->SetAspectRatio( aspectRatio );
+
+	ResourceManager::Instance()->SetWindowHeight(windowHeight);
+	ResourceManager::Instance()->SetWindowWidth(windowWidth);
 }
 #pragma endregion
 

@@ -27,6 +27,7 @@
 #include "RenderSystem.h"
 #include "SkyboxSystem.h"
 #include "SwapSystem.h"
+#include "PostEffectsSystem.h"
 #include "UIRenderSystem.h"
 #include "UIUpdateSystem.h"
 #include "CollisionSystem.h"
@@ -57,6 +58,7 @@ void GameState::Enter(void)
 
         // Register Systems.
         EntityManager* pEntity = EntityManager::Instance();
+
         pEntity->AddSystemWithPriority<PhysicsSystem, 0>();
 		pEntity->AddSystemWithPriority<CollisionSystem, 1>();
 		pEntity->AddSystemWithPriority<InputControllerSystem, 2>();
@@ -64,10 +66,11 @@ void GameState::Enter(void)
         pEntity->AddSystemWithPriority<ClearSystem, 4>();
         pEntity->AddSystemWithPriority<RenderSystem, 5>();
         pEntity->AddSystemWithPriority<SkyboxSystem, 6>();
-        pEntity->AddSystemWithPriority<UIRenderSystem, 7>();
-		pEntity->AddSystemWithPriority<SwapSystem, 8>();
-		pEntity->AddSystemWithPriority<ScriptSystem, 9>();
-		pEntity->AddSystemWithPriority<AttackSystem, 10>();
+		pEntity->AddSystemWithPriority<PostEffectsSystem, 7>();
+        pEntity->AddSystemWithPriority<UIRenderSystem, 8>();
+		pEntity->AddSystemWithPriority<SwapSystem, 9>();
+		pEntity->AddSystemWithPriority<ScriptSystem, 10>();
+		pEntity->AddSystemWithPriority<AttackSystem, 11>();
 
         // Make a SpotLight
         GameEntity spotlight = EntityFactory::CreateSpotlight

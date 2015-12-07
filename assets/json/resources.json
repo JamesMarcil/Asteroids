@@ -84,6 +84,20 @@
     },
 
     {
+      "ID": "StandardVertex",
+      "Type": "Shader",
+      "Stage": "Vertex",
+      "Filename": "VertexShader.cso"
+    },
+
+    {
+      "ID": "StandardPixel",
+      "Type": "Shader",
+      "Stage": "Pixel",
+      "Filename": "PixelShader.cso"
+    },
+
+    {
         "ID" : "RandomNoise",
         "Type" : "Texture",
         "Filename" : "textures/noise.png"
@@ -96,17 +110,24 @@
     },
 
     {
-        "ID" : "StandardVertex",
-        "Type" : "Shader",
-        "Stage" : "Vertex",
-        "Filename" : "VertexShader.cso"
+      "ID": "PPVS",
+      "Type": "Shader",
+      "Stage": "Vertex",
+      "Filename": "BlurVS.cso"
     },
 
     {
-        "ID" : "StandardPixel",
-        "Type" : "Shader",
-        "Stage" : "Pixel",
-        "Filename" : "PixelShader.cso"
+      "ID": "PPWarpBlur",
+      "Type": "Shader",
+      "Stage": "Pixel",
+      "Filename": "WarpBlur.cso"
+    },
+
+    {
+      "ID": "PPNoEffect",
+      "Type": "Shader",
+      "Stage": "Pixel",
+      "Filename": "NoEffect.cso"
     },
 
     {
