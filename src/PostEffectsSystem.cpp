@@ -108,11 +108,13 @@ PostEffectsSystem::PostEffectsSystem()
 PostEffectsSystem::~PostEffectsSystem(void)
 {
 	delete noEffect;
-
-	for (std::vector<ImageEffect*>::iterator it = effectsOrdered.begin(); it != effectsOrdered.end(); ++it)
-	{
-		delete (*it);
-	}
+    for(auto& effect : effectsOrdered)
+    {
+        if(effect)
+        {
+            delete effect;
+        }
+    }
 	effectsOrdered.clear();
 	effectsMap.clear();
 }
