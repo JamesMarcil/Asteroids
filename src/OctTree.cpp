@@ -1,5 +1,4 @@
 #include "OctTree.h"
-#include "EntityManager.h"
 #include <TransformComponent.h>
 #include <CollisionComponent.h>
 
@@ -14,13 +13,20 @@ OctTree::OctTree(std::uint32_t mE)
 	: maxEntities(mE)
 {
 	partitionedEntities = std::vector<std::vector<GameEntity>>();
+
+	D3D11_RASTERIZER_DESC desc;
+	ZeroMemory(&desc, sizeof(D3D11_RASTERIZER_DESC));
+	desc.FillMode = D3D11_FILL_WIREFRAME;
+	desc.CullMode = D3D11_CULL_FRONT;
+	desc.DepthClipEnable = true;
+	ResourceManager::Instance()->RegisterRasterizerState("Wireframe_Rasterizer", desc);
 }
 
 void OctTree::Update(EntityManager* eManager, std::vector<GameEntity> collidables) {
 	partitionedEntities.clear();
 
 	DirectX::XMFLOAT3 centroid(0, 0, 10);
-	Octant initial(centroid, 10, 10, 20);
+	Octant initial(centroid, 20, 20, 20);
 	eManager->AddOctant(initial);
 
 	PartitionSpace(eManager, collidables, initial);

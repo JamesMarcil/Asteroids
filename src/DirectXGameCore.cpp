@@ -252,7 +252,7 @@ bool DirectXGameCore::InitDirect3D()
 		0,
 		driverType,
 		0,
-		createDeviceFlags,
+		0, //createDeviceFlags,
 		0,
 		0,
 		D3D11_SDK_VERSION,

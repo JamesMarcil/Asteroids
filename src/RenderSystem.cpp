@@ -187,6 +187,9 @@ void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
         pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         pDeviceContext->DrawIndexed(pMesh->GetIndexCount(), 0, 0);
     }
+
+	RenderCollisionSpheres(pManager);
+	RenderOctants(pManager);
 }
 
 void RenderSystem::RenderCollisionSpheres(EntityManager* pManager)

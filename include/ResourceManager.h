@@ -215,7 +215,8 @@ public:
 	bool RegisterSamplerState(const std::string& id, D3D11_SAMPLER_DESC samplerDesc);
 
     /*
-     * Register an ID3D11RasterizerState with the ResourceManager.
+     * Register an ID3D11
+	 State with the ResourceManager.
      * @param       id                  The id to store the ID3D11RasterizerState* at.
      * @param       rasterizerDesc      The description used to instantiate the ID3D11RasterizerState.
      * @return A boolean indicating if the operation was successful.

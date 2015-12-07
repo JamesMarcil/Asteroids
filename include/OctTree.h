@@ -3,6 +3,7 @@
 
 #include "GameEntity.h"
 #include "EntityManager.h"
+#include <ResourceManager.h>
 #include <DirectXMath.h>
 #include "CollisionSphere.h"
 #include <Octant.h>
