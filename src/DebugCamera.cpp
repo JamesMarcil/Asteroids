@@ -27,7 +27,7 @@ void DebugCamera::Update(float dt)
 
 	// Current speed
 	float moveSpeed = m_moveSpeed * dt;
-	float rotSpeed = m_rotationSpeed * dt;
+    float rotSpeed = m_rotationSpeed * dt;
 
 	// Speed up when shift is pressed
 	if (pManager->IsKeyDown(VK_SHIFT)) { moveSpeed *= 5; }
@@ -48,8 +48,8 @@ void DebugCamera::Update(float dt)
 		POINT   prevMousePos = pManager->GetPreviousMousePos(),
 				currMousePos = pManager->GetCurrentMousePos();
 
-		float xDiff = min(m_rotationSpeed, (currMousePos.x - prevMousePos.x) * rotSpeed);
-		float yDiff = min(m_rotationSpeed, (currMousePos.y - prevMousePos.y) * rotSpeed);
+		float xDiff = (currMousePos.x - prevMousePos.x) * 0.005f;
+		float yDiff = (currMousePos.y - prevMousePos.y) * 0.005f;
 
 		Rotate(yDiff, xDiff);
 	}
