@@ -12,7 +12,9 @@
 
 // DirectX
 #include <DirectXMath.h>
-#include <SimpleMath.h>
+
+// STD
+#include <cmath>
 
 InputControllerSystem::InputControllerSystem(void)
 {
@@ -28,65 +30,99 @@ InputControllerSystem::~InputControllerSystem(void)
 void InputControllerSystem::Update(EntityManager* pManager, float dt, float tt)
 {
 	using namespace DirectX;
-	using namespace SimpleMath;
 
 	if (m_pCamera->IsDebugActive()) return; //Don't overlap controls
 
-	float horiz = static_cast<float>((m_pInput->IsKeyDown('A') ? -1 : 0) + (m_pInput->IsKeyDown('D') ? 1 : 0));
-	float vert = static_cast<float>((m_pInput->IsKeyDown('S') ? -1 : 0) + (m_pInput->IsKeyDown('W') ? 1 : 0));
-
-	float playableWidth = 5;
-	float playableHeight = 4;
+    bool isWHeld = (m_pInput->IsKeyDown('W'));
+    bool isAHeld = (m_pInput->IsKeyDown('A'));
+    bool isSHeld = (m_pInput->IsKeyDown('S'));
+    bool isDHeld = (m_pInput->IsKeyDown('D'));
+	float horiz = (isAHeld ? -1.0f : 0.0f) + (isDHeld ? 1.0f : 0.0f);
+	float vert  = (isSHeld ? -1.0f : 0.0f) + (isWHeld ? 1.0f : 0.0f);
 
 	for (auto& entity : pManager->EntitiesWithComponents<InputComponent, PhysicsComponent, TransformComponent>())
 	{
+		InputComponent* inputCom = pManager->GetComponent<InputComponent>(entity);
+		PhysicsComponent* pPhysics = pManager->GetComponent<PhysicsComponent>(entity);
 		TransformComponent* pTransform = pManager->GetComponent<TransformComponent>(entity);
 		Transform& t = pTransform->transform;
 
-		InputComponent* inputCom = pManager->GetComponent<InputComponent>(entity);
-		PhysicsComponent* pPhysics = pManager->GetComponent<PhysicsComponent>(entity);
+        // Update acceleration.
+        XMVECTOR acceleration = XMVectorSet(horiz, vert, 0.0f, 0.0f);
+        acceleration = XMVector3Normalize(acceleration);
+        acceleration = XMVectorScale(acceleration, inputCom->movementSpeed);
 
-		DirectX::XMFLOAT3 pos = t.GetTranslation();
-		if ((pos.x < -playableWidth / 2 && horiz < 0) ||
-			(pos.x > playableWidth / 2 && horiz > 0)) {
-			horiz = 0;
-			pPhysics->velocity.x = 0;
-		}
-		if ((pos.y < -playableHeight / 2 && vert < 0) ||
-			(pos.y > playableHeight / 2 && vert > 0)) {
-			vert = 0;
-			pPhysics->velocity.y = 0;
-		}
+		float maxRot = XM_PI / 8.0f;
+		XMFLOAT3 rot = t.GetRotationEuler();
+        XMVECTOR rotVelocity = XMLoadFloat3(&pPhysics->rotationalVelocity);
+        XMVECTOR rotAcceleration = XMLoadFloat3(&pPhysics->rotationalAcceleration);
 
-		Vector3 rot = Vector3(t.GetRotationEuler().x, t.GetRotationEuler().y, t.GetRotationEuler().z);
-		Vector3 accel = Vector3(horiz, vert, 0);// horizAdd + vertAdd;
-		accel.Normalize();
-		accel *= inputCom->movementSpeed;
+        // Handle rotation around the z-axis.
+        if(isAHeld || isDHeld)
+        {
+            // Rotating towards left/right.
+            bool rotatingOppositeDirection = (isDHeld && rot.z > 0.0f) || (isAHeld && rot.z < 0.0f);
+            if (std::abs(rot.z) <= maxRot || rotatingOppositeDirection)
+            {
+                rotAcceleration = XMVectorSet(XMVectorGetX(rotAcceleration), 0.0f, -horiz * 5.0f, 0.0f);
+            }
+            // Stop if still held down but we have reached maximum rotation.
+            else
+            {
+                rotVelocity = XMVectorSet(XMVectorGetX(rotVelocity), 0.0f, 0.0f, 0.0f);
+                rotAcceleration = XMVectorSet(XMVectorGetX(rotAcceleration), 0.0f, 0.0f, 0.0f);
+            }
+        }
+        // Rotate the ship back towards 0.
+        else if (std::abs(rot.z) > 1.0f * (XM_PI / 180.0f))
+        {
+            float sign = (rot.z > 0.0f) ? -1.0f : 1.0f;
+			rotAcceleration = XMVectorSet(XMVectorGetX(rotAcceleration), 0.0f, sign * 5.0f, 0.0f);
+		}
+        // Snap back to 0 once we are within 1 degree.
+        else
+        {
+            rot.z = 0.0f;
+            rotVelocity = XMVectorSet(XMVectorGetX(rotVelocity), 0.0f, 0.0f, 0.0f);
+            rotAcceleration = XMVectorSet(XMVectorGetX(rotAcceleration), 0.0f, 0.0f, 0.0f);
+        }
 
-		pPhysics->acceleration = XMFLOAT3(accel.x, accel.y, 0);
+        // Handle rotation around x-axis.
+        if(isWHeld || isSHeld)
+        {
+            // Rotating towards up/down.
+            bool rotatingOppositeDirection = (isWHeld && rot.x > 0.0f) || (isSHeld && rot.x < 0.0f);
+            if (std::abs(rot.x) <= maxRot || rotatingOppositeDirection)
+            {
+                rotAcceleration = XMVectorSet(-vert * 5.0f, 0.0f, XMVectorGetZ(rotAcceleration), 0.0f);
+            }
+            // Stop if still held down but we have reached maximum rotation.
+            else
+            {
+                rotVelocity = XMVectorSet(0.0f, 0.0f, XMVectorGetZ(rotVelocity), 0.0f);
+                rotAcceleration = XMVectorSet(0.0f, 0.0f, XMVectorGetZ(rotAcceleration), 0.0f);
+            }
+        }
+        // Rotate the ship back towards 0.
+		else if(std::abs(rot.x) > 1.0f * (XM_PI / 180.0f))
+        {
+            float sign = (rot.x > 0.0f) ? -1.0f : 1.0f;
+			rotAcceleration = XMVectorSet(sign * 5.0f, 0.0f, XMVectorGetZ(rotAcceleration), 0.0f);
+		}
+        // Snap back once we are within 1 degree.
+        else
+        {
+            rot.x = 0.0f;
+            rotVelocity = XMVectorSet(0.0f, 0.0f, XMVectorGetZ(rotVelocity), 0.0f);
+            rotAcceleration = XMVectorSet(0.0f, 0.0f, XMVectorGetZ(rotAcceleration), 0.0f);
+        }
 
-		float maxRot = 3.14f / 8.0f;
-		//Rotating to action
-		if ((abs(rot.z) < maxRot || rot.z*horiz > 0) && horiz != 0) {
-			pPhysics->rotationalAcceleration = XMFLOAT3(0, 0, -horiz * 240.0f);
-		}
-		else if (horiz != 0) { //Still held down, but at maximum: stop
-			pPhysics->rotationalAcceleration = XMFLOAT3(0, 0, 0);
-		}
-		else { //Return back to zero
-			pPhysics->rotationalAcceleration = XMFLOAT3(0, 0, rot.z / maxRot  * -80.0f);
-		}
+        // Cleaning issues caused by euler rotation.
+		t.SetRotation(rot.x, 0, rot.z);
 
-		if ((abs(rot.x) < maxRot || rot.x*vert > 0) && vert != 0) {
-			pPhysics->rotationalAcceleration = XMFLOAT3(-vert * 240.0f,0, pPhysics->rotationalAcceleration.z);
-		}
-		else if (vert != 0) { //Still held down, but at maximum: stop
-			pPhysics->rotationalAcceleration = XMFLOAT3(0, 0, pPhysics->rotationalAcceleration.z);
-		}
-		else { //Return back to zero
-			pPhysics->rotationalAcceleration = XMFLOAT3(rot.x / maxRot  * -80.0f,0, pPhysics->rotationalAcceleration.z);
-		}
-
-		t.SetRotation(rot.x, 0, rot.z); //Cleaning issues caused by euler rotation
+        // Save results.
+        XMStoreFloat3(&pPhysics->acceleration, acceleration);
+        XMStoreFloat3(&pPhysics->rotationalVelocity, rotVelocity);
+        XMStoreFloat3(&pPhysics->rotationalAcceleration, rotAcceleration);
 	}
 }
