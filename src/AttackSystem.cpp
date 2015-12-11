@@ -42,11 +42,12 @@ void AttackSystem::FireProjectile(EntityManager* pEntity)
 
 	GameEntity projectile = pEntity->Create("Projectile");
 	pEntity->AddComponent<RenderComponent>(projectile, pResource->GetMaterial("default"), pResource->GetMesh("Sphere"));
-	pEntity->AddComponent<CollisionComponent>(projectile, projectileCollider.GetRadius(), pPlayerTransform->transform.GetTranslation());
-	pEntity->AddComponent<PhysicsComponent>(projectile, DirectX::XMFLOAT3(0, 0, 10), DirectX::XMFLOAT3(0, 0, 5));
+	pEntity->AddComponent<CollisionComponent>(projectile, projectileCollider.GetRadius() * 2, pPlayerTransform->transform.GetTranslation());
+	PhysicsComponent* physics = pEntity->AddComponent<PhysicsComponent>(projectile, DirectX::XMFLOAT3(0, 0, 10), DirectX::XMFLOAT3(0, 0, 20));
+	physics->acceleration = DirectX::XMFLOAT3(0, 0, 20);
 	TransformComponent* pTransform = pEntity->AddComponent<TransformComponent>(projectile, pPlayerTransform->transform.GetTranslation());
-	pTransform->transform.SetScale(0.1f);
+	pTransform->transform.SetScale(0.2f);
 	pTransform->transform.Translate(0, 0, 1);
 	ScriptComponent* script = pEntity->AddComponent<ScriptComponent>(projectile);
-	script->AddScript<AutoDestructScript>(30.0f);
+	script->AddScript<AutoDestructScript>(80.0f);
 }

@@ -24,5 +24,6 @@ void SwapSystem::Update(EntityManager* pManager, float dt, float tt)
 {
     // Present the buffer
 	IDXGISwapChain* pSwapChain = m_pResource->GetSwapChain();
-    HR(pSwapChain->Present(0,0));
+	pSwapChain->Present(0, 0);
+	HR(ResourceManager::Instance()->GetDevice()->GetDeviceRemovedReason());
 }

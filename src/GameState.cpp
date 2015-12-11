@@ -10,6 +10,7 @@
 #include "InputManager.h"
 #include "ResourceManager.h"
 #include "CameraManager.h"
+#include <ParticleManager.h>
 
 // Events
 #include "EventManager.h"
@@ -84,6 +85,12 @@ void GameState::Enter(void)
 
 		//Make Player
 		GameEntity player = EntityFactory::CreatePlayer(XMFLOAT3(0.0f, 0.0f, 0.0f));
+
+		// Particle test time!
+		ParticleManager* pManager = ParticleManager::Instance();
+		Particle p(XMFLOAT4(1, 0, 0, 1), XMFLOAT4(1, 0, 0, 1), XMFLOAT4(1, 0, 0, 1), XMFLOAT3(0, 0, 25), XMFLOAT3(0, 1, 0), XMFLOAT3(0, 1, 0), 0.001f, 0.0f, 5.0f, 0.0f);
+		ParticleGenerator pG = ParticleGenerator(p, XMFLOAT3(0, 0, 25), 10, 0.0001f, 0.0003f, 0);
+		pManager->AddGenerator(pG);
 
         isInitialized = true;
     }

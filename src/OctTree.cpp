@@ -25,8 +25,8 @@ OctTree::OctTree(std::uint32_t mE)
 void OctTree::Update(EntityManager* eManager, std::vector<GameEntity> collidables) {
 	partitionedEntities.clear();
 
-	DirectX::XMFLOAT3 centroid(0, 0, 10);
-	Octant initial(centroid, 20, 20, 20);
+	DirectX::XMFLOAT3 centroid(0, 0, 30);
+	Octant initial(centroid, 20, 20, 70);
 	eManager->AddOctant(initial);
 
 	PartitionSpace(eManager, collidables, initial);

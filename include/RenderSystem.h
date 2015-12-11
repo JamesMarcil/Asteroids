@@ -22,6 +22,7 @@ public:
 
 	void RenderCollisionSpheres(EntityManager* pManager);
 	void RenderOctants(EntityManager* pManager);
+	void RenderParticles();
 };
 
 #endif

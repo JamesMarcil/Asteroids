@@ -26,6 +26,7 @@
 #include "CameraManager.h"
 #include "EntityManager.h"
 #include "ResourceManager.h"
+#include <ParticleManager.h>
 
 // State
 #include "StateMachine.h"
@@ -252,7 +253,7 @@ bool DirectXGameCore::InitDirect3D()
 		0,
 		driverType,
 		0,
-		0, //createDeviceFlags,
+		D3D11_CREATE_DEVICE_DEBUG, //createDeviceFlags,
 		0,
 		0,
 		D3D11_SDK_VERSION,
@@ -396,6 +397,7 @@ int DirectXGameCore::Run()
 			InputManager::Instance()->Update(deltaTime);
             CameraManager::Instance()->Update(deltaTime);
             StateMachine<GameStates>::Instance()->Update(deltaTime, totalTime);
+			ParticleManager::Instance()->Update(deltaTime, totalTime);
             EntityManager::Instance()->Update(deltaTime, totalTime);
 		}
 	}

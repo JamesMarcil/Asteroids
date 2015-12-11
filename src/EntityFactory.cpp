@@ -54,7 +54,7 @@ GameEntity EntityFactory::CreateAsteroid(DirectX::XMFLOAT3 position, DirectX::XM
     ResourceManager* pResource = ResourceManager::Instance();
 
     GameEntity asteroid = pEntity->Create("Asteroid");
-    pEntity->AddComponent<CollisionComponent>(asteroid, 0.75f*scale, position);
+    pEntity->AddComponent<CollisionComponent>(asteroid, 0.95f*scale, position);
     pEntity->AddComponent<AsteroidRenderComponent>(asteroid, id);
     pEntity->AddComponent<RenderComponent>(asteroid, pResource->GetMaterial("asteroid"), pResource->GetMesh("Sphere"));
     pEntity->AddComponent<PhysicsComponent>(asteroid, velocity, acceleration);
