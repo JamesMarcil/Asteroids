@@ -69,7 +69,7 @@ PS_OUTPUT main(VertexToPixel input)
 	float4 diffuseColor = shipTexture.Sample(trilinear, input.uv);
 	
 	// Calculate the final color.
-	output.color = diffuseColor * (dirColor + pointColor + spotColor);
+	output.color = diffuseColor;// *(dirColor + pointColor + spotColor);
 	output.mask = float4(1, 0, 0, 0);
 
 	return output;

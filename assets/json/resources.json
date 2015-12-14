@@ -20,7 +20,7 @@
     {
         "ID" : "Thruster",
         "Type" : "Mesh",
-        "Filename" : "models/cylinder.obj"
+        "Filename" : "models/thruster_exhaust.obj"
     },
 
     {

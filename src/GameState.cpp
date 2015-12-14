@@ -48,7 +48,7 @@ void GameState::Enter(void)
     if(!isInitialized)
     {
 		CameraManager* camMan = CameraManager::Instance();
-		camMan->RegisterCamera<Camera>("Main Camera", 0.0f, 0.0f, -5.0f);
+		camMan->RegisterCamera<Camera>("Main Camera", 0.0f, 1.0f, -5.0f);
 		camMan->SetActiveCamera("Main Camera");
 
 		this->LoadCurrentLevel();

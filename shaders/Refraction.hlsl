@@ -29,7 +29,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 
 	if (maskSample.g == 1)
 	{
-		return float4(0, 1, 1, 0);
+		return float4(0, 1, 1, 0); //pixels.Sample(trilinear, input.uv + float2(0.01f,0));
 	}
 
 	return pixels.Sample(trilinear, input.uv);

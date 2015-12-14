@@ -83,6 +83,15 @@ GameEntity EntityFactory::CreatePlayer(DirectX::XMFLOAT3 position)
     pPhysics->drag = 0.95f;
     pPhysics->rotationalDrag = 0.85f;
 
+	GameEntity exhaust = pEntity->Create("Exhaust");
+
+	pEntity->AddComponent<RenderComponent>(exhaust, pResource->GetMaterial("thruster"), pResource->GetMesh("Thruster"))->maskOnly = true;
+
+	TransformComponent* eTrans = pEntity->AddComponent<TransformComponent>(exhaust, position);
+	eTrans->transform.SetScale(800.0f);
+
+	pTrans->transform.AddChild(&eTrans->transform);
+
     return player;
 }
 
