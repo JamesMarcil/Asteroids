@@ -1,6 +1,6 @@
 cbuffer PerFrame : register(b0)
 {
-	float BlurWidth;
+	float time;
 }
 
 // Defines the input to this pixel shader
@@ -14,6 +14,7 @@ struct VertexToPixel
 // Textures and such
 Texture2D pixels		: register(t0);
 Texture2D mask			: register(t1);
+Texture2D noise			: register(t3);
 SamplerState trilinear	: register(s0);
 
 // Entry point for this pixel shader
@@ -27,9 +28,12 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float4 color = float4(0, 0, 0, 0);
 	float4 maskSample = mask.Sample(trilinear, input.uv);
 
-	if (maskSample.g == 1)
+	if (maskSample.g != 0)
 	{
-		return float4(0, 1, 1, 0); //pixels.Sample(trilinear, input.uv + float2(0.01f,0));
+		float4 noiseSample = noise.Sample(trilinear, input.uv - float2(0, time));
+		float4 normalSample = pixels.Sample(trilinear, input.uv);
+		float4 distortedSample = pixels.Sample(trilinear, input.uv - float2(0, noiseSample.r / 10));
+		return normalSample * (1-maskSample.g) + distortedSample * maskSample.g;
 	}
 
 	return pixels.Sample(trilinear, input.uv);

@@ -16,6 +16,7 @@ Refraction::Refraction()
 {
 	ppVS = ResourceManager::Instance()->GetShader("PPVS");
 	ppPS = ResourceManager::Instance()->GetShader("PPRefraction");
+	noise = ResourceManager::Instance()->GetTexture("Perlin");
 }
 
 Refraction::~Refraction(void)
@@ -93,8 +94,9 @@ void Refraction::RenderEffect(ID3D11ShaderResourceView * srv, ID3D11DeviceContex
 
 		ppPS->SetShaderResourceView("pixels", srv);
 		ppPS->SetShaderResourceView("mask", maskSRV);
+		ppPS->SetShaderResourceView("noise", noise);
 		ppPS->SetSamplerState("trilinear", sampler);
-		//ppPS->SetFloat("BlurWidth", blur);
+		ppPS->SetFloat("time", tt);
 		ppPS->SetShader();
 
 		// Draw a specific number of vertices (without buffers)

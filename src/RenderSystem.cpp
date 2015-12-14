@@ -202,7 +202,7 @@ void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
 	
 
 	if (pMaskRTV != nullptr) { //Render objects which only render to post processing mask
-		pDeviceContext->OMSetRenderTargets(1, &pMaskRTV, depthStencilView);
+		pDeviceContext->OMSetRenderTargets(1, &pMaskRTV, 0);
 		for (auto& entity : pManager->EntitiesWithComponents<RenderComponent, TransformComponent>())
 		{
 			RenderComponent* pRender = pManager->GetComponent<RenderComponent>(entity);
