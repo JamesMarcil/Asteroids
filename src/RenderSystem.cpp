@@ -71,15 +71,6 @@ void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
 		pRTV = pResource->GetRenderTargetView("MainRTV");
 	}
 
-	if (pMaskRTV == nullptr)
-	{
-		pDeviceContext->OMSetRenderTargets(1, &pRTV, depthStencilView);
-	}
-	else
-	{
-		ID3D11RenderTargetView* views[2] = { pRTV, pMaskRTV };
-		pDeviceContext->OMSetRenderTargets(2, views, depthStencilView);
-	}
 
     // Declare a MAX_LIGHTS sized array for each type of LightComponent
     DirectionalLightComponent::Light dirLights[DirectionalLightComponent::MAX_LIGHTS];
@@ -118,35 +109,47 @@ void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
 	ISimpleShader   *pVertexShader = nullptr;
 	ISimpleShader	*pPixelShader = nullptr;
 
-    for(auto& entity : pManager->EntitiesWithComponents<RenderComponent, TransformComponent>())
-    {
-        RenderComponent* pRender = pManager->GetComponent<RenderComponent>(entity);
-        TransformComponent* pTransform = pManager->GetComponent<TransformComponent>(entity);
+	if (pMaskRTV == nullptr)
+	{
+		pDeviceContext->OMSetRenderTargets(1, &pRTV, depthStencilView);
+	}
+	else
+	{
+		ID3D11RenderTargetView* views[2] = { pRTV, pMaskRTV };
+		pDeviceContext->OMSetRenderTargets(2, views, depthStencilView);
+	}
 
-        // Attempt to cache the Mesh.
-        if(!pMesh || pMesh != pRender->mesh)
-        {
-            // Set the Mesh.
-            pMesh = pRender->mesh;
+	for (auto& entity : pManager->EntitiesWithComponents<RenderComponent, TransformComponent>())
+	{
+		RenderComponent* pRender = pManager->GetComponent<RenderComponent>(entity);
+		TransformComponent* pTransform = pManager->GetComponent<TransformComponent>(entity);
 
-            // Update Mesh information.
-            ID3D11Buffer* vb = pMesh->GetVertexBuffer();
-            ID3D11Buffer* ib = pMesh->GetIndexBuffer();
-            UINT stride = sizeof(Vertex);
-            UINT offset = 0;
-            pDeviceContext->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
-            pDeviceContext->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
-        }
+		if (pRender->maskOnly) continue;
 
-        // Attempt to cache the Material.
-        if(!pMaterial || pMaterial != pRender->material)
-        {
-            // Set the Material.
-            pMaterial = pRender->material;
+		// Attempt to cache the Mesh.
+		if (!pMesh || pMesh != pRender->mesh)
+		{
+			// Set the Mesh.
+			pMesh = pRender->mesh;
 
-            // Update Material information.
-            pMaterial->WriteShaderInfo();
-        }
+			// Update Mesh information.
+			ID3D11Buffer* vb = pMesh->GetVertexBuffer();
+			ID3D11Buffer* ib = pMesh->GetIndexBuffer();
+			UINT stride = sizeof(Vertex);
+			UINT offset = 0;
+			pDeviceContext->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
+			pDeviceContext->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
+		}
+
+		// Attempt to cache the Material.
+		if (!pMaterial || pMaterial != pRender->material)
+		{
+			// Set the Material.
+			pMaterial = pRender->material;
+
+			// Update Material information.
+			pMaterial->WriteShaderInfo();
+		}
 
 		// Attempt to cache the Vertex Shader
 		if (!pVertexShader || pVertexShader != pRender->material->GetVertexShader())
@@ -178,24 +181,120 @@ void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
 			pPixelShader->SetSamplerState("trilinear", m_pResource->GetSamplerState("trilinear"));
 		}
 
-        // Update "PerObject" Constant Buffer.
-        Transform& t = pTransform->transform;
-        pVertexShader->SetMatrix4x4("world", t.GetWorldMatrix());
+		// Update "PerObject" Constant Buffer.
+		Transform& t = pTransform->transform;
+		pVertexShader->SetMatrix4x4("world", t.GetWorldMatrix());
 		if (pManager->HasComponent<AsteroidRenderComponent>(entity)) {
 			AsteroidRenderComponent* asteroid = pManager->GetComponent<AsteroidRenderComponent>(entity);
 			pVertexShader->SetInt("id", asteroid->randomID);
 		}
 
-        pVertexShader->CopyBufferData("PerObject");
+		pVertexShader->CopyBufferData("PerObject");
 
-        // Set the Shaders but do not copy buffers, this has been done already.
-        pVertexShader->SetShader(false);
-        pPixelShader->SetShader(false);
+		// Set the Shaders but do not copy buffers, this has been done already.
+		pVertexShader->SetShader(false);
+		pPixelShader->SetShader(false);
 
-        // Draw the GameEntity
-        pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        pDeviceContext->DrawIndexed(pMesh->GetIndexCount(), 0, 0);
-    }
+		// Draw the GameEntity
+		pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		pDeviceContext->DrawIndexed(pMesh->GetIndexCount(), 0, 0);
+	}
+	
+
+	if (pMaskRTV != nullptr) { //Render objects which only render to post processing mask
+		pDeviceContext->OMSetRenderTargets(1, &pMaskRTV, depthStencilView);
+		for (auto& entity : pManager->EntitiesWithComponents<RenderComponent, TransformComponent>())
+		{
+			RenderComponent* pRender = pManager->GetComponent<RenderComponent>(entity);
+			TransformComponent* pTransform = pManager->GetComponent<TransformComponent>(entity);
+
+			if (!pRender->maskOnly) continue;
+
+			// Attempt to cache the Mesh.
+			if (!pMesh || pMesh != pRender->mesh)
+			{
+				// Set the Mesh.
+				pMesh = pRender->mesh;
+
+				// Update Mesh information.
+				ID3D11Buffer* vb = pMesh->GetVertexBuffer();
+				ID3D11Buffer* ib = pMesh->GetIndexBuffer();
+				UINT stride = sizeof(Vertex);
+				UINT offset = 0;
+				pDeviceContext->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
+				pDeviceContext->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
+			}
+
+			// Attempt to cache the Material.
+			if (!pMaterial || pMaterial != pRender->material)
+			{
+				// Set the Material.
+				pMaterial = pRender->material;
+
+				// Update Material information.
+				pMaterial->WriteShaderInfo();
+			}
+
+			// Attempt to cache the Vertex Shader
+			if (!pVertexShader || pVertexShader != pRender->material->GetVertexShader())
+			{
+				pVertexShader = pRender->material->GetVertexShader();
+
+				// Update "PerFrame" Vertex Shader data.
+				pVertexShader->SetMatrix4x4("view", pCamera->GetViewMatrix());
+				pVertexShader->SetMatrix4x4("projection", pCamera->GetProjectionMatrix());
+				pVertexShader->CopyBufferData("PerFrame");
+
+			}
+
+			// Attempt to cache the pixel shader
+			if (!pPixelShader || pPixelShader != pRender->material->GetPixelShader())
+			{
+				pPixelShader = pRender->material->GetPixelShader();
+
+				// Update "Lights" Constant Buffer.
+				pPixelShader->SetData("directionalLights", reinterpret_cast<void*>(dirLights), DirectionalLightComponent::MAX_LIGHTS * sizeof(DirectionalLightComponent::Light));
+				pPixelShader->SetData("pointLights", reinterpret_cast<void*>(pointLights), PointLightComponent::MAX_LIGHTS * sizeof(PointLightComponent::Light));
+				pPixelShader->SetData("spotLights", reinterpret_cast<void*>(spotLights), SpotLightComponent::MAX_LIGHTS * sizeof(SpotLightComponent::Light));
+				pPixelShader->CopyBufferData("Lights");
+
+				// Update "PerFrame" Constant Buffer.
+				pPixelShader->SetFloat3("cameraPosition", XMFLOAT3(camPos.x, camPos.y, camPos.z));
+				pPixelShader->CopyBufferData("PerFrame");
+
+				pPixelShader->SetSamplerState("trilinear", m_pResource->GetSamplerState("trilinear"));
+			}
+
+			// Update "PerObject" Constant Buffer.
+			Transform& t = pTransform->transform;
+			pVertexShader->SetMatrix4x4("world", t.GetWorldMatrix());
+			if (pManager->HasComponent<AsteroidRenderComponent>(entity)) {
+				AsteroidRenderComponent* asteroid = pManager->GetComponent<AsteroidRenderComponent>(entity);
+				pVertexShader->SetInt("id", asteroid->randomID);
+			}
+
+			pVertexShader->CopyBufferData("PerObject");
+
+			// Set the Shaders but do not copy buffers, this has been done already.
+			pVertexShader->SetShader(false);
+			pPixelShader->SetShader(false);
+
+			// Draw the GameEntity
+			pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			pDeviceContext->DrawIndexed(pMesh->GetIndexCount(), 0, 0);
+		}
+
+
+		if (pMaskRTV == nullptr)
+		{
+			pDeviceContext->OMSetRenderTargets(1, &pRTV, depthStencilView);
+		}
+		else
+		{
+			ID3D11RenderTargetView* views[2] = { pRTV, pMaskRTV };
+			pDeviceContext->OMSetRenderTargets(2, views, depthStencilView);
+		}
+	}
 }
 
 void RenderSystem::RenderCollisionSpheres(EntityManager* pManager)

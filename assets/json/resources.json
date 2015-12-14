@@ -18,6 +18,12 @@
     },
 
     {
+        "ID" : "Thruster",
+        "Type" : "Mesh",
+        "Filename" : "models/cylinder.obj"
+    },
+
+    {
         "ID" : "Ship",
         "Type" : "Mesh",
         "Filename" : "models/ship.obj"
@@ -131,6 +137,13 @@
     },
 
     {
+      "ID": "PPRefraction",
+      "Type": "Shader",
+      "Stage": "Pixel",
+      "Filename": "Refraction.cso"
+    },
+
+    {
         "ID" : "ShipVertex",
         "Type" : "Shader",
         "Stage" : "Vertex",
@@ -142,6 +155,13 @@
         "Type" : "Shader",
         "Stage" : "Pixel",
         "Filename" : "ShipPS.cso"
+    },
+
+    {
+        "ID" : "ThrusterPS",
+        "Type" : "Shader",
+        "Stage" : "Pixel",
+        "Filename" : "ThrusterPS.cso"
     },
 
     {
@@ -222,6 +242,14 @@
             { "Key" : "shipTexture", "TextureName" : "Ship" },
             { "Key" : "shipSpecMap", "TextureName" : "Ship_Spec" }
         ]
+    },
+
+    {
+        "ID" : "thruster",
+        "Type" : "Material",
+        "VertexShader" : "StandardVertex",
+        "PixelShader" : "ThrusterPS",
+        "Textures" : [ ]
     },
 
     {

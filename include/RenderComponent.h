@@ -10,10 +10,13 @@ struct RenderComponent : public Component<RenderComponent>
 {
     Material* material;
     Mesh* mesh;
+	bool maskOnly;
 
     RenderComponent(Material* const pMaterial, Mesh* const pMesh)
         : material(pMaterial), mesh(pMesh)
-    { /* Nothing to do */ }
+    {
+		maskOnly = false;
+	}
 
     ~RenderComponent(void){}
 };

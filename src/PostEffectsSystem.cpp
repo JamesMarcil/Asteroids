@@ -6,8 +6,13 @@
 #include "CameraManager.h"
 #include "EventManager.h"
 
+// Components
+#include "RenderComponent.h"
+#include "TransformComponent.h"
+
 // Effects
 #include "Warp.h"
+#include "Refraction.h"
 
 // DirectX
 #include <d3d11.h>
@@ -100,6 +105,11 @@ PostEffectsSystem::PostEffectsSystem()
 	effectsOrdered.emplace_back(w);
 	effectsMap.emplace("Warp", w);
 
+	Refraction* r = new Refraction();
+	effectsOrdered.emplace_back(r);
+	effectsMap.emplace("Refraction",r);
+	r->Enabled(true);
+
 	noEffect = new NoEffect();
 
 	EventManager::Instance()->Register("WarpBegin", this);
@@ -149,6 +159,7 @@ void PostEffectsSystem::Update(EntityManager * pManager, float dt, float tt)
 	UINT offset = 0;
 	pDeviceContext->IASetVertexBuffers(0, 1, &nothing, &stride, &offset);
 	pDeviceContext->IASetIndexBuffer(0, DXGI_FORMAT_R32_UINT, 0);
+
 
 	bool alt = false;
 	for (auto& effect : effectsOrdered)
