@@ -11,79 +11,16 @@
 
 // DirectX
 #include <d3d11.h>
+#include "DXMacros.h"
 
 using namespace DirectX;
 
-PostEffectsSystem::PostEffectsSystem()
+PostEffectsSystem::PostEffectsSystem(void)
 {
+    m_pResource = ResourceManager::Instance();
+    m_pEvent = EventManager::Instance();
 
-#pragma region post process resource setup
-
-	ResourceManager* pManager = ResourceManager::Instance();
-
-	ID3D11RenderTargetView* ppRTV;
-	ID3D11ShaderResourceView* ppSRV;
-
-	ID3D11RenderTargetView* swapRTV;
-	ID3D11ShaderResourceView* swapSRV;
-
-	// Create post-process resources
-	D3D11_TEXTURE2D_DESC textureDesc;
-	ZeroMemory(&textureDesc, sizeof(textureDesc));
-	textureDesc.Width = pManager->GetWindowWidth();
-	textureDesc.Height = pManager->GetWindowHeight();
-	textureDesc.ArraySize = 1;
-	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-	textureDesc.CPUAccessFlags = 0;
-	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	textureDesc.MipLevels = 1;
-	textureDesc.MiscFlags = 0;
-	textureDesc.SampleDesc.Count = 1;
-	textureDesc.SampleDesc.Quality = 0;
-	textureDesc.Usage = D3D11_USAGE_DEFAULT;
-
-	// create the texture that we will render into
-	ID3D11Texture2D* ppTexture;
-	pManager->GetDevice()->CreateTexture2D(&textureDesc, 0, &ppTexture);
-
-	// create the texture that we will render into
-	ID3D11Texture2D* swapTexture;
-	pManager->GetDevice()->CreateTexture2D(&textureDesc, 0, &swapTexture);
-
-	// Create the Render Target View
-	D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
-	ZeroMemory(&rtvDesc, sizeof(rtvDesc));
-	rtvDesc.Format = textureDesc.Format;
-	rtvDesc.Texture2D.MipSlice = 0;
-	rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-
-	pManager->GetDevice()->CreateRenderTargetView(ppTexture, &rtvDesc, &ppRTV);
-	pManager->GetDevice()->CreateRenderTargetView(swapTexture, &rtvDesc, &swapRTV);
-
-	// Create the Shader Resource View for the scene
-	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-	ZeroMemory(&srvDesc, sizeof(srvDesc));
-	srvDesc.Format = textureDesc.Format;
-	srvDesc.Texture2D.MipLevels = 1;
-	srvDesc.Texture2D.MostDetailedMip = 0;
-	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-
-	pManager->GetDevice()->CreateShaderResourceView(ppTexture, &srvDesc, &ppSRV);
-	pManager->GetDevice()->CreateShaderResourceView(swapTexture, &srvDesc, &swapSRV);
-
-	// register the scene texture as our postEffectTexture
-	pManager->RegisterTexture("PostEffectTexture", ppSRV);
-	pManager->RegisterTexture("PostEffectSwapTexture", swapSRV);
-
-	// We can release the texture because the RenderTarget and Shader Resource View now handle it
-	ppTexture->Release();
-	swapTexture->Release();
-
-	// Register the post processing Render Targets
-	pManager->RegisterRenderTargetView("PostRTV", ppRTV);
-	pManager->RegisterRenderTargetView("PostSwapRTV", swapRTV);
-
-#pragma endregion
+    CreatePostEffectRTVsAndSRVs();
 
 	Warp* w = new Warp();
 	effectsOrdered.emplace_back(w);
@@ -91,7 +28,8 @@ PostEffectsSystem::PostEffectsSystem()
 
 	noEffect = new NoEffect();
 
-	EventManager::Instance()->Register("WarpBegin", this);
+    m_pEvent->Register("WarpBegin", this);
+    m_pEvent->Register("OnResize", this);
 }
 
 PostEffectsSystem::~PostEffectsSystem(void)
@@ -116,21 +54,25 @@ PostEffectsSystem::~PostEffectsSystem(void)
 */
 void PostEffectsSystem::Update(EntityManager * pManager, float dt, float tt)
 {
-	ResourceManager* pResource = ResourceManager::Instance();
-	ID3D11Device* pDevice = pResource->GetDevice();
-	ID3D11DeviceContext* pDeviceContext = pResource->GetDeviceContext();
+    // Grab the device and context.
+	ID3D11Device* pDevice =                 m_pResource->GetDevice();
+	ID3D11DeviceContext* pDeviceContext =   m_pResource->GetDeviceContext();
 
-	ID3D11RenderTargetView* mainRTV = pResource->GetRenderTargetView("MainRTV");
-	ID3D11RenderTargetView* postRTV = pResource->GetRenderTargetView("PostRTV");
-	ID3D11RenderTargetView* swapRTV = pResource->GetRenderTargetView("PostSwapRTV");
+    // Grab the main RTV and DSV.
+    ID3D11RenderTargetView* mainRTV = m_pResource->GetRenderTargetView("MainRTV");
+	ID3D11DepthStencilView* dsv = m_pResource->GetDepthStencilView();
 
-	ID3D11DepthStencilView* dsv = pResource->GetDepthStencilView();
+    // Grab the Post-Process RTVs and SRVs.
+	ID3D11RenderTargetView* postRTV = m_pResource->GetRenderTargetView("PostRTV");
+	ID3D11ShaderResourceView* ppSRV =   m_pResource->GetTexture("PostEffectTexture");
 
-	// Grab the Texture we rendered into
-	ID3D11ShaderResourceView* ppSRV = pResource->GetTexture("PostEffectTexture");
-	ID3D11ShaderResourceView* swapSRV = pResource->GetTexture("PostEffectSwapTexture");
+	ID3D11RenderTargetView* swapRTV = m_pResource->GetRenderTargetView("PostSwapRTV");
+	ID3D11ShaderResourceView* swapSRV = m_pResource->GetTexture("PostEffectSwapTexture");
 
-	// unbind the buffers and set up the "triangle" to draw onto
+	ID3D11RenderTargetView* maskRTV = m_pResource->GetRenderTargetView("MaskRTV");
+	ID3D11ShaderResourceView* maskSRV = m_pResource->GetTexture("MaskTexture");
+
+	// Unbind the buffers and set up the "triangle" to draw.
 	ID3D11Buffer* nothing = 0;
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
@@ -176,7 +118,113 @@ void PostEffectsSystem::EventRouter(const std::string & name, void * data)
 {
 	if (name == "WarpBegin")
 	{
-		
 		effectsMap["Warp"]->Enabled(true);
 	}
+    else if(name == "OnResize")
+    {
+        CreatePostEffectRTVsAndSRVs();
+    }
+}
+
+void PostEffectsSystem::CreatePostEffectRTVsAndSRVs(void)
+{
+    ID3D11Device* pDevice = m_pResource->GetDevice();
+
+	ID3D11Texture2D* ppTexture;
+	ID3D11RenderTargetView* ppRTV;
+	ID3D11ShaderResourceView* ppSRV;
+
+	ID3D11Texture2D* swapTexture;
+	ID3D11RenderTargetView* swapRTV;
+	ID3D11ShaderResourceView* swapSRV;
+
+	ID3D11Texture2D* maskTexture;
+	ID3D11RenderTargetView* maskRTV;
+	ID3D11ShaderResourceView* maskSRV;
+
+    // Destroy previous RTVs.
+    {
+        ppRTV = m_pResource->GetRenderTargetView("PostRTV");
+        swapRTV = m_pResource->GetRenderTargetView("PostSwapRTV");
+        maskRTV = m_pResource->GetRenderTargetView("MaskRTV");
+
+        ReleaseMacro(ppRTV);
+        ReleaseMacro(swapRTV);
+        ReleaseMacro(maskRTV);
+    }
+
+    // Destroy previoue Post-Process Textures.
+    {
+        ppSRV =     m_pResource->GetTexture("PostEffectTexture");
+        swapSRV =   m_pResource->GetTexture("PostEffectSwapTexture");
+        maskSRV =   m_pResource->GetTexture("MaskTexture");
+
+        ReleaseMacro(ppSRV);
+        ReleaseMacro(swapSRV);
+        ReleaseMacro(maskSRV);
+    }
+
+	// Create the Post-Process Textures.
+    {
+        D3D11_TEXTURE2D_DESC desc;
+        ZeroMemory(&desc, sizeof(desc));
+        desc.Width =  m_pResource->GetWindowWidth();
+        desc.Height = m_pResource->GetWindowHeight();
+        desc.ArraySize = 1;
+        desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+        desc.CPUAccessFlags = 0;
+        desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        desc.MipLevels = 1;
+        desc.MiscFlags = 0;
+        desc.SampleDesc.Count = 1;
+        desc.SampleDesc.Quality = 0;
+        desc.Usage = D3D11_USAGE_DEFAULT;
+
+        // create the texture that we will render into
+        pDevice->CreateTexture2D(&desc, 0, &ppTexture);
+        pDevice->CreateTexture2D(&desc, 0, &swapTexture);
+        pDevice->CreateTexture2D(&desc, 0, &maskTexture);
+    }
+
+	// Create the RTVs for the scene.
+    {
+        D3D11_RENDER_TARGET_VIEW_DESC desc;
+        ZeroMemory(&desc, sizeof(desc));
+        desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        desc.Texture2D.MipSlice = 0;
+        desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+
+        pDevice->CreateRenderTargetView(ppTexture, &desc, &ppRTV);
+        pDevice->CreateRenderTargetView(swapTexture, &desc, &swapRTV);
+        pDevice->CreateRenderTargetView(maskTexture, &desc, &maskRTV);
+    }
+
+	// Create the SRVs for the scene.
+    {
+        D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+        ZeroMemory(&desc, sizeof(desc));
+        desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        desc.Texture2D.MipLevels = 1;
+        desc.Texture2D.MostDetailedMip = 0;
+        desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+
+        pDevice->CreateShaderResourceView(ppTexture, &desc, &ppSRV);
+        pDevice->CreateShaderResourceView(swapTexture, &desc, &swapSRV);
+        pDevice->CreateShaderResourceView(maskTexture, &desc, &maskSRV);
+    }
+
+	// Register the Post-Process SRVs.
+	m_pResource->RegisterShaderResourceView("PostEffectTexture", ppSRV);
+	m_pResource->RegisterShaderResourceView("PostEffectSwapTexture", swapSRV);
+	m_pResource->RegisterShaderResourceView("MaskTexture", maskSRV);
+
+	// Register the Post-Process RTVs.
+	m_pResource->RegisterRenderTargetView("PostRTV", ppRTV);
+	m_pResource->RegisterRenderTargetView("PostSwapRTV", swapRTV);
+	m_pResource->RegisterRenderTargetView("MaskRTV", maskRTV);
+
+	// We can release the textures because the RTV and SRV now handle it.
+    ReleaseMacro(ppTexture);
+    ReleaseMacro(swapTexture);
+    ReleaseMacro(maskTexture);
 }

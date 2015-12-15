@@ -111,6 +111,14 @@ public:
      */
     void RegisterDepthStencilView(ID3D11DepthStencilView* pDepthStencil);
 
+	/*
+	* Register an ID3D11ShaderResourceView* with the ResourceManager.
+	* @param       id          The id to store the ID3D11ShaderResourceView* at.
+	* @param       srv		   The ID3D11ShaderResourceView to register.
+	* @return  A bool indicating if the operation was successful.
+	*/
+	void RegisterShaderResourceView(const std::string& id, ID3D11ShaderResourceView* srv);
+
     /*
      * Register an IDXGISwapChain
      * @param   pSwapChain          The IDXGISwapChain to register.
@@ -197,14 +205,6 @@ public:
      * @return  A bool indicating if the operation was successful.
      */
     bool RegisterTexture(const std::string& id, const std::wstring& filename );
-
-	/*
-	* Register an ID3D11ShaderResourceView* with the ResourceManager.
-	* @param       id          The id to store the ID3D11ShaderResourceView* at.
-	* @param       srv		   The ID3D11ShaderResourceView to register.
-	* @return  A bool indicating if the operation was successful.
-	*/
-	bool RegisterTexture(const std::string& id, ID3D11ShaderResourceView* srv);
 
 	/*
 	* Register an ID3D11SamplerState* with the ResourceManager.

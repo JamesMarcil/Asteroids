@@ -83,7 +83,15 @@ void ResourceManager::RegisterDeviceAndContext( ID3D11Device* const device, ID3D
 */
 void ResourceManager::RegisterRenderTargetView(const std::string& id, ID3D11RenderTargetView* pRTV)
 {
-	renderTargetViews.emplace(id, pRTV);
+    auto& iter = renderTargetViews.find(id);
+    if(iter == renderTargetViews.cend())
+    {
+        renderTargetViews.emplace(id, pRTV);
+    }
+    else
+    {
+        renderTargetViews[id] = pRTV;
+    }
 }
 
 /*
@@ -248,23 +256,17 @@ bool ResourceManager::RegisterTexture( const std::string& id, const std::wstring
 * @param       srv		   The ID3D11ShaderResourceView to register.
 * @return  A bool indicating if the operation was successful.
 */
-bool ResourceManager::RegisterTexture(const std::string & id, ID3D11ShaderResourceView * srv)
+void ResourceManager::RegisterShaderResourceView(const std::string & id, ID3D11ShaderResourceView * pSRV)
 {
-	// Bail if there is not a registered ID3D11Device or ID3D11DeviceContext
-	if (!device || !deviceContext)
-	{
-		return false;
-	}
-
-	// Bail if there is already an ID3D11ShaderResourceView* stored at that id
-	if (textures.find(id) != textures.cend())
-	{
-		return false;
-	}
-
-	textures.emplace(id, srv);
-
-	return true;
+    auto& iter = textures.find(id);
+    if(iter == textures.cend())
+    {
+        textures.emplace(id, pSRV);
+    }
+    else
+    {
+        textures[id] = pSRV;
+    }
 }
 
 

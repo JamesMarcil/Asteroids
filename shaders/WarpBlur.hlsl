@@ -13,6 +13,7 @@ struct VertexToPixel
 
 // Textures and such
 Texture2D pixels		: register(t0);
+Texture2D mask			: register(t1);
 SamplerState trilinear	: register(s0);
 
 // Entry point for this pixel shader
@@ -23,12 +24,17 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float BlurStart = 1.0f; /// blur offset
 	int nsamples = 5;
 
+	float4 color = float4(0, 0, 0, 0);
+	float4 maskSample = mask.Sample(trilinear, input.uv);
+
+	if (maskSample.r == 1)
+	{
+		return pixels.Sample(trilinear, input.uv);;
+	}
+
 	input.uv -= Center;
 
-
-	float4 color = float4(0,0,0,0);
-
-	for (int i = 0; i < nsamples; i++)
+	[unroll] for (int i = 0; i < nsamples; i++)
 	{
 		float scale = BlurStart + BlurWidth * (i / (float)(nsamples - 1));
 		color += pixels.Sample(trilinear, input.uv * scale + Center);

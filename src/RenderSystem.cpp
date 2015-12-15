@@ -63,6 +63,7 @@ void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
 
 	// try to grab the post processing Render Target
 	ID3D11RenderTargetView* pRTV = pResource->GetRenderTargetView("PostRTV");
+	ID3D11RenderTargetView* pMaskRTV = pResource->GetRenderTargetView("MaskRTV");
 
 	// if the target doesn't exist fall back to the normal target
 	if (pRTV == nullptr)
@@ -70,7 +71,15 @@ void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
 		pRTV = pResource->GetRenderTargetView("MainRTV");
 	}
 
-	pDeviceContext->OMSetRenderTargets(1, &pRTV, depthStencilView);
+	if (pMaskRTV == nullptr)
+	{
+		pDeviceContext->OMSetRenderTargets(1, &pRTV, depthStencilView);
+	}
+	else
+	{
+		ID3D11RenderTargetView* views[2] = { pRTV, pMaskRTV };
+		pDeviceContext->OMSetRenderTargets(2, views, depthStencilView);
+	}
 
     // Declare a MAX_LIGHTS sized array for each type of LightComponent
     DirectionalLightComponent::Light dirLights[DirectionalLightComponent::MAX_LIGHTS];
