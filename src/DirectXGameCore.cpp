@@ -26,6 +26,7 @@
 #include "CameraManager.h"
 #include "EntityManager.h"
 #include "ResourceManager.h"
+#include "EventManager.h"
 
 // State
 #include "StateMachine.h"
@@ -269,8 +270,9 @@ bool DirectXGameCore::InitDirect3D()
 		return false;
 	}
 
-	ResourceManager::Instance()->RegisterDeviceAndContext(device, deviceContext);
-    ResourceManager::Instance()->RegisterSwapChain(swapChain);
+    ResourceManager* pResource = ResourceManager::Instance();
+    pResource->RegisterDeviceAndContext(device, deviceContext);
+    pResource->RegisterSwapChain(swapChain);
 
 	// There are several remaining steps before we can reasonably use DirectX.
 	// These steps also need to happen each time the window is resized, 
@@ -330,30 +332,33 @@ void DirectXGameCore::OnResize()
 	// uses the underlying textures
 	deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
 
-    // Update the ResourceManager with the new RenderTarget and DepthStencil Views
-    //ResourceManager::Instance()->RegisterRenderTargetAndDepthStencilView(renderTargetView, depthStencilView);
-	ResourceManager::Instance()->RegisterDepthStencilView(depthStencilView);
-	ResourceManager::Instance()->RegisterRenderTargetView("MainRTV", renderTargetView);
-
-
 	// Update the viewport to match the new window size and set it on the device
 	viewport.TopLeftX	= 0;
 	viewport.TopLeftY	= 0;
-	viewport.Width		= (float)windowWidth;
-	viewport.Height		= (float)windowHeight;
+	viewport.Width		= static_cast<float>(windowWidth);
+	viewport.Height		= static_cast<float>(windowHeight);
 	viewport.MinDepth	= 0.0f;
 	viewport.MaxDepth	= 1.0f;
 	deviceContext->RSSetViewports(1, &viewport);
 
 	// Recalculate the aspect ratio, since it probably changed
-	aspectRatio = (float)windowWidth / windowHeight;
+	aspectRatio = static_cast<float>(windowWidth / windowHeight);
 
     // Update the active Camera
-    Camera* active = CameraManager::Instance()->GetActiveCamera();
-    active->SetAspectRatio( aspectRatio );
+    CameraManager* pCamera = CameraManager::Instance();
+    Camera* pActiveCam = pCamera->GetActiveCamera();
+    pActiveCam->SetAspectRatio(aspectRatio);
 
-	ResourceManager::Instance()->SetWindowHeight(windowHeight);
-	ResourceManager::Instance()->SetWindowWidth(windowWidth);
+    // Update the ResourceManager.
+    ResourceManager* pResource = ResourceManager::Instance();
+    pResource->SetWindowHeight(windowHeight);
+    pResource->SetWindowWidth(windowWidth);
+	pResource->RegisterDepthStencilView(depthStencilView);
+	pResource->RegisterRenderTargetView("MainRTV", renderTargetView);
+
+    // Notify interested parties of a window resize.
+    EventManager* pEvent = EventManager::Instance();
+    pEvent->Fire("OnResize", nullptr);
 }
 #pragma endregion
 

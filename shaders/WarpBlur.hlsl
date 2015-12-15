@@ -34,12 +34,9 @@ float4 main(VertexToPixel input) : SV_TARGET
 
 	input.uv -= Center;
 
-	for (int i = 0; i < nsamples; i++)
+	[unroll] for (int i = 0; i < nsamples; i++)
 	{
 		float scale = BlurStart + BlurWidth * (i / (float)(nsamples - 1));
-
-
-
 		color += pixels.Sample(trilinear, input.uv * scale + Center);
 	}
 
