@@ -74,14 +74,14 @@ GameEntity EntityFactory::CreatePlayer(DirectX::XMFLOAT3 position)
 
     GameEntity player = pEntity->Create("Player");
     pEntity->AddComponent<RenderComponent>(player, pResource->GetMaterial("ship"), pResource->GetMesh("Ship"));
-    pEntity->AddComponent<InputComponent>(player, 50.0f);
+    pEntity->AddComponent<InputComponent>(player, 5.0f);
     pEntity->AddComponent<CollisionComponent>(player, *pResource->GetMesh("Ship"), XMFLOAT3(0, 0, 0), 0.0007f);
     pEntity->AddComponent<AttackComponent>(player, 5.0f);
     TransformComponent* pTrans = pEntity->AddComponent<TransformComponent>(player, position);
     pTrans->transform.SetScale(.001f);
     PhysicsComponent* pPhysics = pEntity->AddComponent<PhysicsComponent>(player, XMVectorZero(), XMVectorZero());
-    pPhysics->drag = 0.95f;
-    pPhysics->rotationalDrag = 0.85f;
+    pPhysics->drag = 0.60f;
+    pPhysics->rotationalDrag = 0.30f;
 
     return player;
 }
