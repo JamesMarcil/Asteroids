@@ -21,10 +21,9 @@ cbuffer Lights : register(b1)
     SpotLight spotLights[MAX_LIGHTS];
 };
 
-Texture2D diffuseTexture    : register(t0);
-Texture2D rustTexture       : register(t1);
-Texture2D specMapTexture    : register(t2);
-Texture2D noiseTexture      : register(t3);
+Texture2D rustTexture       : register(t0);
+Texture2D specMapTexture    : register(t1);
+Texture2D noiseTexture      : register(t2);
 SamplerState trilinear      : register(s0);
 
 float rand(float2 co) {
