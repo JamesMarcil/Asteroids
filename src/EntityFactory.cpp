@@ -18,6 +18,7 @@
 #include "CollisionComponent.h"
 #include "AttackComponent.h"
 #include "AsteroidRenderComponent.h"
+#include <ParticleComponent.h>
 
 // Scripts
 #include "AutoDestructScript.h"
@@ -70,7 +71,7 @@ GameEntity EntityFactory::CreateAsteroid(DirectX::XMFLOAT3 position, DirectX::XM
 GameEntity EntityFactory::CreatePlayer(DirectX::XMFLOAT3 position)
 {
     EntityManager* pEntity = EntityManager::Instance();
-    ResourceManager* pResource = ResourceManager::Instance();
+	ResourceManager* pResource = ResourceManager::Instance();
 
     GameEntity player = pEntity->Create("Player");
     pEntity->AddComponent<RenderComponent>(player, pResource->GetMaterial("ship"), pResource->GetMesh("Ship"));
@@ -83,6 +84,34 @@ GameEntity EntityFactory::CreatePlayer(DirectX::XMFLOAT3 position)
     pPhysics->drag = 0.95f;
     pPhysics->rotationalDrag = 0.85f;
 
+	// Particles
+	Particle p(XMFLOAT4(1, 0, 0, 1),
+			   XMFLOAT4(1, 0, 0, 1),
+			   XMFLOAT4(1, 0, 0, 1),
+			   XMFLOAT3(0, 0, 0),
+			   XMFLOAT3(0, 0.0f, 1.0f),
+			   XMFLOAT3(0, 0.0f, 1.0f),
+			   1.0f,
+			   0.0f,
+			   0.04f,
+			   0.0f,
+			   0);
+
+	ParticleGenerator* pGML = new ParticleGenerator(p, XMFLOAT3( 0.0f, -0.15f, -1.0f), 0.5f, 0.00001, 10);
+	ParticleGenerator* pGMU = new ParticleGenerator(p, XMFLOAT3( 0.0f, +0.05f, -1.0f), 0.5f, 0.00001, 10);
+	ParticleGenerator* pGRU = new ParticleGenerator(p, XMFLOAT3(+0.3f, +0.05f, -1.0f), 0.5f, 0.00001, 10);
+	ParticleGenerator* pGLU = new ParticleGenerator(p, XMFLOAT3(-0.3f, +0.05f, -1.0f), 0.5f, 0.00001, 10);
+	ParticleGenerator* pGRL = new ParticleGenerator(p, XMFLOAT3(+0.3f, -0.15f, -1.0f), 0.5f, 0.00001, 10);
+	ParticleGenerator* pGLL = new ParticleGenerator(p, XMFLOAT3(-0.3f, -0.15f, -1.0f), 0.5f, 0.00001, 10);
+
+
+	ParticleComponent* pParticles = pEntity->AddComponent<ParticleComponent>(player);
+	pParticles->AddGenerator(pGML);
+	pParticles->AddGenerator(pGMU);
+	pParticles->AddGenerator(pGRU);
+	pParticles->AddGenerator(pGLU);
+	pParticles->AddGenerator(pGRL);
+	pParticles->AddGenerator(pGLL);
     return player;
 }
 

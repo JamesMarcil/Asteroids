@@ -8,7 +8,6 @@
 #include "ResourceManager.h"
 #include "EntityManager.h"
 #include "CameraManager.h"
-#include <ParticleManager.h>
 
 // DirectX
 #include <d3d11.h>
@@ -191,7 +190,6 @@ void RenderSystem::Update(EntityManager* pManager, float dt, float tt )
 
 	//RenderCollisionSpheres(pManager);
 	//RenderOctants(pManager);
-	RenderParticles();
 }
 
 void RenderSystem::RenderCollisionSpheres(EntityManager* pManager)
@@ -279,41 +277,5 @@ void RenderSystem::RenderOctants(EntityManager* pManager) {
 		colliderMat->GetPixelShader()->SetShader(true);
 
 		deviceContext->DrawIndexed(cube->GetIndexCount(), 0, 0);
-	}
-}
-
-void RenderSystem::RenderParticles() {
-	ParticleManager* pManager = ParticleManager::Instance();
-	ResourceManager* rManager = ResourceManager::Instance();
-	ID3D11DeviceContext*	 deviceContext = rManager->GetDeviceContext();
-	SimpleVertexShader*		 particleVS = dynamic_cast<SimpleVertexShader*>(rManager->GetShader("ParticleVS"));
-	SimpleGeometryShader*	 particleGS = dynamic_cast<SimpleGeometryShader*>(rManager->GetShader("ParticleGS"));
-	SimplePixelShader*		 particlePS = dynamic_cast<SimplePixelShader*>(rManager->GetShader("ParticlePS"));
-	ID3D11BlendState*		 particleBlendState = rManager->GetBlendState("particleBlendState");
-	ID3D11DepthStencilState* particleDepthState = rManager->GetDepthStencilState("particleDepthState");
-
-	float factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	UINT particleStride = sizeof(Particle);
-	UINT particleOffset = 0;
-
-	for (auto& pGen : pManager->GetGenerators()) {
-		particleGS->SetMatrix4x4("world", XMFLOAT4X4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
-		particleGS->SetMatrix4x4("view", m_pCamera->GetActiveCamera()->GetViewMatrix());
-		particleGS->SetMatrix4x4("projection", m_pCamera->GetActiveCamera()->GetProjectionMatrix());
-
-		particleVS->SetShader(false);
-		particleGS->SetShader(true);
-		particlePS->SetShader(false);
-
-		deviceContext->OMSetBlendState(particleBlendState, factor, 0xffffffff);
-		deviceContext->OMSetDepthStencilState(particleDepthState, 0);
-
-		deviceContext->IASetVertexBuffers(0, 1, &pGen.readBuff, &particleStride, &particleOffset);
-		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-		deviceContext->DrawAuto();
-
-		deviceContext->OMSetBlendState(0, factor, 0xffffffff);
-		deviceContext->OMSetDepthStencilState(0, 0);
-		deviceContext->GSSetShader(0, 0, 0);
 	}
 }

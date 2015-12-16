@@ -25,6 +25,7 @@ VStoGS main(VSInput input)
 	VStoGS output;
 
 	output.color = input.startColor;
+	output.color.w = input.age / input.lifeTime;
 	float t = input.age;
 	output.position.xyz = input.position + input.velocity * t + input.acceleration * t * t * 0.5;
 	output.size = input.size;

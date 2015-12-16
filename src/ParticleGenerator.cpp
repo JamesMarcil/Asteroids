@@ -1,7 +1,7 @@
 #include <ParticleGenerator.h>
 
 
-ParticleGenerator::ParticleGenerator(Particle p, DirectX::XMFLOAT3 pos, float lt, float sr, float dt, float tt)
+ParticleGenerator::ParticleGenerator(Particle p, DirectX::XMFLOAT3 pos, float lt, float sr, float numRoots)
 {
 	init = false;
 	lifeTime = lt;
@@ -12,6 +12,7 @@ ParticleGenerator::ParticleGenerator(Particle p, DirectX::XMFLOAT3 pos, float lt
 	ResourceManager* rManager = ResourceManager::Instance();
 	ID3D11Device* device = rManager->GetDevice();
 	ID3D11DeviceContext* deviceContext = rManager->GetDeviceContext();
+
 	generatorVS = dynamic_cast<SimpleVertexShader*>(rManager->GetShader("ParticleGeneratorVS"));
 	generatorGS = dynamic_cast<SimpleGeometryShader*>(rManager->GetShader("ParticleGeneratorGS"));
 
@@ -20,9 +21,13 @@ ParticleGenerator::ParticleGenerator(Particle p, DirectX::XMFLOAT3 pos, float lt
 	generatorGS->CreateCompatibleStreamOutBuffer(&writeBuff, 1000000);
 
 	// Create initial ROOT vertex buffer
-	UINT stride = 0;
+	UINT stride = sizeof(Particle);
 	UINT offset = 0;
-	Particle vertices[1] = { p };
+	Particle* vertices = (Particle*)malloc(sizeof(Particle) * numRoots);
+
+	for (int i = 0; i < numRoots; i++) {
+		vertices[i] = p;
+	}
 
 	D3D11_BUFFER_DESC vbd;
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
@@ -36,8 +41,8 @@ ParticleGenerator::ParticleGenerator(Particle p, DirectX::XMFLOAT3 pos, float lt
 	device->CreateBuffer(&vbd, &initialVertexData, &particleBuff);
 
 	// Set constant variables
-	generatorGS->SetFloat("dt", dt);
-	generatorGS->SetFloat("tt", tt);
+	generatorGS->SetFloat("dt", 0.0f);
+	generatorGS->SetFloat("tt", 0.0f);
 	generatorGS->SetFloat("lifeTime", lifeTime);
 	generatorGS->SetFloat("spawnRate", spawnRate);
 	generatorGS->SetFloat3("generatorPos", position);
@@ -69,18 +74,25 @@ ParticleGenerator::~ParticleGenerator() {
 	//writeBuff->Release();
 }
 
-void ParticleGenerator::Update(float dt, float tt) {
+void ParticleGenerator::Update(DirectX::XMFLOAT3 ePosition, float dt, float tt) {
 	ResourceManager* rManager = ResourceManager::Instance();
 	ID3D11DeviceContext* deviceContext = rManager->GetDeviceContext();
 	UINT stride = sizeof(Particle);
 	UINT offset = 0;
+	generatorVS = dynamic_cast<SimpleVertexShader*>(rManager->GetShader("ParticleGeneratorVS"));
+	generatorGS = dynamic_cast<SimpleGeometryShader*>(rManager->GetShader("ParticleGeneratorGS"));
+
+	DirectX::XMVECTOR ePos = DirectX::XMLoadFloat3(&ePosition);
+	DirectX::XMVECTOR localPos = DirectX::XMLoadFloat3(&position);
+	DirectX::XMFLOAT3 finalPos(0, 0, 0);
+	DirectX::XMStoreFloat3(&finalPos, DirectX::XMVectorAdd(ePos, localPos));
 
 	// Set constant variables
 	generatorGS->SetFloat("dt", dt);
 	generatorGS->SetFloat("tt", tt);
 	generatorGS->SetFloat("lifeTime", lifeTime);
 	generatorGS->SetFloat("spawnRate", spawnRate);
-	generatorGS->SetFloat3("generatorPos", position);
+	generatorGS->SetFloat3("generatorPos", finalPos);
 	generatorGS->SetSamplerState("randomSampler", rManager->GetSamplerState("trilinear"));
 	generatorGS->SetShaderResourceView("randomTexture", rManager->GetTexture("randomTexture"));
 
@@ -88,7 +100,6 @@ void ParticleGenerator::Update(float dt, float tt) {
 	generatorVS->SetShader(true);
 	generatorGS->SetShader(true);
 	deviceContext->PSSetShader(0, 0, 0);
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
 	// Unbind vertex buffers (incase)
 	ID3D11Buffer* unset = 0;

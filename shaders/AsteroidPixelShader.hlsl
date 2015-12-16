@@ -68,5 +68,5 @@ float4 main(VertexToPixel input) : SV_TARGET
 	if (input.worldPos.z > noiseTexture.Sample(trilinear, input.uv).r*150.0f + 50.f) discard; //Fade in
 
     // Calculate the final color.
-	return diffuseColor * (dirColor + pointColor + spotColor);
+	return diffuseColor; //  *(dirColor + pointColor + spotColor);
 }

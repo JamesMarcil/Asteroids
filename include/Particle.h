@@ -3,6 +3,8 @@
 
 #include <DirectXMath.h>
 
+enum ParticleType { ROOT = 1, RESET = 2, STANDARD = 3 };
+
 struct Particle
 {
 	DirectX::XMFLOAT4 startColor;
@@ -15,6 +17,7 @@ struct Particle
 	float age;
 	float lifeTime;
 	float startTime;
+	int type;
 
 	Particle(DirectX::XMFLOAT4 sCol,
 		DirectX::XMFLOAT4 mCol,
@@ -25,8 +28,9 @@ struct Particle
 		float s,
 		float a,
 		float lt,
-		float st)
-		: startColor(sCol), midColor(mCol), endColor(eCol), position(pos), velocity(vel), acceleration(accel), size(s), age(a), lifeTime(lt), startTime(st)
+		float st,
+		int t)
+		: startColor(sCol), midColor(mCol), endColor(eCol), position(pos), velocity(vel), acceleration(accel), size(s), age(a), lifeTime(lt), startTime(st), type(t)
 	{
 	}
 };

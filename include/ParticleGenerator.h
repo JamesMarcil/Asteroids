@@ -21,10 +21,10 @@ public:
 	float lifeTime;
 	float spawnRate;
 
-	ParticleGenerator(Particle p, DirectX::XMFLOAT3 pos, float lr, float sr, float lt, float sR);
+	ParticleGenerator(Particle p, DirectX::XMFLOAT3 pos, float lt, float sr, float numRoots);
 	~ParticleGenerator();
 
-	void Update(float dt, float tt);
+	void Update(DirectX::XMFLOAT3 ePosition, float dt, float tt);
 	void SwapBuffers();
 
 	ID3D11Buffer* GetParticles() { return readBuff; }

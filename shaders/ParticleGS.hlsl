@@ -7,8 +7,8 @@ cbuffer TransformationData : register(b0)
 
 struct GSInput
 {
-	float4 position	: SV_POSITION;
 	float4 color	: COLOR;
+	float3 position	: POSITION;
 	float size		: TEXCOORD0;
 	int type		: TEXCOORD1;
 };
@@ -38,11 +38,11 @@ void main(point GSInput input[1],
 
 	[unroll]
 	for (int i = 0; i < 4; i++) {
-		output.position = mul(input[0].position, mvp);
+		output.position = mul(float4(input[0].position, 1), mvp);
 
 		float depthChange = output.position.z / output.position.w;
 
-		output.position.xy += offsets[i] * depthChange * input[0].size;
+		output.position.xy += offsets[i] * depthChange * input[0].size * 20;
 		output.color = input[0].color;
 
 		outStream.Append(output);

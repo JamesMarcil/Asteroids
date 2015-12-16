@@ -10,7 +10,6 @@ cbuffer GlobalData : register(b0)
 cbuffer GeneratorData : register(b1)
 {
 	float3 generatorPos;
-	float  lifeTime;
 	float  spawnRate;
 };
 
@@ -26,7 +25,7 @@ struct GSInput
 	float  age			: TEXCOORD3;
 	float  lifeTime		: TEXCOORD4;
 	float  startTime	: TEXCOORD5;
-	float  type			: TEXCOORD6;
+	int    type			: TEXCOORD6;
 };
 
 texture1D randomTexture : register(t0);
@@ -59,16 +58,17 @@ void main(point GSInput input[1],
 
 			// Random offsets
 			float4 random = randomTexture.SampleLevel(randomSampler, tt * 10, 0);
-			newParticle.position += random.xyz * 0.5f;
-			newParticle.velocity.x = random.w * 0.3f;
-			newParticle.velocity.z = random.x * 0.3f;
+			newParticle.position.xy += random.xy * 0.05f;
+			newParticle.velocity.x = 0;
+			newParticle.velocity.y = 0;
+			newParticle.velocity.z = input[0].velocity.z;
 
 			outStream.Append(newParticle);
 		}
 
 		outStream.Append(input[0]);
 	}
-	else if (input[0].age < lifeTime) {
+	else if (input[0].age < input[0].lifeTime) {
 		outStream.Append(input[0]);
 	}
 }

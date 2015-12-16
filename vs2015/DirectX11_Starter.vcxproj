@@ -124,8 +124,10 @@
     <ClInclude Include="..\include\NoEffect.h" />
     <ClInclude Include="..\include\Octant.h" />
     <ClInclude Include="..\include\OctTree.h" />
+    <ClInclude Include="..\include\Particle.h" />
+    <ClInclude Include="..\include\ParticleComponent.h" />
     <ClInclude Include="..\include\ParticleGenerator.h" />
-    <ClInclude Include="..\include\ParticleManager.h" />
+    <ClInclude Include="..\include\ParticleSystem.h" />
     <ClInclude Include="..\include\PhysicsComponent.h" />
     <ClInclude Include="..\include\PhysicsSystem.h" />
     <ClInclude Include="..\include\PostEffectsSystem.h" />
@@ -153,7 +155,6 @@
     <ClInclude Include="..\include\Script.h" />
     <ClInclude Include="..\include\Warp.h" />
     <ClInclude Include="..\include\AsteroidRenderComponent.h" />
-    <ClInclude Include="Particle.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\AABB.cpp" />
@@ -179,6 +180,7 @@
     <ClCompile Include="..\src\NoEffect.cpp" />
     <ClCompile Include="..\src\OctTree.cpp" />
     <ClCompile Include="..\src\ParticleGenerator.cpp" />
+    <ClCompile Include="..\src\ParticleSystem.cpp" />
     <ClCompile Include="..\src\PhysicsSystem.cpp" />
     <ClCompile Include="..\src\PostEffectsSystem.cpp" />
     <ClCompile Include="..\src\RenderSystem.cpp" />

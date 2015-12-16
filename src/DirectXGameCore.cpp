@@ -26,7 +26,6 @@
 #include "CameraManager.h"
 #include "EntityManager.h"
 #include "ResourceManager.h"
-#include <ParticleManager.h>
 
 // State
 #include "StateMachine.h"
@@ -63,8 +62,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 DirectXGameCore::DirectXGameCore(HINSTANCE hInstance)
 	: hAppInst(hInstance),
 	windowCaption(L"Galactic Bulge presents: Asteroids"),
-	windowWidth(800),
-	windowHeight(600),
+	windowWidth(1600),
+	windowHeight(1200),
 	hMainWnd(0),
 	hasFocus(false),
 	minimized(false),
@@ -397,7 +396,6 @@ int DirectXGameCore::Run()
 			InputManager::Instance()->Update(deltaTime);
             CameraManager::Instance()->Update(deltaTime);
             StateMachine<GameStates>::Instance()->Update(deltaTime, totalTime);
-			ParticleManager::Instance()->Update(deltaTime, totalTime);
             EntityManager::Instance()->Update(deltaTime, totalTime);
 		}
 	}
