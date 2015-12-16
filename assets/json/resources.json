@@ -60,6 +60,12 @@
     },
 
     {
+        "ID" : "PerforatedRock",
+        "Type" : "Texture",
+        "Filename" : "textures/PerforatedRock.jpg"
+    },
+
+    {
         "ID" : "Space",
         "Type" : "Texture",
         "Filename" : "textures/SpaceCubeMap.dds"
@@ -215,8 +221,7 @@
         "VertexShader" : "AsteroidVertex",
         "PixelShader" : "AsteroidPixel",
         "Textures" : [
-            { "Key" : "rustTexture", "TextureName" : "Rust" },
-            { "Key" : "specMapTexture", "TextureName" : "Rust_Spec" },
+            { "Key" : "diffuse", "TextureName" : "PerforatedRock" },
             { "Key" : "noiseTexture", "TextureName" : "RandomNoise" },
             { "Key" : "perlinTexture", "TextureName" : "Perlin" }
         ]
