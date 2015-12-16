@@ -10,7 +10,6 @@
 #include "PhysicsComponent.h"
 #include "InputComponent.h"
 #include "LightComponent.h"
-#include "ScriptComponent.h"
 #include "AABBComponent.h"
 #include "ButtonComponent.h"
 #include "UIRenderComponent.h"
@@ -18,9 +17,6 @@
 #include "CollisionComponent.h"
 #include "AttackComponent.h"
 #include "AsteroidRenderComponent.h"
-
-// Scripts
-#include "AutoDestructScript.h"
 
 using namespace DirectX;
 
@@ -61,8 +57,6 @@ GameEntity EntityFactory::CreateAsteroid(DirectX::XMFLOAT3 position, DirectX::XM
     TransformComponent* pTransform = pEntity->AddComponent<TransformComponent>(asteroid, position);
     pTransform->transform.SetRotation(rotation);
     pTransform->transform.SetScale(scale);
-    ScriptComponent* script = pEntity->AddComponent<ScriptComponent>(asteroid);
-    script->AddScript<AutoDestructScript>(-5.0f);
 
     return asteroid;
 }
