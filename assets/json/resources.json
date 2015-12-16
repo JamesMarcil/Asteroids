@@ -48,18 +48,6 @@
     },
 
     {
-        "ID" : "Loam",
-        "Type" : "Texture",
-        "Filename" : "textures/loam.jpg"
-    },
-
-    {
-        "ID" : "Rock",
-        "Type" : "Texture",
-        "Filename" : "textures/rock.jpg"
-    },
-
-    {
         "ID" : "PerforatedRock",
         "Type" : "Texture",
         "Filename" : "textures/PerforatedRock.jpg"
