@@ -33,6 +33,10 @@
 #include "CollisionSystem.h"
 #include "AttackSystem.h"
 
+// Scripts
+#include "ScriptComponent.h"
+#include "AutoDestructScript.h"
+
 // For the DirectX Math library
 using namespace DirectX;
 
@@ -93,6 +97,7 @@ void GameState::Enter(void)
 
 void GameState::LoadCurrentLevel()
 {
+    EntityManager* pEntity = EntityManager::Instance();
 	srand(static_cast<std::time_t>(0));
 	this->currentLevel++;
 	int span = 10;
@@ -106,7 +111,9 @@ void GameState::LoadCurrentLevel()
         XMFLOAT3 rotation{rand() * 3.0f, rand() * 3.0f, rand() * 3.0f};
 		float scale = 1.0f + rand() * 0.0001f;
 
-        EntityFactory::CreateAsteroid(position, velocity, acceleration, rotation, scale, i+1);
+        GameEntity asteroid = EntityFactory::CreateAsteroid(position, velocity, acceleration, rotation, scale, i+1);
+        ScriptComponent* pScript = pEntity->AddComponent<ScriptComponent>(asteroid);
+        pScript->AddScript<AutoDestructScript>(-5.0f);
 	}
 }
 

@@ -20,9 +20,8 @@ cbuffer Lights : register(b1)
     SpotLight spotLights[MAX_LIGHTS];
 };
 
-Texture2D diffuseTexture    : register(t0);
-Texture2D rustTexture       : register(t1);
-Texture2D specMapTexture    : register(t2);
+Texture2D rustTexture       : register(t0);
+Texture2D specMapTexture    : register(t1);
 SamplerState trilinear      : register(s0);
 
 float4 main(VertexToPixel input) : SV_TARGET

@@ -10,7 +10,6 @@
 #include "PhysicsComponent.h"
 #include "InputComponent.h"
 #include "LightComponent.h"
-#include "ScriptComponent.h"
 #include "AABBComponent.h"
 #include "ButtonComponent.h"
 #include "UIRenderComponent.h"
@@ -18,9 +17,6 @@
 #include "CollisionComponent.h"
 #include "AttackComponent.h"
 #include "AsteroidRenderComponent.h"
-
-// Scripts
-#include "AutoDestructScript.h"
 
 using namespace DirectX;
 
@@ -40,9 +36,12 @@ GameEntity EntityFactory::CreateButton(DirectX::XMFLOAT2 center, float width, fl
     EntityManager* pEntity = EntityManager::Instance();
     ResourceManager* pResource = ResourceManager::Instance();
 
+    float halfWidth = static_cast<float>(pResource->GetWindowWidth()) / 2.0f;
+    float halfHeight = static_cast<float>(pResource->GetWindowHeight()) / 2.0f;
+
     GameEntity button = pEntity->Create("Button");
     pEntity->AddComponent<ButtonComponent>(button, true, event);
-    pEntity->AddComponent<AABBComponent>(button, XMFLOAT2{center.x + 400.0f, center.y + 300.0f}, width / 2.0f, height / 2.0f); // TODO: Replace with half window width and half window height
+    pEntity->AddComponent<AABBComponent>(button, XMFLOAT2{center.x + halfWidth, center.y + halfHeight}, width / 2.0f, height / 2.0f);
     pEntity->AddComponent<UITextComponent>(button, text, spritefont_id, position, color);
 
     return button;
@@ -61,8 +60,6 @@ GameEntity EntityFactory::CreateAsteroid(DirectX::XMFLOAT3 position, DirectX::XM
     TransformComponent* pTransform = pEntity->AddComponent<TransformComponent>(asteroid, position);
     pTransform->transform.SetRotation(rotation);
     pTransform->transform.SetScale(scale);
-    ScriptComponent* script = pEntity->AddComponent<ScriptComponent>(asteroid);
-    script->AddScript<AutoDestructScript>(-5.0f);
 
     return asteroid;
 }
@@ -74,14 +71,14 @@ GameEntity EntityFactory::CreatePlayer(DirectX::XMFLOAT3 position)
 
     GameEntity player = pEntity->Create("Player");
     pEntity->AddComponent<RenderComponent>(player, pResource->GetMaterial("ship"), pResource->GetMesh("Ship"));
-    pEntity->AddComponent<InputComponent>(player, 50.0f);
+    pEntity->AddComponent<InputComponent>(player, 5.0f);
     pEntity->AddComponent<CollisionComponent>(player, *pResource->GetMesh("Ship"), XMFLOAT3(0, 0, 0), 0.0007f);
     pEntity->AddComponent<AttackComponent>(player, 5.0f);
     TransformComponent* pTrans = pEntity->AddComponent<TransformComponent>(player, position);
     pTrans->transform.SetScale(.001f);
     PhysicsComponent* pPhysics = pEntity->AddComponent<PhysicsComponent>(player, XMVectorZero(), XMVectorZero());
-    pPhysics->drag = 0.95f;
-    pPhysics->rotationalDrag = 0.85f;
+    pPhysics->drag = 0.60f;
+    pPhysics->rotationalDrag = 0.30f;
 
 	GameEntity exhaust = pEntity->Create("Exhaust");
 

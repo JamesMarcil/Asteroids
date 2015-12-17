@@ -60,32 +60,32 @@ void Warp::RenderEffect(ID3D11ShaderResourceView * srv, ID3D11DeviceContext* pDe
 		if (timeElapsed <= warpTime / 3)
 		{
 			// map the time elapsed onto 0 - 1
-			time0to1 = Tweens::Instance()->MapRange(timeElapsed, 0, warpTime / 3, 0, 1);
+			time0to1 = Tweens::MapRange(timeElapsed, 0, warpTime / 3, 0, 1);
 
 			// Ease in the blur
-			blur = Tweens::Instance()->EaseIn(time0to1);
+			blur = Tweens::EaseIn(time0to1);
 
 			// Map back from 0-1 into 0 - blurWidth
-			blur = Tweens::Instance()->MapRange(blur, 0, 1, 0, blurWidth);
+			blur = Tweens::MapRange(blur, 0, 1, 0, blurWidth);
 			blur = -blur;
 
 			// Ease in the fov
-			fov = Tweens::Instance()->EaseIn(time0to1);
-			fov = Tweens::Instance()->MapRange(fov, 0, 1, startFOV, endFOV);
+			fov = Tweens::EaseIn(time0to1);
+			fov = Tweens::MapRange(fov, 0, 1, startFOV, endFOV);
 		}
 		else if (timeElapsed > 2 * (warpTime / 3))
 		{
 			// map time onto 0-1
-			time0to1 = Tweens::Instance()->MapRange(timeElapsed, 2 * (warpTime / 3), warpTime, 0, 1);
+			time0to1 = Tweens::MapRange(timeElapsed, 2 * (warpTime / 3), warpTime, 0, 1);
 
 			// Ease out blur
-			blur = Tweens::Instance()->EaseOut(time0to1);
-			blur = Tweens::Instance()->MapRange(blur, 0, 1, 0, blurWidth);
+			blur = Tweens::EaseOut(time0to1);
+			blur = Tweens::MapRange(blur, 0, 1, 0, blurWidth);
 			blur = -blur;
 
 			// Ease out fov
-			fov = Tweens::Instance()->EaseOut(time0to1);
-			fov = Tweens::Instance()->MapRange(fov, 0, 1, startFOV, endFOV);
+			fov = Tweens::EaseOut(time0to1);
+			fov = Tweens::MapRange(fov, 0, 1, startFOV, endFOV);
 		}
 		else
 		{

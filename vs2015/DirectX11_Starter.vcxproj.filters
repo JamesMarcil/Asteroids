@@ -258,6 +258,12 @@
     <ClInclude Include="..\include\AsteroidRenderComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\Script.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\ResetPositionScript.h">
+      <Filter>Header Files\Components\Scripts</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ExitState.cpp">

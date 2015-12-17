@@ -30,12 +30,6 @@
     },
 
     {
-        "ID" : "Diffuse",
-        "Type" : "Texture",
-        "Filename" : "textures/crate.png"
-    },
-
-    {
         "ID" : "Rust",
         "Type" : "Texture",
         "Filename" : "textures/rusty.jpg"
@@ -60,15 +54,9 @@
     },
 
     {
-        "ID" : "Loam",
+        "ID" : "PerforatedRock",
         "Type" : "Texture",
-        "Filename" : "textures/loam.jpg"
-    },
-
-    {
-        "ID" : "Rock",
-        "Type" : "Texture",
-        "Filename" : "textures/rock.jpg"
+        "Filename" : "textures/PerforatedRock.jpg"
     },
 
     {
@@ -200,14 +188,6 @@
     },
 
     {
-        "ID" : "UIMaterial",
-        "Type" : "Material",
-        "VertexShader" : "UIVertex",
-        "PixelShader" : "UIPixel",
-        "Textures" : [ { "Key" : "buttonTexture", "TextureName" : "Diffuse" } ]
-    },
-
-    {
         "ID" : "AsteroidVertex",
         "Type" : "Shader",
         "Stage" : "Vertex",
@@ -226,8 +206,7 @@
         "Type" : "Material",
         "VertexShader" : "StandardVertex",
         "PixelShader" : "StandardPixel",
-        "Textures" : [ 
-            { "Key" : "diffuseTexture", "TextureName" : "Diffuse" },
+        "Textures" : [
             { "Key" : "rustTexture", "TextureName" : "Rust" },
             { "Key" : "specMapTexture", "TextureName" : "Rust_Spec" }
         ]
@@ -238,9 +217,21 @@
         "Type" : "Material",
         "VertexShader" : "ShipVertex",
         "PixelShader" : "ShipPixel",
-        "Textures" : [ 
+        "Textures" : [
             { "Key" : "shipTexture", "TextureName" : "Ship" },
             { "Key" : "shipSpecMap", "TextureName" : "Ship_Spec" }
+        ]
+    },
+
+    {
+        "ID" : "asteroid",
+        "Type" : "Material",
+        "VertexShader" : "AsteroidVertex",
+        "PixelShader" : "AsteroidPixel",
+        "Textures" : [
+            { "Key" : "diffuse", "TextureName" : "PerforatedRock" },
+            { "Key" : "noiseTexture", "TextureName" : "RandomNoise" },
+            { "Key" : "perlinTexture", "TextureName" : "Perlin" }
         ]
     },
 
@@ -249,7 +240,7 @@
         "Type" : "Material",
         "VertexShader" : "StandardVertex",
         "PixelShader" : "ThrusterPS",
-        "Textures" : [ ]
+        "Textures" : []
     },
 
     {
@@ -262,19 +253,5 @@
         "ID" : "SpaceAge54",
         "Type" : "SpriteFont",
         "Filename" : "fonts/space_54.fnt"
-    },
-
-    {
-        "ID" : "asteroid",
-        "Type" : "Material",
-        "VertexShader" : "AsteroidVertex",
-        "PixelShader" : "AsteroidPixel",
-        "Textures" : [ 
-            { "Key" : "diffuseTexture", "TextureName" : "Diffuse" },
-            { "Key" : "rustTexture", "TextureName" : "Rust" },
-            { "Key" : "specMapTexture", "TextureName" : "Rust_Spec" },
-            { "Key" : "noiseTexture", "TextureName" : "RandomNoise" },
-            { "Key" : "perlinTexture", "TextureName" : "Perlin" }
-        ]
     }
 ]
