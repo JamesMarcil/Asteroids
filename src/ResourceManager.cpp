@@ -46,6 +46,12 @@ ResourceManager::~ResourceManager(void)
         ReleaseMacro(pair.second);
     }
 
+    // Release BlendStates.
+    for(auto& pair : blendStates)
+    {
+        ReleaseMacro(pair.second);
+    }
+
 	// Release Materials
 	for (auto& pair : materials)
 	{

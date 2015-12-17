@@ -1,5 +1,5 @@
-#include <ParticleGenerator.h>
-
+#include "ParticleGenerator.h"
+#include "DXMacros.h"
 
 ParticleGenerator::ParticleGenerator(Particle p, DirectX::XMFLOAT3 pos, float lt, float sr, float numRoots)
 {
@@ -65,9 +65,9 @@ ParticleGenerator::ParticleGenerator(Particle p, DirectX::XMFLOAT3 pos, float lt
 }
 
 ParticleGenerator::~ParticleGenerator() {
-	particleBuff->Release();
-	readBuff->Release();
-	writeBuff->Release();
+    ReleaseMacro(particleBuff);
+    ReleaseMacro(readBuff);
+    ReleaseMacro(writeBuff);
 }
 
 void ParticleGenerator::Update(Transform eTransform, float dt, float tt) {

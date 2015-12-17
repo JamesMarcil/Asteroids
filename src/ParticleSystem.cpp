@@ -1,6 +1,6 @@
-#include <ParticleSystem.h>
-
-#include <AttackComponent.h>
+#include "ParticleSystem.h"
+#include "AttackComponent.h"
+#include "DXMacros.h"
 
 ParticleSystem::ParticleSystem() {
 	ResourceManager*	 rManager	   = ResourceManager::Instance();
@@ -58,18 +58,12 @@ ParticleSystem::ParticleSystem() {
 	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-	D3D11_DEPTH_STENCIL_DESC depthDesc;
-	ZeroMemory(&depthDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
-	depthDesc.DepthEnable = true;
-	depthDesc.DepthFunc = D3D11_COMPARISON_LESS;
-	depthDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-
 	rManager->RegisterShaderResourceView("randomTexture", randomSRV);
 	rManager->RegisterBlendState("particleBlendState", blendDesc);
 }
 
 ParticleSystem::~ParticleSystem(void) {
-	randomTexture->Release();
+    ReleaseMacro(randomTexture);
 }
 
 void ParticleSystem::Update(EntityManager* pManager, float dt, float tt) {
