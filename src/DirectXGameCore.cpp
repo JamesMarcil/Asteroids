@@ -180,7 +180,7 @@ bool DirectXGameCore::InitMainWindow()
 	// We want the specified width and height to be the viewable client
 	// area (not counting borders), so we need to adjust for borders
 	RECT R = { 0, 0, windowWidth, windowHeight };
-	AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
+	AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME, false);
 	int realWidth  = R.right - R.left;
 	int realHeight = R.bottom - R.top;
 
@@ -188,7 +188,7 @@ bool DirectXGameCore::InitMainWindow()
 	hMainWnd = CreateWindow(
 		L"D3DWndClassName", 
 		windowCaption.c_str(), 
-		WS_OVERLAPPEDWINDOW, 
+		WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME,
 		CW_USEDEFAULT, 
 		CW_USEDEFAULT, 
 		realWidth,

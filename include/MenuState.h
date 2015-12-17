@@ -6,6 +6,8 @@
 #include "IGameState.h"
 #include "IEventListener.h"
 
+#include "GameEntity.h"
+
 // STD
 #include <string>
 
@@ -28,6 +30,8 @@ private:
     EntityManager* m_pEntity;
     ResourceManager* m_pResource;
     StateMachine<GameStates>* m_pState;
+
+    GameEntity title, button;
 
     void SpawnAsteroids(void);
     virtual void EventRouter(const std::string& event, void* pData) override;

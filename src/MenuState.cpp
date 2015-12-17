@@ -1,5 +1,8 @@
 #include "MenuState.h"
 
+// STD
+#include <cmath>
+
 // DirectX
 #include <DirectXMath.h>
 
@@ -24,6 +27,8 @@
 #include "GameStates.h"
 
 // Scripts
+#include "AABBComponent.h"
+#include "UITextComponent.h"
 #include "ScriptComponent.h"
 #include "ResetPositionScript.h"
 
@@ -72,25 +77,29 @@ void MenuState::Enter(void)
     m_pEvent->Register("PlayClicked", this);
     m_pEvent->Register("WarpBegin", this);
     m_pEvent->Register("WarpEnd", this);
+    m_pEvent->Register("OnResize", this);
     m_pEvent->Fire("WarpBegin", nullptr);
 
-    GameEntity title = EntityFactory::CreateTextField
+    float width = static_cast<float>(m_pResource->GetWindowWidth());
+    float height = static_cast<float>(m_pResource->GetWindowHeight());
+
+    title = EntityFactory::CreateTextField
         (
             L"Asteroids",
             "SpaceAge54",
-            XMFLOAT2{125.0f, 0.0f},
+            XMFLOAT2{0.15625f * width, 0.15625f * height},
             XMFLOAT4{1.0f, 1.0f, 1.0f, 1.0f}
         );
 
-    GameEntity button = EntityFactory::CreateButton
+    button = EntityFactory::CreateButton
         (
             XMFLOAT2{0.0f, 0.0f},
-            800,
-            600,
+            width,
+            height,
             "PlayClicked",
             L"Click to Play",
             "SpaceAge48",
-            XMFLOAT2{75.0f, 275.0f},
+            XMFLOAT2{0.1f * width, 0.5f * height},
             XMFLOAT4{1.0f, 1.0f, 1.0f, 1.0f}
         );
 
@@ -135,6 +144,7 @@ void MenuState::Exit(void)
     m_pEvent->UnRegister("WarpBegin", this);
     m_pEvent->UnRegister("WarpEnd", this);
     m_pEvent->UnRegister("PlayClicked", this);
+    m_pEvent->UnRegister("OnResize", this);
 }
 
 #pragma endregion
@@ -148,5 +158,29 @@ void MenuState::EventRouter(const std::string& event, void* pData)
     else if(event == "WarpEnd")
     {
         m_pEvent->Fire("WarpBegin", nullptr);
+    }
+    else if(event == "OnResize")
+    {
+        float width = static_cast<float>(m_pResource->GetWindowWidth());
+        float height = static_cast<float>(m_pResource->GetWindowHeight());
+
+        // Update the Title text.
+        {
+            UITextComponent* pText = m_pEntity->GetComponent<UITextComponent>(title);
+            XMFLOAT2& position = pText->position;
+            position.x = 0.15625f * width;
+            position.y = 0.15625f * height;
+        }
+
+        // Update the Play button.
+        {
+            AABBComponent* pAABB = m_pEntity->GetComponent<AABBComponent>(button);
+            pAABB->boundingBox = AABB{XMFLOAT2{0.5f * width, 0.5f * height}, 0.5f * width, 0.5f * height};
+
+            UITextComponent* pText = m_pEntity->GetComponent<UITextComponent>(button);
+            XMFLOAT2& position = pText->position;
+            position.x = 0.1f * width;
+            position.y = 0.5f * height;
+        }
     }
 }

@@ -36,9 +36,12 @@ GameEntity EntityFactory::CreateButton(DirectX::XMFLOAT2 center, float width, fl
     EntityManager* pEntity = EntityManager::Instance();
     ResourceManager* pResource = ResourceManager::Instance();
 
+    float halfWidth = static_cast<float>(pResource->GetWindowWidth()) / 2.0f;
+    float halfHeight = static_cast<float>(pResource->GetWindowHeight()) / 2.0f;
+
     GameEntity button = pEntity->Create("Button");
     pEntity->AddComponent<ButtonComponent>(button, true, event);
-    pEntity->AddComponent<AABBComponent>(button, XMFLOAT2{center.x + 400.0f, center.y + 300.0f}, width / 2.0f, height / 2.0f); // TODO: Replace with half window width and half window height
+    pEntity->AddComponent<AABBComponent>(button, XMFLOAT2{center.x + halfWidth, center.y + halfHeight}, width / 2.0f, height / 2.0f);
     pEntity->AddComponent<UITextComponent>(button, text, spritefont_id, position, color);
 
     return button;

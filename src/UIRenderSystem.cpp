@@ -103,9 +103,10 @@ void UIRenderSystem::Update(EntityManager* pManager, float dt, float tt )
     Camera* pCamera = m_pCamera->GetActiveCamera();
 
     // Generate Orthographic Projection matrix.
-    // TODO: Set from windowWidth/windowHeight
     XMFLOAT4X4 projection;
-    XMStoreFloat4x4(&projection, XMMatrixTranspose(XMMatrixOrthographicLH(800.0f, 600.0f, Camera::DEFAULT_NEAR_PLANE, Camera::DEFAULT_FAR_PLANE)));
+    float width = static_cast<float>(m_pResource->GetWindowWidth());
+    float height = static_cast<float>(m_pResource->GetWindowHeight());
+    XMStoreFloat4x4(&projection, XMMatrixTranspose(XMMatrixOrthographicLH(width, height, Camera::DEFAULT_NEAR_PLANE, Camera::DEFAULT_FAR_PLANE)));
 
     // Get the Vertex Shader.
     ISimpleShader* pVertex = m_pResource->GetShader("UIVertex");
@@ -166,7 +167,9 @@ void UIRenderSystem::Update(EntityManager* pManager, float dt, float tt )
         SpriteFont* pSpriteFnt = m_pResource->GetSpriteFont(pText->spritefontID);
 
         // Finally render the text.
-        pSpriteFnt->DrawString(spriteBatch, text.c_str(), position, color);
+        float width = static_cast<float>(m_pResource->GetWindowWidth());
+        float scale = (width / 800.0f);
+        pSpriteFnt->DrawString(spriteBatch, text.c_str(), position, color, 0.0f, XMFLOAT2{0.0f, 0.0f}, scale);
     }
     spriteBatch->End();
 
