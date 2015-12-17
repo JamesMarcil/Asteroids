@@ -1,23 +1,28 @@
+cbuffer GeneratorData : register(b0)
+{
+	float lifeTime;
+};
+
 struct VSInput
 {
 	float4 startColor	: COLOR0;
 	float4 midColor		: COLOR1;
 	float4 endColor		: COLOR2;
+	float  startSize	: TEXCOORD0;
+	float  midSize		: TEXCOORD1;
+	float  endSize		: TEXCOORD2;
+	float  age			: TEXCOORD3;
+	int    type			: TEXCOORD4;
 	float3 position		: POSITION;
-	float3 velocity		: TEXCOORD0;
-	float3 acceleration	: TEXCOORD1;
-	float  startSize	: TEXCOORD2;
-	float  midSize		: TEXCOORD3;
-	float  endSize		: TEXCOORD4;
-	float  age			: TEXCOORD5;
-	int    type			: TEXCOORD6;
+	float3 velocity		: TEXCOORD5;
+	float3 acceleration	: TEXCOORD6;
 };
 
 struct VStoGS {
 	float4 color	: COLOR;
 	float3 position	: POSITION;
-	float size		: TEXCOORD0;
-	int type		: TEXCOORD1;
+	float  size		: TEXCOORD0;
+	int    type		: TEXCOORD1;
 };
 
 float BezierCurve(float p0, float p1, float p2, float t) {
@@ -53,8 +58,8 @@ VStoGS main(VSInput input)
 	VStoGS output;
 
 	float t = input.age;
-	float agePercent = t / 5;
-	output.position.xyz = input.position + input.velocity;
+	float agePercent = t / lifeTime;
+	output.position.xyz = input.position + input.velocity * t + input.acceleration * t * t * 0.5f;
 	output.size  =  BezierCurve(input.startSize, input.midSize, input.endSize, agePercent);
 	output.color =  BezierCurve(input.startColor, input.midColor, input.endColor, agePercent);
 	output.type  =  input.type;

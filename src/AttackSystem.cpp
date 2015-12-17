@@ -14,13 +14,14 @@
 #include "CollisionComponent.h"
 #include <ScriptComponent.h>
 #include <AutoDestructScript.h>
+#include <ParticleComponent.h>
 
 // DirectX
 #include <DirectXMath.h>
 
 AttackSystem::AttackSystem(void)
 {
-    ResourceManager* pResource = ResourceManager::Instance();
+     ResourceManager* pResource = ResourceManager::Instance();
     projectileCollider = CollisionSphere(*pResource->GetMesh("Helix"), DirectX::XMFLOAT3(0,0,0), 0.1f);
 }
 
@@ -50,4 +51,9 @@ void AttackSystem::FireProjectile(EntityManager* pEntity)
 	pTransform->transform.Translate(0, 0, 1);
 	ScriptComponent* script = pEntity->AddComponent<ScriptComponent>(projectile);
 	script->AddScript<AutoDestructScript>(80.0f);
+
+	//projectileGenerator->position = pTransform->transform.GetTranslation();
+
+	//ParticleComponent* pParticle = pEntity->AddComponent<ParticleComponent>(projectile);
+	//pParticle->AddGenerator(projectileGenerator);
 }

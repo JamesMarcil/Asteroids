@@ -61,5 +61,5 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float4 diffuseColor = shipTexture.Sample(trilinear, input.uv);
 
 	// Calculate the final color.
-	return diffuseColor; // * (dirColor + pointColor + spotColor);
+	return diffuseColor * (dirColor + pointColor + spotColor);
 }

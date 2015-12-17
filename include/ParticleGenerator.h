@@ -4,6 +4,7 @@
 #include <d3d11.h>
 #include "Particle.h"
 #include "ResourceManager.h"
+#include "Transform.h"
 
 struct ParticleGenerator
 {
@@ -24,7 +25,7 @@ public:
 	ParticleGenerator(Particle p, DirectX::XMFLOAT3 pos, float lt, float sr, float numRoots);
 	~ParticleGenerator();
 
-	void Update(DirectX::XMFLOAT3 ePosition, float dt, float tt);
+	void Update(Transform eTransform, float dt, float tt);
 	void SwapBuffers();
 
 	ID3D11Buffer* GetParticles() { return readBuff; }

@@ -10,14 +10,14 @@ struct Particle
 	DirectX::XMFLOAT4 startColor;
 	DirectX::XMFLOAT4 midColor;
 	DirectX::XMFLOAT4 endColor;
-	DirectX::XMFLOAT3 position;
-	DirectX::XMFLOAT3 velocity;
-	DirectX::XMFLOAT3 acceleration;
 	float startSize;
 	float midSize;
 	float endSize;
 	float age;
 	int   type;
+	DirectX::XMFLOAT3 position;
+	DirectX::XMFLOAT3 velocity;
+	DirectX::XMFLOAT3 acceleration;
 
 	Particle(DirectX::XMFLOAT4 sCol,
 		DirectX::XMFLOAT4 mCol,

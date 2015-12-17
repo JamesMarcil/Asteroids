@@ -65,12 +65,12 @@ ParticleGenerator::ParticleGenerator(Particle p, DirectX::XMFLOAT3 pos, float lt
 }
 
 ParticleGenerator::~ParticleGenerator() {
-	//particleBuff->Release();
-	//readBuff->Release();
-	//writeBuff->Release();
+	particleBuff->Release();
+	readBuff->Release();
+	writeBuff->Release();
 }
 
-void ParticleGenerator::Update(DirectX::XMFLOAT3 ePosition, float dt, float tt) {
+void ParticleGenerator::Update(Transform eTransform, float dt, float tt) {
 	ResourceManager* rManager = ResourceManager::Instance();
 	ID3D11DeviceContext* deviceContext = rManager->GetDeviceContext();
 	UINT stride = sizeof(Particle);
@@ -78,10 +78,11 @@ void ParticleGenerator::Update(DirectX::XMFLOAT3 ePosition, float dt, float tt) 
 	generatorVS = dynamic_cast<SimpleVertexShader*>(rManager->GetShader("ParticleGeneratorVS"));
 	generatorGS = dynamic_cast<SimpleGeometryShader*>(rManager->GetShader("ParticleGeneratorGS"));
 
-	DirectX::XMVECTOR ePos = DirectX::XMLoadFloat3(&ePosition);
-	DirectX::XMVECTOR localPos = DirectX::XMLoadFloat3(&position);
-	DirectX::XMFLOAT3 finalPos(0, 0, 0);
-	DirectX::XMStoreFloat3(&finalPos, DirectX::XMVectorAdd(ePos, localPos));
+	DirectX::XMMATRIX translationMat = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
+	DirectX::XMMATRIX rotationMat = DirectX::XMMatrixRotationRollPitchYaw(eTransform.GetRotation().x * 2, eTransform.GetRotation().y * 2, eTransform.GetRotation().z * 2);
+	DirectX::XMFLOAT4X4 transformMat;
+	DirectX::XMStoreFloat4x4(&transformMat, DirectX::XMMatrixTranspose(translationMat * rotationMat));
+	DirectX::XMFLOAT3 finalPos = DirectX::XMFLOAT3(eTransform.GetTranslation().x + transformMat._14, eTransform.GetTranslation().y + transformMat._24, eTransform.GetTranslation().z + transformMat._34);
 
 	// Set constant variables
 	generatorGS->SetFloat("dt", dt);

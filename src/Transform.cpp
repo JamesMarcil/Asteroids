@@ -113,6 +113,7 @@ XMFLOAT4X4 Transform::GetWorldMatrix()
     // Return the final result
     XMFLOAT4X4 result;
     XMStoreFloat4x4(&result, XMMatrixTranspose(XMMatrixAffineTransformation(scalingVector, rotationAxis, rotationQuaternion, translationVector)));
+	printf("");
     return result;
 }
 

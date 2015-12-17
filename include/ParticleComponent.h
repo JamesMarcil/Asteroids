@@ -12,10 +12,10 @@ private:
 public:
 	virtual ~ParticleComponent() override
 	{
-		/*for (ParticleGenerator* pGen : generators) {
+		for (ParticleGenerator* pGen : generators) {
 			delete pGen;
 			pGen = 0;
-		}*/
+		}
 	}
 
 	std::vector<ParticleGenerator*> GetGenerators() {

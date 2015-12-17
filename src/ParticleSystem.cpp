@@ -1,5 +1,7 @@
 #include <ParticleSystem.h>
 
+#include <AttackComponent.h>
+
 ParticleSystem::ParticleSystem() {
 	ResourceManager*	 rManager	   = ResourceManager::Instance();
 	ID3D11Device*		 device		   = rManager->GetDevice();
@@ -66,6 +68,10 @@ ParticleSystem::ParticleSystem() {
 	rManager->RegisterBlendState("particleBlendState", blendDesc);
 }
 
+ParticleSystem::~ParticleSystem(void) {
+	randomTexture->Release();
+}
+
 void ParticleSystem::Update(EntityManager* pManager, float dt, float tt) {
 	ResourceManager*		 rManager = ResourceManager::Instance();
 	Camera*					 mainCamera = CameraManager::Instance()->GetActiveCamera();
@@ -82,15 +88,21 @@ void ParticleSystem::Update(EntityManager* pManager, float dt, float tt) {
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
 	for (auto& gE : entitiesWithParticleComponents) {
-		entityPosition = pManager->GetComponent<TransformComponent>(gE)->transform.GetTranslation();
+		Transform entityTransform = pManager->GetComponent<TransformComponent>(gE)->transform;
 
 		for (ParticleGenerator* pGen : pManager->GetComponent<ParticleComponent>(gE)->GetGenerators()) {
-			pGen->Update(entityPosition, dt, tt);
+			pGen->Update(entityTransform, dt, tt);
 		}
 
 		deviceContext->OMSetBlendState(particleBlendState, factor, 0xffffffff);
 
+		DirectX::XMFLOAT4X4 rotation = pManager->GetComponent<TransformComponent>(pManager->EntitiesWithComponents<AttackComponent>()[0])->transform.GetWorldMatrix();
+		rotation._11 = 1.0f;
+		rotation._22 = 1.0f;
+		rotation._33 = 1.0f;
+
 		for (ParticleGenerator* pGen : pManager->GetComponent<ParticleComponent>(gE)->GetGenerators()) {
+			particleVS->SetFloat("lifeTime", pGen->lifeTime);
 			particleGS->SetMatrix4x4("world", DirectX::XMFLOAT4X4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
 			particleGS->SetMatrix4x4("view", mainCamera->GetViewMatrix());
 			particleGS->SetMatrix4x4("projection", mainCamera->GetProjectionMatrix());

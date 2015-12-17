@@ -19,14 +19,14 @@ struct GSInput
 	float4 startColor	: COLOR0;
 	float4 midColor		: COLOR1;
 	float4 endColor		: COLOR2;
+	float  startSize	: TEXCOORD0;
+	float  midSize		: TEXCOORD1;
+	float  endSize		: TEXCOORD2;
+	float  age			: TEXCOORD3;
+	int    type			: TEXCOORD4;
 	float3 position		: POSITION;
-	float3 velocity		: TEXCOORD0;
-	float3 acceleration	: TEXCOORD1;
-	float  startSize	: TEXCOORD2;
-	float  midSize		: TEXCOORD3;
-	float  endSize		: TEXCOORD4;
-	float  age			: TEXCOORD5;
-	int    type			: TEXCOORD6;
+	float3 velocity		: TEXCOORD5;
+	float3 acceleration	: TEXCOORD6;
 };
 
 texture1D randomTexture : register(t0);
@@ -60,8 +60,8 @@ void main(point GSInput input[1],
 			// Random offsets
 			float4 random = randomTexture.SampleLevel(randomSampler, tt * 10, 0);
 			newParticle.position.xy += random.xy * 0.05f;
-			newParticle.velocity.x = 0;
-			newParticle.velocity.y = 0;
+			newParticle.velocity.x = random.x;
+			newParticle.velocity.y = random.y;
 			newParticle.velocity.z = input[0].velocity.z;
 
 			outStream.Append(newParticle);

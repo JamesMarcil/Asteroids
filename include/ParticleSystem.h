@@ -21,6 +21,7 @@ public:
 	ID3D11ShaderResourceView* randomSRV;
 
 	ParticleSystem(void);
+	~ParticleSystem(void);
 
 	virtual void Update(EntityManager* p, float dt, float tt) override;
 };
