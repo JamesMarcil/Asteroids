@@ -200,7 +200,35 @@
         "Stage" : "Pixel",
         "Filename" : "AsteroidPixelShader.cso"
     },
+	
+	{
+        "ID" : "ParticleVS",
+        "Type" : "Shader",
+        "Stage" : "Vertex",
+        "Filename" : "ParticleVS.cso"
+    },
+	
+	{
+        "ID" : "ParticleGS",
+        "Type" : "Shader",
+        "Stage" : "Geometry",
+        "Filename" : "ParticleGS.cso"
+    },
 
+	{
+        "ID" : "ParticlePS",
+        "Type" : "Shader",
+        "Stage" : "Pixel",
+        "Filename" : "ParticlePS.cso"
+    },
+	
+	{
+        "ID" : "ParticleGeneratorVS",
+        "Type" : "Shader",
+        "Stage" : "Vertex",
+        "Filename" : "ParticleGeneratorVS.cso"
+    },
+	
     {
         "ID" : "default",
         "Type" : "Material",
@@ -221,6 +249,14 @@
             { "Key" : "shipTexture", "TextureName" : "Ship" },
             { "Key" : "shipSpecMap", "TextureName" : "Ship_Spec" }
         ]
+    },
+	
+	{
+        "ID" : "collider",
+        "Type" : "Material",
+        "VertexShader" : "StandardVertex",
+        "PixelShader" : "ColliderPixel",
+        "Textures" : []
     },
 
     {

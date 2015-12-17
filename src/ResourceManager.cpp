@@ -190,6 +190,15 @@ ID3D11DepthStencilState*    ResourceManager::GetDepthStencilState(const std::str
     return iter->second;
 }
 
+ID3D11BlendState* ResourceManager::GetBlendState(const std::string& id) {
+	auto& iter = blendStates.find(id);
+	if (iter == blendStates.cend())
+	{
+		return nullptr;
+	}
+	return iter->second;
+}
+
 Material* ResourceManager::GetMaterial(const std::string& id)
 {
 	auto& iter = materials.find(id);
@@ -357,6 +366,28 @@ bool ResourceManager::RegisterDepthStencilState(const std::string& id, D3D11_DEP
 }
 
 /*
+* Register an ID3D11BlendState with the ResourceManager.
+* @param       id                  The id to store the ID3D11BlendState at.
+* @param       blendDesc			The description used to instantiate the ID3D11BlendState.
+* @return A boolean indicating if the operation was successful.
+*/
+bool ResourceManager::RegisterBlendState(const std::string& id, D3D11_BLEND_DESC blendDesc) {
+	if (!device || !deviceContext) {
+		return false;
+	}
+
+	if (blendStates.find(id) != blendStates.cend()) {
+		return false;
+	}
+	
+	ID3D11BlendState* blendState;
+	HR(device->CreateBlendState(&blendDesc, &blendState));
+	blendStates.emplace(id, blendState);
+
+	return true;
+}
+
+/*
  * TODO
  */
 bool ResourceManager::RegisterSpriteFont(const std::string& id, const std::wstring& filename)
@@ -425,6 +456,10 @@ void ResourceManager::ParseShader(json obj, json parent)
     {
         RegisterShader<SimplePixelShader>(id, std::wstring(filename.begin(), filename.end()).c_str());
     }
+	else if (stage == "Geometry")
+	{
+		RegisterShader<SimpleGeometryShader>(id, std::wstring(filename.begin(), filename.end()).c_str());
+	}
 }
 
 void ResourceManager::ParseMaterial(json obj, json parent)

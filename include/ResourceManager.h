@@ -30,6 +30,7 @@ private:
 	std::unordered_map<std::string, ID3D11SamplerState*> samplers;
 	std::unordered_map<std::string, ID3D11RasterizerState*> rasterizers;
 	std::unordered_map<std::string, ID3D11DepthStencilState*> depthStencils;
+	std::unordered_map<std::string, ID3D11BlendState*> blendStates;
 	std::unordered_map<std::string, Material*> materials;
 	std::unordered_map<std::string, ID3D11RenderTargetView*> renderTargetViews;
 	std::unordered_map<std::string, DirectX::SpriteFont*> spritefonts;
@@ -76,6 +77,7 @@ public:
 	ID3D11SamplerState*             GetSamplerState(const std::string& id);
     ID3D11RasterizerState*          GetRasterizerState(const std::string& id);
     ID3D11DepthStencilState*        GetDepthStencilState(const std::string& id);
+	ID3D11BlendState*				GetBlendState(const std::string& id);
     DirectX::SpriteFont*            GetSpriteFont(const std::string& id);
     ID3D11Device*                   GetDevice() { return this->device; }
 	ID3D11DeviceContext*            GetDeviceContext() { return this->deviceContext; }
@@ -191,6 +193,39 @@ public:
         return true;
     }
 
+	/*
+	* Register an ISimpleShader* with the ResourceManager.
+	* @param       id          The id to store the ISimpleShader* at.
+	* @param       filename    The filename of the compiled shader object.
+	* @return  A bool indicating if the operation was successful.
+	*/
+	template <typename T>
+	bool RegisterShader(const std::string& id, LPCWSTR filename, SimpleGeometryShader* gShader)
+	{
+		static_assert(std::is_base_of<ISimpleShader, T>::value, "Must be an instance of ISimpleShader!");
+
+		// Bail if there is not a registered ID3D11Device or ID3D11DeviceContext
+		if (!device || !deviceContext)
+		{
+			return false;
+		}
+
+		// Bail if there is already an ISimpleShader stored at that id
+		if (shaders.find(id) != shaders.cend())
+		{
+			return false;
+		}
+
+		// Create the ISimpleShader
+		{
+			gShader->LoadShaderFile(filename);
+
+			shaders.emplace(id, gShader);
+		}
+
+		return true;
+	}
+
     /*
      * Register a DirectX::Spritefont with the ResourceManager.
      * @param   id          The id to store the DirectX::SpriteFont at.
@@ -215,7 +250,8 @@ public:
 	bool RegisterSamplerState(const std::string& id, D3D11_SAMPLER_DESC samplerDesc);
 
     /*
-     * Register an ID3D11RasterizerState with the ResourceManager.
+     * Register an ID3D11
+	 State with the ResourceManager.
      * @param       id                  The id to store the ID3D11RasterizerState* at.
      * @param       rasterizerDesc      The description used to instantiate the ID3D11RasterizerState.
      * @return A boolean indicating if the operation was successful.
@@ -229,6 +265,14 @@ public:
      * @return A boolean indicating if the operation was successful.
      */
     bool RegisterDepthStencilState(const std::string& id, D3D11_DEPTH_STENCIL_DESC depthStencilDesc);
+
+	/*
+	* Register an ID3D11BlendState with the ResourceManager.
+	* @param       id                  The id to store the ID3D11BlendState at.
+	* @param       blendDesc			The description used to instantiate the ID3D11BlendState.
+	* @return A boolean indicating if the operation was successful.
+	*/
+	bool RegisterBlendState(const std::string& id, D3D11_BLEND_DESC blendDesc);
 
 	/*
 	* Register a material with the ResourceManager

@@ -888,8 +888,9 @@ bool SimpleGeometryShader::CreateShaderWithStreamOut(ID3DBlob* shaderBlob)
 bool SimpleGeometryShader::CreateCompatibleStreamOutBuffer(ID3D11Buffer** buffer, int vertexCount)
 {
 	// Was stream output actually used?
-	if (!this->useStreamOut || !shaderValid || streamOutVertexSize == 0)
+	if (!this->useStreamOut || !shaderValid || streamOutVertexSize == 0) {
 		return false;
+	}
 
 	// Set up the buffer description
 	D3D11_BUFFER_DESC desc;

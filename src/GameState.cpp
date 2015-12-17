@@ -32,6 +32,7 @@
 #include "UIUpdateSystem.h"
 #include "CollisionSystem.h"
 #include "AttackSystem.h"
+#include <ParticleSystem.h>
 
 // Scripts
 #include "ScriptComponent.h"
@@ -69,12 +70,13 @@ void GameState::Enter(void)
         pEntity->AddSystemWithPriority<UIUpdateSystem, 3>();
         pEntity->AddSystemWithPriority<ClearSystem, 4>();
         pEntity->AddSystemWithPriority<RenderSystem, 5>();
-        pEntity->AddSystemWithPriority<SkyboxSystem, 6>();
-		pEntity->AddSystemWithPriority<PostEffectsSystem, 7>();
-        pEntity->AddSystemWithPriority<UIRenderSystem, 8>();
-		pEntity->AddSystemWithPriority<SwapSystem, 9>();
-		pEntity->AddSystemWithPriority<ScriptSystem, 10>();
-		pEntity->AddSystemWithPriority<AttackSystem, 11>();
+		pEntity->AddSystemWithPriority<ParticleSystem, 6>();
+        pEntity->AddSystemWithPriority<SkyboxSystem, 7>();
+		pEntity->AddSystemWithPriority<PostEffectsSystem, 8>();
+        pEntity->AddSystemWithPriority<UIRenderSystem, 9>();
+		pEntity->AddSystemWithPriority<SwapSystem, 10>();
+		pEntity->AddSystemWithPriority<ScriptSystem, 11>();
+		pEntity->AddSystemWithPriority<AttackSystem, 12>();
 
         // Make a SpotLight
         GameEntity spotlight = EntityFactory::CreateSpotlight

@@ -25,7 +25,7 @@ void CollisionSystem::Update(EntityManager* pManager, float dt, float tt)
 	}
 
 	// Create our oct tree if we havent already
-	if (!octTree) octTree = new OctTree(3);
+	if (!octTree) octTree = new OctTree(4);
 
 	octTree->Update(pManager, collidables);
 	std::vector<std::vector<GameEntity>> partitionedEntities = octTree->GetPartitionedEntities();

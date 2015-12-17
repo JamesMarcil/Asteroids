@@ -17,6 +17,7 @@
 #include "CollisionComponent.h"
 #include "AttackComponent.h"
 #include "AsteroidRenderComponent.h"
+#include <ParticleComponent.h>
 
 using namespace DirectX;
 
@@ -53,7 +54,7 @@ GameEntity EntityFactory::CreateAsteroid(DirectX::XMFLOAT3 position, DirectX::XM
     ResourceManager* pResource = ResourceManager::Instance();
 
     GameEntity asteroid = pEntity->Create("Asteroid");
-    pEntity->AddComponent<CollisionComponent>(asteroid, 0.55f*scale, position);
+    pEntity->AddComponent<CollisionComponent>(asteroid, 0.95f*scale, position);
     pEntity->AddComponent<AsteroidRenderComponent>(asteroid, id);
     pEntity->AddComponent<RenderComponent>(asteroid, pResource->GetMaterial("asteroid"), pResource->GetMesh("Sphere"));
     pEntity->AddComponent<PhysicsComponent>(asteroid, velocity, acceleration);
@@ -67,7 +68,7 @@ GameEntity EntityFactory::CreateAsteroid(DirectX::XMFLOAT3 position, DirectX::XM
 GameEntity EntityFactory::CreatePlayer(DirectX::XMFLOAT3 position)
 {
     EntityManager* pEntity = EntityManager::Instance();
-    ResourceManager* pResource = ResourceManager::Instance();
+	ResourceManager* pResource = ResourceManager::Instance();
 
     GameEntity player = pEntity->Create("Player");
     pEntity->AddComponent<RenderComponent>(player, pResource->GetMaterial("ship"), pResource->GetMesh("Ship"));
@@ -88,6 +89,34 @@ GameEntity EntityFactory::CreatePlayer(DirectX::XMFLOAT3 position)
 
 	pTrans->transform.AddChild(&eTrans->transform);
 
+	// Particles
+	Particle p(XMFLOAT4(1, 0, 0, 1),
+			   XMFLOAT4(1, 1, 0.1f, 0.8f),
+			   XMFLOAT4(1, 0.5f, 0.1f, 0.9f),
+			   XMFLOAT3(0, 0, -0.9),
+			   XMFLOAT3(0, 0, -0.3),
+			   XMFLOAT3(0, 0, 0),
+			   0.9f,
+			   0.4f,
+			   0.1f,
+			   0.0f,
+			   0);
+
+	ParticleGenerator* pGML = new ParticleGenerator(p, XMFLOAT3( 0.0f,  -0.16f, -1.05f), 0.08f, 0.00001, 10);
+	ParticleGenerator* pGMU = new ParticleGenerator(p, XMFLOAT3( 0.0f,  +0.04f, -1.05f), 0.08f, 0.00001, 10);
+	ParticleGenerator* pGRU = new ParticleGenerator(p, XMFLOAT3(+0.33f, +0.04f, -1.05f), 0.08f, 0.00001, 10);
+	ParticleGenerator* pGLU = new ParticleGenerator(p, XMFLOAT3(-0.33f, +0.04f, -1.05f), 0.08f, 0.00001, 10);
+	ParticleGenerator* pGRL = new ParticleGenerator(p, XMFLOAT3(+0.35f, -0.16f, -1.05f), 0.08f, 0.00001, 10);
+	ParticleGenerator* pGLL = new ParticleGenerator(p, XMFLOAT3(-0.35f, -0.16f, -1.05f), 0.08f, 0.00001, 10);
+
+
+	ParticleComponent* pParticles = pEntity->AddComponent<ParticleComponent>(player);
+	pParticles->AddGenerator(pGML);
+	pParticles->AddGenerator(pGMU);
+	pParticles->AddGenerator(pGRU);
+	pParticles->AddGenerator(pGLU);
+	pParticles->AddGenerator(pGRL);
+	pParticles->AddGenerator(pGLL);
     return player;
 }
 
