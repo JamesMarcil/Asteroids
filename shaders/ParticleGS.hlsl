@@ -9,8 +9,8 @@ struct GSInput
 {
 	float4 color	: COLOR;
 	float3 position	: POSITION;
-	float size		: TEXCOORD0;
-	int type		: TEXCOORD1;
+	float  size		: TEXCOORD0;
+	int    type		: TEXCOORD1;
 };
 
 struct GStoPS
@@ -42,7 +42,7 @@ void main(point GSInput input[1],
 
 		float depthChange = output.position.z / output.position.w;
 
-		output.position.xy += offsets[i] * depthChange * input[0].size * 20;
+		output.position.xy += offsets[i] * depthChange * input[0].size;
 		output.color = input[0].color;
 
 		outStream.Append(output);

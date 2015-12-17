@@ -86,23 +86,23 @@ GameEntity EntityFactory::CreatePlayer(DirectX::XMFLOAT3 position)
 
 	// Particles
 	Particle p(XMFLOAT4(1, 0, 0, 1),
-			   XMFLOAT4(1, 0, 0, 1),
-			   XMFLOAT4(1, 0, 0, 1),
+			   XMFLOAT4(1, 1, 0.1f, 0.1f),
+			   XMFLOAT4(1, 0.5f, 0.1f, 0),
 			   XMFLOAT3(0, 0, 0),
-			   XMFLOAT3(0, 0.0f, 1.0f),
-			   XMFLOAT3(0, 0.0f, 1.0f),
+			   XMFLOAT3(0, 0, 0),
+			   XMFLOAT3(0, 0, 0),
 			   1.0f,
-			   0.0f,
-			   0.04f,
+			   3.0f,
+			   2.0f,
 			   0.0f,
 			   0);
 
-	ParticleGenerator* pGML = new ParticleGenerator(p, XMFLOAT3( 0.0f, -0.15f, -1.0f), 0.5f, 0.00001, 10);
-	ParticleGenerator* pGMU = new ParticleGenerator(p, XMFLOAT3( 0.0f, +0.05f, -1.0f), 0.5f, 0.00001, 10);
-	ParticleGenerator* pGRU = new ParticleGenerator(p, XMFLOAT3(+0.3f, +0.05f, -1.0f), 0.5f, 0.00001, 10);
-	ParticleGenerator* pGLU = new ParticleGenerator(p, XMFLOAT3(-0.3f, +0.05f, -1.0f), 0.5f, 0.00001, 10);
-	ParticleGenerator* pGRL = new ParticleGenerator(p, XMFLOAT3(+0.3f, -0.15f, -1.0f), 0.5f, 0.00001, 10);
-	ParticleGenerator* pGLL = new ParticleGenerator(p, XMFLOAT3(-0.3f, -0.15f, -1.0f), 0.5f, 0.00001, 10);
+	ParticleGenerator* pGML = new ParticleGenerator(p, XMFLOAT3( 0.0f,  -0.02f, -1.0f), 5.0f, 0.001, 10);
+	ParticleGenerator* pGMU = new ParticleGenerator(p, XMFLOAT3( 0.0f,  +0.05f, -1.0f), 5.0f, 0.001, 10);
+	ParticleGenerator* pGRU = new ParticleGenerator(p, XMFLOAT3(+0.33f, +0.05f, -1.0f), 5.0f, 0.001, 10);
+	ParticleGenerator* pGLU = new ParticleGenerator(p, XMFLOAT3(-0.33f, +0.05f, -1.0f), 5.0f, 0.001, 10);
+	ParticleGenerator* pGRL = new ParticleGenerator(p, XMFLOAT3(+0.33f, -0.15f, -1.0f), 5.0f, 0.001, 10);
+	ParticleGenerator* pGLL = new ParticleGenerator(p, XMFLOAT3(-0.33f, -0.15f, -1.0f), 5.0f, 0.001, 10);
 
 
 	ParticleComponent* pParticles = pEntity->AddComponent<ParticleComponent>(player);

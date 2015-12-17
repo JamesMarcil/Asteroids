@@ -23,11 +23,7 @@ ParticleGenerator::ParticleGenerator(Particle p, DirectX::XMFLOAT3 pos, float lt
 	// Create initial ROOT vertex buffer
 	UINT stride = sizeof(Particle);
 	UINT offset = 0;
-	Particle* vertices = (Particle*)malloc(sizeof(Particle) * numRoots);
-
-	for (int i = 0; i < numRoots; i++) {
-		vertices[i] = p;
-	}
+	Particle vertices[] = { p };
 
 	D3D11_BUFFER_DESC vbd;
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
@@ -90,9 +86,9 @@ void ParticleGenerator::Update(DirectX::XMFLOAT3 ePosition, float dt, float tt) 
 	// Set constant variables
 	generatorGS->SetFloat("dt", dt);
 	generatorGS->SetFloat("tt", tt);
-	generatorGS->SetFloat("lifeTime", lifeTime);
-	generatorGS->SetFloat("spawnRate", spawnRate);
 	generatorGS->SetFloat3("generatorPos", finalPos);
+	generatorGS->SetFloat("spawnRate", spawnRate);
+	generatorGS->SetFloat("lifeTime", lifeTime);
 	generatorGS->SetSamplerState("randomSampler", rManager->GetSamplerState("trilinear"));
 	generatorGS->SetShaderResourceView("randomTexture", rManager->GetTexture("randomTexture"));
 

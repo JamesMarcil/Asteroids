@@ -11,6 +11,7 @@ cbuffer GeneratorData : register(b1)
 {
 	float3 generatorPos;
 	float  spawnRate;
+	float  lifeTime;
 };
 
 struct GSInput
@@ -21,10 +22,10 @@ struct GSInput
 	float3 position		: POSITION;
 	float3 velocity		: TEXCOORD0;
 	float3 acceleration	: TEXCOORD1;
-	float  size			: TEXCOORD2;
-	float  age			: TEXCOORD3;
-	float  lifeTime		: TEXCOORD4;
-	float  startTime	: TEXCOORD5;
+	float  startSize	: TEXCOORD2;
+	float  midSize		: TEXCOORD3;
+	float  endSize		: TEXCOORD4;
+	float  age			: TEXCOORD5;
 	int    type			: TEXCOORD6;
 };
 
@@ -50,10 +51,10 @@ void main(point GSInput input[1],
 			newParticle.position		= generatorPos;
 			newParticle.velocity		= input[0].velocity;
 			newParticle.acceleration	= input[0].acceleration;
-			newParticle.size			= input[0].size;
-			newParticle.age				= 0;
-			newParticle.lifeTime		= input[0].lifeTime;
-			newParticle.startTime		= tt;
+			newParticle.startSize		= input[0].startSize;
+			newParticle.midSize			= input[0].midSize;
+			newParticle.endSize			= input[0].endSize;
+			newParticle.age				= 0.0f;
 			newParticle.type			= STANDARD;
 
 			// Random offsets
@@ -68,7 +69,7 @@ void main(point GSInput input[1],
 
 		outStream.Append(input[0]);
 	}
-	else if (input[0].age < input[0].lifeTime) {
+	else if (input[0].age < lifeTime) {
 		outStream.Append(input[0]);
 	}
 }

@@ -6,10 +6,10 @@ struct VStoGS
 	float3 position		: POSITION;
 	float3 velocity		: TEXCOORD0;
 	float3 acceleration	: TEXCOORD1;
-	float  size			: TEXCOORD2;
-	float  age			: TEXCOORD3;
-	float  lifeTime		: TEXCOORD4;
-	float  startTime	: TEXCOORD5;
+	float  startSize	: TEXCOORD2;
+	float  midSize		: TEXCOORD3;
+	float  endSize		: TEXCOORD4;
+	float  age			: TEXCOORD5;
 	int    type			: TEXCOORD6;
 };
 

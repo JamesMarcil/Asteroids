@@ -101,9 +101,10 @@ void ParticleSystem::Update(EntityManager* pManager, float dt, float tt) {
 
 			deviceContext->IASetVertexBuffers(0, 1, &pGen->readBuff, &particleStride, &particleOffset);
 			deviceContext->DrawAuto();
+
+			deviceContext->GSSetShader(0, 0, 0);
 		}
 
 		deviceContext->OMSetBlendState(0, factor, 0xffffffff);
-		deviceContext->GSSetShader(0, 0, 0);
 	}
 }

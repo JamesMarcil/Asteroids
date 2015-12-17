@@ -13,11 +13,11 @@ struct Particle
 	DirectX::XMFLOAT3 position;
 	DirectX::XMFLOAT3 velocity;
 	DirectX::XMFLOAT3 acceleration;
-	float size;
+	float startSize;
+	float midSize;
+	float endSize;
 	float age;
-	float lifeTime;
-	float startTime;
-	int type;
+	int   type;
 
 	Particle(DirectX::XMFLOAT4 sCol,
 		DirectX::XMFLOAT4 mCol,
@@ -25,12 +25,12 @@ struct Particle
 		DirectX::XMFLOAT3 pos,
 		DirectX::XMFLOAT3 vel,
 		DirectX::XMFLOAT3 accel,
-		float s,
+		float sSize,
+		float mSize,
+		float eSize,
 		float a,
-		float lt,
-		float st,
-		int t)
-		: startColor(sCol), midColor(mCol), endColor(eCol), position(pos), velocity(vel), acceleration(accel), size(s), age(a), lifeTime(lt), startTime(st), type(t)
+		int   t)
+		: startColor(sCol), midColor(mCol), endColor(eCol), position(pos), velocity(vel), acceleration(accel), startSize(sSize), midSize(mSize), endSize(eSize), age(a), type(t)
 	{
 	}
 };
