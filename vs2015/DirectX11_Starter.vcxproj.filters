@@ -198,6 +198,9 @@
     <ClInclude Include="..\include\Warp.h">
       <Filter>Header Files\Effects</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\Refraction.h">
+      <Filter>Header Files\Effects</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\ImageEffect.h">
       <Filter>Header Files\Effects</Filter>
     </ClInclude>
@@ -347,6 +350,9 @@
     <ClCompile Include="..\src\Warp.cpp">
       <Filter>Source Files\Effects</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Refraction.cpp">
+      <Filter>Source Files\Effects</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\NoEffect.cpp">
       <Filter>Source Files\Effects</Filter>
     </ClCompile>
@@ -397,6 +403,9 @@
     <FxCompile Include="..\shaders\ColliderPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="..\shaders\ThrusterPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
     <FxCompile Include="..\shaders\BlurPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
@@ -419,6 +428,9 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="..\shaders\AsteroidPixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\shaders\Refraction.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
